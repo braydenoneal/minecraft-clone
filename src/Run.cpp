@@ -12,7 +12,6 @@ int main() {
         WindowContext::handle_events();
         input.do_actions();
         renderer.render();
-        game_context.model_angle += 0.01f;
         draw.draw();
         gui_context.render();
         window_context.swap_buffers();
