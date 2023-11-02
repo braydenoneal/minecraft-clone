@@ -8,7 +8,14 @@ public:
         game_context = input_game_context;
     }
 
-    static void render() {
+    static void draw(const VertexArray &vertex_array, const IndexBuffer &index_buffer, const Shader &shader) {
+        shader.bind();
+        vertex_array.bind();
+        index_buffer.bind();
+        glDrawElements(GL_TRIANGLES, index_buffer.get_count(), GL_UNSIGNED_INT, nullptr);
+    };
+
+    void render() {
         clear();
     }
 

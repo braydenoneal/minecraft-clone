@@ -1,8 +1,9 @@
 class WindowContext {
 public:
     GLFWwindow *window;
-    unsigned int window_width{1920};
-    unsigned int window_height{1080};
+    int window_width{1920};
+    int window_height{1080};
+    float field_of_view{70};
 
     WindowContext() {
         glfwInit();
@@ -22,6 +23,10 @@ public:
 
     [[nodiscard]] int window_should_close() const {
         return glfwWindowShouldClose(window);
+    }
+
+    [[nodiscard]] float get_aspect_ratio() const {
+        return (float) window_width / (float) window_height;
     }
 
     void swap_buffers() const {
