@@ -1,6 +1,8 @@
 class WindowContext {
 public:
     GLFWwindow *window;
+    unsigned int window_width{1920};
+    unsigned int window_height{1080};
 
     WindowContext() {
         glfwInit();
@@ -9,7 +11,7 @@ public:
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-        window = glfwCreateWindow(1920, 1080, "Test", nullptr, nullptr);
+        window = glfwCreateWindow(window_width, window_height, "Test", nullptr, nullptr);
 
         glfwMakeContextCurrent(window);
 

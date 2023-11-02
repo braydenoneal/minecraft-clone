@@ -1,0 +1,4 @@
+class GameContext {
+public:
+
+};

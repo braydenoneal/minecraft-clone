@@ -1,8 +1,14 @@
 class GuiContext {
 public:
-    static void init(WindowContext window_context) {
+    WindowContext *window_context;
+    GameContext *game_context;
+
+    GuiContext(WindowContext *input_window_context, GameContext *input_game_context) {
+        window_context = input_window_context;
+        game_context = input_game_context;
+
         ImGui::CreateContext();
-        ImGui_ImplGlfw_InitForOpenGL(window_context.window, true);
+        ImGui_ImplGlfw_InitForOpenGL(window_context->window, true);
         ImGui_ImplOpenGL3_Init("#version 330 core");
         ImGui::StyleColorsDark();
     }

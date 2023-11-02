@@ -2,8 +2,10 @@
 
 int main() {
     WindowContext window_context;
-
-    GuiContext::init(window_context);
+    GameContext game_context;
+    Input input(&window_context, &game_context);
+    GuiContext gui_context(&window_context, &game_context);
+    Renderer renderer(&window_context, &game_context);
 
     while(!window_context.window_should_close()) {
         WindowContext::handle_events();

@@ -5,5 +5,7 @@
 #include <backends/imgui_impl_opengl3.h>
 
 #include "WindowContext.h"
+#include "GameContext.h"
+#include "Input.h"
 #include "GuiContext.h"
 #include "Renderer.h"
