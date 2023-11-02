@@ -7,6 +7,7 @@
 
 #include "WindowContext.h"
 #include "GameContext.h"
+#include "renderer/transform/Transform.h"
 #include "Action.h"
 #include "Input.h"
 #include "GuiContext.h"
@@ -17,5 +18,4 @@
 #include "renderer/textures/Texture.h"
 #include "renderer/Renderer.h"
 #include "renderer/models/Cube.h"
-#include "renderer/transform/Transform.h"
 #include "renderer/Draw.h"
