@@ -25,7 +25,7 @@ namespace Transform {
     }
 
     glm::mat4 perspective_transformation(float field_of_view, float aspect_ratio, float near_plane_distance, float far_plane_distance) {
-        return glm::perspective(field_of_view, aspect_ratio, near_plane_distance, far_plane_distance);
+        return glm::perspective(glm::radians(field_of_view), aspect_ratio, near_plane_distance, far_plane_distance);
     }
 
     glm::vec3 translate_in_direction_by_amount(glm::vec3 position, float angle, glm::vec3 amount) {
