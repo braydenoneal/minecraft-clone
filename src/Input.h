@@ -61,7 +61,7 @@ public:
             }
         }
 
-        game_context->model_angle += 0.01f;
+//        game_context->model_angle += 0.01f;
 
         if (!game_context->paused) {
             game_context->camera_angle.y = M_PI * ((float) game_context->camera_cursor_x / (float) window_context->window_height);
