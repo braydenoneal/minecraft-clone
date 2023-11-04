@@ -7,7 +7,7 @@ int main() {
     GuiContext gui_context(&window_context, &game_context);
     Renderer renderer(&window_context, &game_context);
 
-    int quad_count = 6 * 16 * 16;
+    int quad_count = 6 * Chunk::size * Chunk::size;
 
     Cube cube(quad_count, &Chunk::flat_chunk_positions()[0], &Chunk::flat_chunk_indices()[0]);
     Draw draw(&window_context, &game_context, &cube);

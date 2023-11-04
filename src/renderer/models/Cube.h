@@ -1,58 +1,13 @@
+#include <glm/gtc/noise.hpp>
+
 class Cube {
 public:
-    float positions[1 * 5 * 7 * 6] = {
-            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.6f,
-            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f,  0.6f,
-             0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.6f,
-             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.6f,
-             0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.6f,
-
-             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.6f,
-             0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  0.0f,  0.6f,
-            -0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.6f,
-            -0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.6f,
-            -0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.6f,
-
-            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.8f,
-            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  0.0f,  0.8f,
-            -0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.8f,
-            -0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.8f,
-            -0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.8f,
-
-             0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.8f,
-             0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f,  0.8f,
-             0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.8f,
-             0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.8f,
-             0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.8f,
-
-            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  1.0f,  1.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f,  0.0f,  1.0f,  1.0f,
-             0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  1.0f,  1.0f,
-             0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  1.0f,  1.0f,
-             0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  1.0f,  1.0f,
-
-             0.5f, -0.5f,  0.5f,  0.0f,  1.0f,  2.0f,  0.4f,
-             0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  2.0f,  0.4f,
-            -0.5f, -0.5f,  0.5f,  1.0f,  1.0f,  2.0f,  0.4f,
-            -0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  2.0f,  0.4f,
-            -0.5f, -0.5f,  0.5f,  1.0f,  1.0f,  2.0f,  0.4f,
-    };
-
-    unsigned int indices[1 * 6 * 6] = {
-            0, 1, 2, 3, 4, 1,
-            5, 6, 7, 8, 9, 6,
-            10, 11, 12, 13, 14, 11,
-            15, 16, 17, 18, 19, 16,
-            20, 21, 22, 23, 24, 21,
-            25, 26, 27, 28, 29, 26
-    };
-
     std::vector<std::string> texture_paths = {"../res/textures/grass_block_side.png", "../res/textures/grass_block_top.png", "../res/textures/dirt.png"};
 
     VertexArray va = VertexArray();
     VertexBufferLayout layout = VertexBufferLayout();
-    VertexBuffer vb; // = VertexBuffer(positions, 1 * 5 * 7 * sizeof(float));
-    IndexBuffer ib; // = IndexBuffer(indices, 1 * 6);
+    VertexBuffer vb;
+    IndexBuffer ib;
     Shader shader = Shader("../res/shaders/Basic.glsl");
     Texture textures = Texture(texture_paths);
 
@@ -83,19 +38,59 @@ public:
         glm::mat4 model_rotate = Transform::rotate(model_angle);
 
         shader.bind();
-//        shader.set_uniform_matrix_4fv("u_cr", camera_rotate);
-//        shader.set_uniform_matrix_4fv("u_ct", camera_translate);
-//        shader.set_uniform_matrix_4fv("u_mr", model_rotate);
-//        shader.set_uniform_matrix_4fv("u_p", perspective);
         shader.set_uniform_matrix_4fv("u_all", perspective * camera_rotate * camera_translate);
 
         for (unsigned int i = 0; i < count; i++) {
             for (unsigned int j = 0; j < count; j++) {
-                glm::mat4 model_translate = Transform::translate(glm::vec3(model_position.x + ((float) i - (float) count / 2.0f) * 16, model_position.y, model_position.z + ((float) j - (float) count / 2.0f) * 16));
+                float y = roundf(Chunk::size * glm::perlin(glm::vec2((float) i / Chunk::size, (float) j / Chunk::size)));
+                glm::mat4 model_translate = Transform::translate(glm::vec3(model_position.x + ((float) i - (float) count / 2.0f) * Chunk::size, model_position.y + y, model_position.z + ((float) j - (float) count / 2.0f) * Chunk::size));
                 shader.set_uniform_matrix_4fv("u_mt", model_translate);
 
                 glDrawElements(GL_TRIANGLES, ib.get_count(), GL_UNSIGNED_INT, nullptr);
             }
         }
+    }
+
+    void static_draw(glm::mat4 perspective, glm::vec3 camera_position, glm::vec3 camera_angle, glm::vec3 model_position, glm::vec3 model_angle, int chunk_x, int chunk_z) {
+        int quad_count = 6 * Chunk::size * Chunk::size;
+        auto positions = Chunk::flat_chunk_positions(chunk_x, chunk_z);
+        auto indices = Chunk::flat_chunk_indices();
+
+//        glEnable(GL_BLEND);
+//        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//
+//        glEnable(GL_DEPTH_TEST);
+//        glDepthFunc(GL_LESS);
+//
+//        glEnable(GL_CULL_FACE);
+//        glCullFace(GL_FRONT);
+
+        VertexArray va_1 = VertexArray();
+//        VertexBufferLayout layout = VertexBufferLayout();
+        VertexBuffer vb_1 = VertexBuffer(&positions[0], quad_count * 5 * 7 * sizeof(float));
+        IndexBuffer ib_1 = IndexBuffer(&indices[0], quad_count * 6);
+//        Shader shader_1 = Shader("../res/shaders/Basic.glsl");
+//        std::vector<std::string> texture_paths = {"../res/textures/grass_block_side.png", "../res/textures/grass_block_top.png", "../res/textures/dirt.png"};
+//        Texture textures_1 = Texture(texture_paths);
+
+//        layout.push(GL_FLOAT, 3, GL_FALSE);
+//        layout.push(GL_FLOAT, 3, GL_FALSE);
+//        layout.push(GL_FLOAT, 1, GL_FALSE);
+        va_1.add_buffer(vb_1, layout);
+
+//        textures_1.bind(0);
+//        shader_1.set_uniform_1i("u_Textures", 0);
+
+        glm::mat4 camera_rotate = Transform::rotate(camera_angle);
+        glm::mat4 camera_translate = Transform::translate(glm::vec3(-camera_position.x, -camera_position.y, camera_position.z));
+        glm::mat4 model_rotate = Transform::rotate(model_angle);
+
+        shader.bind();
+        shader.set_uniform_matrix_4fv("u_all", perspective * camera_rotate * camera_translate);
+
+        glm::mat4 model_translate = Transform::translate(glm::vec3(model_position.x + ((float) chunk_x) * Chunk::size, model_position.y, model_position.z + ((float) chunk_z) * Chunk::size));
+        shader.set_uniform_matrix_4fv("u_mt", model_translate);
+
+        glDrawElements(GL_TRIANGLES, ib_1.get_count(), GL_UNSIGNED_INT, nullptr);
     }
 };

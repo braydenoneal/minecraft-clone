@@ -7,7 +7,7 @@ public:
     glm::vec3 camera_angle{glm::vec3(0.0f)};
     glm::vec3 model_position{glm::vec3(0.0f)};
     glm::vec3 model_angle{glm::vec3(0.0f)};
-    int cube_count{96};
+    int cube_count{2};
     bool paused{true};
     double default_cursor_x{0.0};
     double default_cursor_y{0.0};

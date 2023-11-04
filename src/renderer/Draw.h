@@ -12,6 +12,11 @@ public:
 
     void draw() const {
         glm::mat4 perspective = Transform::perspective_transformation(window_context->field_of_view, window_context->get_aspect_ratio(), 0.0001f, 10000.0f);
-        cube->draw(perspective, game_context->cube_count, game_context->camera_position, game_context->camera_angle, game_context->model_position, game_context->model_angle);
+//        cube->draw(perspective, game_context->cube_count, game_context->camera_position, game_context->camera_angle, game_context->model_position, game_context->model_angle);
+        for (int x = 0; x < game_context->cube_count; x++) {
+            for (int z = 0; z < game_context->cube_count; z++) {
+                cube->static_draw(perspective, game_context->camera_position, game_context->camera_angle, game_context->model_position, game_context->model_angle, x, z);
+            }
+        }
     }
 };

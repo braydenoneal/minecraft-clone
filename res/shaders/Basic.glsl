@@ -8,11 +8,7 @@ layout (location = 2) in float brightness;
 out vec3 v_TextureCoordinates;
 out float f_Brightness;
 
-//uniform mat4 u_cr;
-//uniform mat4 u_ct;
-//uniform mat4 u_mr;
 uniform mat4 u_mt;
-//uniform mat4 u_p;
 uniform mat4 u_all;
 
 void main() {
@@ -33,6 +29,8 @@ uniform sampler2DArray u_Textures;
 
 void main() {
     vec4 textureColor = texture(u_Textures, v_TextureCoordinates);
+    float fog_distance = gl_FragCoord.z / gl_FragCoord.w;
     textureColor.rgb *= f_Brightness;
+    textureColor = mix(textureColor, vec4(0.5f, 0.8f, 1.0f, 1.0f), (1.0 - exp2(-0.000015 * fog_distance * fog_distance)));
     color = textureColor;
 }
