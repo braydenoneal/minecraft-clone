@@ -6,7 +6,8 @@ int main() {
     Input input(&window_context, &game_context);
     GuiContext gui_context(&window_context, &game_context);
     Renderer renderer(&window_context, &game_context);
-    Draw draw(&window_context, &game_context);
+    Cube cube;
+    Draw draw(&window_context, &game_context, &cube);
 
     while(!window_context.window_should_close()) {
         WindowContext::handle_events();

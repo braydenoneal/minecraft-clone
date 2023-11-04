@@ -8,10 +8,15 @@ layout (location = 2) in float brightness;
 out vec3 v_TextureCoordinates;
 out float f_Brightness;
 
-uniform mat4 u_MVP;
+//uniform mat4 u_cr;
+//uniform mat4 u_ct;
+//uniform mat4 u_mr;
+uniform mat4 u_mt;
+//uniform mat4 u_p;
+uniform mat4 u_all;
 
 void main() {
-    gl_Position = u_MVP * position;
+    gl_Position = u_all * u_mt * position;
     v_TextureCoordinates = textureCoordinates;
     f_Brightness = brightness;
 }

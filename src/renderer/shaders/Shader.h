@@ -50,6 +50,10 @@ public:
         glUniformMatrix4fv(get_uniform_location(name), 1, GL_FALSE, &mat4[0][0]);
     }
 
+    void set_uniform_3f(const std::string &name, glm::vec3 vec3) {
+        glUniform3f(get_uniform_location(name), vec3.x, vec3.y, vec3.z);
+    }
+
     static ShaderProgramSource parse_shader(const std::string &filepath) {
         std::ifstream stream(filepath);
 

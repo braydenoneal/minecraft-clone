@@ -21,7 +21,7 @@ public:
         {
             ImGui::Begin("Debug");
             ImGui::SliderFloat3("Position", &game_context->camera_position[0], -10.0f, 10.0f);
-            ImGui::SliderInt("Cubes", &game_context->cube_count, 1, 64);
+            ImGui::SliderInt("Cubes", &game_context->cube_count, 1, 256);
             ImGui::SliderFloat("FOV", &window_context->field_of_view, 1.0f, 120.0f);
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             ImGui::End();
