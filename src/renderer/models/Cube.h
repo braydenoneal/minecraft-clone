@@ -1,62 +1,64 @@
 class Cube {
 public:
-    float positions[1 * 5 * 7] = {
-//            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.6f,
-//            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f,  0.6f,
-//            0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.6f,
-//            0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.6f,
-//            0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.6f,
-//
-//            0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.6f,
-//            0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  0.0f,  0.6f,
-//            -0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.6f,
-//            -0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.6f,
-//            -0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.6f,
-//
-//            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.8f,
-//            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  0.0f,  0.8f,
-//            -0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.8f,
-//            -0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.8f,
-//            -0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.8f,
-//
-//            0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.8f,
-//            0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f,  0.8f,
-//            0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.8f,
-//            0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.8f,
-//            0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.8f,
-//
+    float positions[1 * 5 * 7 * 6] = {
+            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.6f,
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f,  0.6f,
+             0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.6f,
+             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.6f,
+             0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.6f,
+
+             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.6f,
+             0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  0.0f,  0.6f,
+            -0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.6f,
+            -0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.6f,
+            -0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.6f,
+
+            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.8f,
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  0.0f,  0.8f,
+            -0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.8f,
+            -0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.8f,
+            -0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.8f,
+
+             0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.8f,
+             0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f,  0.8f,
+             0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.8f,
+             0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.8f,
+             0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.8f,
+
             -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  1.0f,  1.0f,
             -0.5f,  0.5f, -0.5f,  0.0f,  0.0f,  1.0f,  1.0f,
-            0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  1.0f,  1.0f,
-            0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  1.0f,  1.0f,
-            0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  1.0f,  1.0f,
-//
-//            0.5f, -0.5f,  0.5f,  0.0f,  1.0f,  2.0f,  0.4f,
-//            0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  2.0f,  0.4f,
-//            -0.5f, -0.5f,  0.5f,  1.0f,  1.0f,  2.0f,  0.4f,
-//            -0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  2.0f,  0.4f,
-//            -0.5f, -0.5f,  0.5f,  1.0f,  1.0f,  2.0f,  0.4f,
+             0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  1.0f,  1.0f,
+             0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  1.0f,  1.0f,
+             0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  1.0f,  1.0f,
+
+             0.5f, -0.5f,  0.5f,  0.0f,  1.0f,  2.0f,  0.4f,
+             0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  2.0f,  0.4f,
+            -0.5f, -0.5f,  0.5f,  1.0f,  1.0f,  2.0f,  0.4f,
+            -0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  2.0f,  0.4f,
+            -0.5f, -0.5f,  0.5f,  1.0f,  1.0f,  2.0f,  0.4f,
     };
 
-    unsigned int indices[1 * 6] = {
+    unsigned int indices[1 * 6 * 6] = {
             0, 1, 2, 3, 4, 1,
-//            5, 6, 7, 8, 9, 6,
-//            10, 11, 12, 13, 14, 11,
-//            15, 16, 17, 18, 19, 16,
-//            20, 21, 22, 23, 24, 21,
-//            25, 26, 27, 28, 29, 26
+            5, 6, 7, 8, 9, 6,
+            10, 11, 12, 13, 14, 11,
+            15, 16, 17, 18, 19, 16,
+            20, 21, 22, 23, 24, 21,
+            25, 26, 27, 28, 29, 26
     };
 
     std::vector<std::string> texture_paths = {"../res/textures/grass_block_side.png", "../res/textures/grass_block_top.png", "../res/textures/dirt.png"};
 
     VertexArray va = VertexArray();
     VertexBufferLayout layout = VertexBufferLayout();
-    VertexBuffer vb = VertexBuffer(positions, 1 * 5 * 7 * sizeof(float));
-    IndexBuffer ib = IndexBuffer(indices, 1 * 6);
+    VertexBuffer vb; // = VertexBuffer(positions, 1 * 5 * 7 * sizeof(float));
+    IndexBuffer ib; // = IndexBuffer(indices, 1 * 6);
     Shader shader = Shader("../res/shaders/Basic.glsl");
     Texture textures = Texture(texture_paths);
 
-    Cube() {
+    Cube(int quad_count, float positions[], unsigned int indices[]) :
+            vb(VertexBuffer(positions, quad_count * 5 * 7 * sizeof(float))),
+            ib(IndexBuffer(indices, quad_count * 6)) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -89,7 +91,7 @@ public:
 
         for (unsigned int i = 0; i < count; i++) {
             for (unsigned int j = 0; j < count; j++) {
-                glm::mat4 model_translate = Transform::translate(glm::vec3(model_position.x + i, model_position.y, model_position.z + j));
+                glm::mat4 model_translate = Transform::translate(glm::vec3(model_position.x + ((float) i - (float) count / 2.0f) * 16, model_position.y, model_position.z + ((float) j - (float) count / 2.0f) * 16));
                 shader.set_uniform_matrix_4fv("u_mt", model_translate);
 
                 glDrawElements(GL_TRIANGLES, ib.get_count(), GL_UNSIGNED_INT, nullptr);

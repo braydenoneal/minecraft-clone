@@ -16,5 +16,6 @@
 #include "renderer/shaders/Shader.h"
 #include "renderer/textures/Texture.h"
 #include "renderer/Renderer.h"
+#include "renderer/chunk/Chunk.h"
 #include "renderer/models/Cube.h"
 #include "renderer/Draw.h"

@@ -6,7 +6,10 @@ int main() {
     Input input(&window_context, &game_context);
     GuiContext gui_context(&window_context, &game_context);
     Renderer renderer(&window_context, &game_context);
-    Cube cube;
+
+    int quad_count = 6 * 16 * 16;
+
+    Cube cube(quad_count, &Chunk::flat_chunk_positions()[0], &Chunk::flat_chunk_indices()[0]);
     Draw draw(&window_context, &game_context, &cube);
 
     while(!window_context.window_should_close()) {
