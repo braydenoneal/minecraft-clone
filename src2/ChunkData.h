@@ -1,13 +1,15 @@
 #include <vector>
 #include <array>
+#include <algorithm>
 #include <glm/gtc/noise.hpp>
 
 const unsigned int chunk_size = 16;
+const unsigned int chunk_height = 96;
 
 class ChunkData {
 public:
     typedef unsigned int block_id_t;
-    typedef std::array<block_id_t, chunk_size * chunk_size * chunk_size> chunk_data_t;
+    typedef std::array<block_id_t, chunk_size * chunk_height * chunk_size> chunk_data_t;
 
     typedef std::array<float, 7> vertex_t;
     typedef std::array<vertex_t, 5> face_t;
@@ -15,7 +17,7 @@ public:
     typedef std::vector<face_t> mesh_data_t;
 
     static unsigned int get_chunk_position(unsigned int x, unsigned int y, unsigned int z) {
-        return x * chunk_size * chunk_size + y * chunk_size + z;
+        return x * chunk_size * chunk_height + y * chunk_size + z;
     }
 
     static chunk_data_t get_flat_chunk_data() {
@@ -35,8 +37,19 @@ public:
 
         for (int x = 0; x < chunk_size; x++) {
             for (int z = 0; z < chunk_size; z++) {
-                int y = 8 + (int) roundf(chunk_size / 2 * glm::perlin(glm::vec2((float) (x + cx * chunk_size) / chunk_size, (float) (z + cz * chunk_size) / chunk_size)));
+                auto px = (float) (cx * chunk_size + x);
+                auto pz = (float) (cz * chunk_size + z);
+
+                float level0 = glm::perlin(glm::vec2(px / 128.0f, pz / 128.0f));
+                float level1 = glm::perlin(glm::vec2(px / 16.0f, pz / 16.0f));
+
+                int y = std::floor((float) chunk_height * 0.5f / 2.0f * (1.0f + level1));
+
                 chunk_data[get_chunk_position(x, y, z)] = 1;
+
+                for (int i = 0 ; i < y; i++) {
+                    chunk_data[get_chunk_position(x, i, z)] = 2;
+                }
             }
         }
 
@@ -115,25 +128,106 @@ public:
         };
     }
 
+    static face_t get_positive_x_dirt_face(int x, int y, int z) {
+        return {
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  1.0f,  2.0f,  0.8f },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  2.0f,  0.8f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.8f },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  0.0f,  2.0f,  0.8f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.8f },
+        };
+    }
+
+    static face_t get_negative_x_dirt_face(int x, int y, int z) {
+        return {
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  2.0f,  0.8f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  0.0f,  2.0f,  0.8f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.8f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  2.0f,  0.8f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.8f },
+        };
+    }
+
+    static face_t get_positive_y_dirt_face(int x, int y, int z) {
+        return {
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  2.0f,  1.0f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  2.0f,  1.0f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  1.0f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  2.0f,  1.0f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  1.0f },
+        };
+    }
+
+    static face_t get_negative_y_dirt_face(int x, int y, int z) {
+        return {
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  2.0f,  0.4f },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  2.0f,  0.4f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.4f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  2.0f,  0.4f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.4f },
+        };
+    }
+
+    static face_t get_positive_z_dirt_face(int x, int y, int z) {
+        return {
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  2.0f,  0.6f },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  0.0f,  2.0f,  0.6f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.6f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  0.0f,  2.0f,  0.6f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.6f },
+        };
+    }
+
+    static face_t get_negative_z_dirt_face(int x, int y, int z) {
+        return {
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  1.0f,  2.0f,  0.6f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  2.0f,  0.6f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.6f },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  2.0f,  0.6f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.6f },
+        };
+    }
+
     static mesh_data_t get_chunk_mesh(chunk_data_t chunk_data) {
         mesh_data_t mesh_data{};
 
-        for (int x = 0; x < 16; x++) {
-            for (int y = 0; y < 16; y++) {
-                for (int z = 0; z < 16; z++) {
-                    if (chunk_data[get_chunk_position(x, y, z)] > 0) {
-                        if (x == 15 || (x < 15 && chunk_data[get_chunk_position(x + 1, y, z)] == 0))
+        for (int x = 0; x < chunk_size; x++) {
+            for (int y = 0; y < chunk_height; y++) {
+                for (int z = 0; z < chunk_size; z++) {
+                    if (chunk_data[get_chunk_position(x, y, z)] == 1) {
+                        if (x == chunk_size - 1 || (x < chunk_size - 1 && chunk_data[get_chunk_position(x + 1, y, z)] == 0)) {
                             mesh_data.push_back(get_positive_x_face(x, y, z));
-                        if (x == 0  || (x > 0  && chunk_data[get_chunk_position(x - 1, y, z)] == 0))
+                        }
+                        if (x == 0 || (x > 0 && chunk_data[get_chunk_position(x - 1, y, z)] == 0))
                             mesh_data.push_back(get_negative_x_face(x, y, z));
-                        if (y == 15 || (y < 15 && chunk_data[get_chunk_position(x, y + 1, z)] == 0))
+                        if (y == chunk_size - 1 || (y < chunk_height - 1 && chunk_data[get_chunk_position(x, y + 1, z)] == 0)) {
                             mesh_data.push_back(get_positive_y_face(x, y, z));
-                        if (y == 0  || (y > 0  && chunk_data[get_chunk_position(x, y - 1, z)] == 0))
+                        }
+                        if (y == 0 || (y > 0 && chunk_data[get_chunk_position(x, y - 1, z)] == 0))
                             mesh_data.push_back(get_negative_y_face(x, y, z));
-                        if (z == 15 || (z < 15 && chunk_data[get_chunk_position(x, y, z + 1)] == 0))
+                        if (z == chunk_size - 1 || (z < chunk_size - 1 && chunk_data[get_chunk_position(x, y, z + 1)] == 0)) {
                             mesh_data.push_back(get_positive_z_face(x, y, z));
-                        if (z == 0  || (z > 0  && chunk_data[get_chunk_position(x, y, z - 1)] == 0))
+                        }
+                        if (z == 0 || (z > 0 && chunk_data[get_chunk_position(x, y, z - 1)] == 0)) {
                             mesh_data.push_back(get_negative_z_face(x, y, z));
+                        }
+                    } else if (chunk_data[get_chunk_position(x, y, z)] == 2) {
+                        if (x == chunk_size - 1 || (x < chunk_size - 1 && chunk_data[get_chunk_position(x + 1, y, z)] == 0)) {
+                            mesh_data.push_back(get_positive_x_dirt_face(x, y, z));
+                        }
+                        if (x == 0 || (x > 0 && chunk_data[get_chunk_position(x - 1, y, z)] == 0))
+                            mesh_data.push_back(get_negative_x_dirt_face(x, y, z));
+                        if (y == chunk_size - 1 || (y < chunk_height - 1 && chunk_data[get_chunk_position(x, y + 1, z)] == 0)) {
+                            mesh_data.push_back(get_positive_y_dirt_face(x, y, z));
+                        }
+                        if (y == 0 || (y > 0 && chunk_data[get_chunk_position(x, y - 1, z)] == 0))
+                            mesh_data.push_back(get_negative_y_dirt_face(x, y, z));
+                        if (z == chunk_size - 1 || (z < chunk_size - 1 && chunk_data[get_chunk_position(x, y, z + 1)] == 0)) {
+                            mesh_data.push_back(get_positive_z_dirt_face(x, y, z));
+                        }
+                        if (z == 0 || (z > 0 && chunk_data[get_chunk_position(x, y, z - 1)] == 0)) {
+                            mesh_data.push_back(get_negative_z_dirt_face(x, y, z));
+                        }
                     }
                 }
             }

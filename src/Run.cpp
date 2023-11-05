@@ -1,6 +1,7 @@
 #include "Context.h"
 #include "../src2/ChunkData.h"
 #include "../src2/DrawChunk.h"
+#include <glm/gtc/noise.hpp>
 
 int main() {
     WindowContext window_context;
