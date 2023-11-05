@@ -6,6 +6,17 @@
 const unsigned int chunk_size = 16;
 const unsigned int chunk_height = 96;
 
+struct AmbientMap {
+    bool px_py_pz = false;
+    bool px_py_nz = false;
+    bool nx_py_pz = false;
+    bool nx_py_nz = false;
+    bool px_ny_pz = false;
+    bool px_ny_nz = false;
+    bool nx_ny_pz = false;
+    bool nx_ny_nz = false;
+};
+
 class ChunkData {
 public:
     typedef unsigned int block_id_t;
@@ -74,183 +85,183 @@ public:
         return chunk_data;
     }
 
-    static face_t get_positive_x_face(int x, int y, int z) {
+    static face_t get_positive_x_face(int x, int y, int z, AmbientMap ambient_map) {
         return {
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  1.0f,  0.0f,  0.8f },
-                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  0.0f,  0.8f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.8f },
-                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  0.0f,  0.0f,  0.8f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.8f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  1.0f,  0.0f, (ambient_map.px_py_nz ? 0.6f : 0.8f) },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  0.0f, (ambient_map.px_ny_nz ? 0.6f : 0.8f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  0.0f, (ambient_map.px_py_pz ? 0.6f : 0.8f) },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  0.0f,  0.0f, (ambient_map.px_ny_pz ? 0.6f : 0.8f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  0.0f, (ambient_map.px_py_pz ? 0.6f : 0.8f) },
         };
     }
 
-    static face_t get_negative_x_face(int x, int y, int z) {
+    static face_t get_negative_x_face(int x, int y, int z, AmbientMap ambient_map) {
         return {
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  0.0f,  0.8f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  0.0f,  0.0f,  0.8f },
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.8f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  0.0f,  0.8f },
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.8f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  0.0f, (ambient_map.nx_py_pz ? 0.6f : 0.8f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  0.0f,  0.0f, (ambient_map.nx_ny_pz ? 0.6f : 0.8f) },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  0.0f, (ambient_map.nx_py_nz ? 0.6f : 0.8f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  0.0f, (ambient_map.nx_ny_nz ? 0.6f : 0.8f) },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  0.0f, (ambient_map.nx_py_nz ? 0.6f : 0.8f) },
         };
     }
 
-    static face_t get_positive_y_face(int x, int y, int z) {
+    static face_t get_positive_y_face(int x, int y, int z, AmbientMap ambient_map) {
         return {
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  1.0f,  1.0f },
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  1.0f,  1.0f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  1.0f,  1.0f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  1.0f,  1.0f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  1.0f,  1.0f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  1.0f, (ambient_map.nx_py_pz ? 0.8f : 1.0f) },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  1.0f, (ambient_map.nx_py_nz ? 0.8f : 1.0f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  1.0f, (ambient_map.px_py_pz ? 0.8f : 1.0f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  1.0f, (ambient_map.px_py_nz ? 0.8f : 1.0f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  1.0f, (ambient_map.px_py_pz ? 0.8f : 1.0f) },
         };
     }
 
-    static face_t get_negative_y_face(int x, int y, int z) {
+    static face_t get_negative_y_face(int x, int y, int z, AmbientMap ambient_map) {
         return {
-                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  2.0f,  0.4f },
-                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  2.0f,  0.4f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.4f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  2.0f,  0.4f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.4f },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  3.0f, (ambient_map.px_ny_pz ? 0.2f : 0.4f) },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  3.0f, (ambient_map.px_ny_nz ? 0.2f : 0.4f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f, (ambient_map.nx_ny_pz ? 0.2f : 0.4f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  3.0f, (ambient_map.nx_ny_nz ? 0.2f : 0.4f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f, (ambient_map.nx_ny_pz ? 0.2f : 0.4f) },
         };
     }
 
-    static face_t get_positive_z_face(int x, int y, int z) {
+    static face_t get_positive_z_face(int x, int y, int z, AmbientMap ambient_map) {
         return {
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  0.0f,  0.6f },
-                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  0.0f,  0.0f,  0.6f },
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.6f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  0.0f,  0.0f,  0.6f },
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.6f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  0.0f, (ambient_map.px_py_pz ? 0.4f : 0.6f) },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  0.0f,  0.0f, (ambient_map.px_ny_pz ? 0.4f : 0.6f) },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  0.0f, (ambient_map.nx_py_pz ? 0.4f : 0.6f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  0.0f,  0.0f, (ambient_map.nx_ny_pz ? 0.4f : 0.6f) },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  0.0f, (ambient_map.nx_py_pz ? 0.4f : 0.6f) },
         };
     }
 
-    static face_t get_negative_z_face(int x, int y, int z) {
+    static face_t get_negative_z_face(int x, int y, int z, AmbientMap ambient_map) {
         return {
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  1.0f,  0.0f,  0.6f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  0.0f,  0.6f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.6f },
-                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  0.0f,  0.6f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.6f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  1.0f,  0.0f, (ambient_map.nx_py_nz ? 0.4f : 0.6f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  0.0f, (ambient_map.nx_ny_nz ? 0.4f : 0.6f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  0.0f, (ambient_map.px_py_nz ? 0.4f : 0.6f) },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  0.0f, (ambient_map.px_ny_nz ? 0.4f : 0.6f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  0.0f, (ambient_map.px_py_nz ? 0.4f : 0.6f) },
         };
     }
 
-    static face_t get_positive_x_dirt_face(int x, int y, int z) {
+    static face_t get_positive_x_dirt_face(int x, int y, int z, AmbientMap ambient_map) {
         return {
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  1.0f,  2.0f,  0.8f },
-                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  2.0f,  0.8f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.8f },
-                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  0.0f,  2.0f,  0.8f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.8f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  1.0f,  2.0f, (ambient_map.px_py_nz ? 0.6f : 0.8f) },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  2.0f, (ambient_map.px_ny_nz ? 0.6f : 0.8f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f, (ambient_map.px_py_pz ? 0.6f : 0.8f) },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  0.0f,  2.0f, (ambient_map.px_ny_pz ? 0.6f : 0.8f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f, (ambient_map.px_py_pz ? 0.6f : 0.8f) },
         };
     }
 
-    static face_t get_negative_x_dirt_face(int x, int y, int z) {
+    static face_t get_negative_x_dirt_face(int x, int y, int z, AmbientMap ambient_map) {
         return {
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  2.0f,  0.8f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  0.0f,  2.0f,  0.8f },
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.8f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  2.0f,  0.8f },
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.8f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  2.0f, (ambient_map.nx_py_pz ? 0.6f : 0.8f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  0.0f,  2.0f, (ambient_map.nx_ny_pz ? 0.6f : 0.8f) },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  2.0f, (ambient_map.nx_py_nz ? 0.6f : 0.8f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  2.0f, (ambient_map.nx_ny_nz ? 0.6f : 0.8f) },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  2.0f, (ambient_map.nx_py_nz ? 0.6f : 0.8f) },
         };
     }
 
-    static face_t get_positive_y_dirt_face(int x, int y, int z) {
+    static face_t get_positive_y_dirt_face(int x, int y, int z, AmbientMap ambient_map) {
         return {
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  2.0f,  1.0f },
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  2.0f,  1.0f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  1.0f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  2.0f,  1.0f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  1.0f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  2.0f, (ambient_map.nx_py_pz ? 0.8f : 1.0f) },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  2.0f, (ambient_map.nx_py_nz ? 0.8f : 1.0f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f, (ambient_map.px_py_pz ? 0.8f : 1.0f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  2.0f, (ambient_map.px_py_nz ? 0.8f : 1.0f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f, (ambient_map.px_py_pz ? 0.8f : 1.0f) },
         };
     }
 
-    static face_t get_negative_y_dirt_face(int x, int y, int z) {
+    static face_t get_negative_y_dirt_face(int x, int y, int z, AmbientMap ambient_map) {
         return {
-                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  2.0f,  0.4f },
-                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  2.0f,  0.4f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.4f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  2.0f,  0.4f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.4f },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  2.0f, (ambient_map.px_ny_pz ? 0.2f : 0.4f) },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  2.0f, (ambient_map.px_ny_nz ? 0.2f : 0.4f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f, (ambient_map.nx_ny_pz ? 0.2f : 0.4f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  2.0f, (ambient_map.nx_ny_nz ? 0.2f : 0.4f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f, (ambient_map.nx_ny_pz ? 0.2f : 0.4f) },
         };
     }
 
-    static face_t get_positive_z_dirt_face(int x, int y, int z) {
+    static face_t get_positive_z_dirt_face(int x, int y, int z, AmbientMap ambient_map) {
         return {
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  2.0f,  0.6f },
-                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  0.0f,  2.0f,  0.6f },
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.6f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  0.0f,  2.0f,  0.6f },
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.6f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  2.0f, (ambient_map.px_py_pz ? 0.4f : 0.6f) },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  0.0f,  2.0f, (ambient_map.px_ny_pz ? 0.4f : 0.6f) },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f, (ambient_map.nx_py_pz ? 0.4f : 0.6f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  0.0f,  2.0f, (ambient_map.nx_ny_pz ? 0.4f : 0.6f) },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f, (ambient_map.nx_py_pz ? 0.4f : 0.6f) },
         };
     }
 
-    static face_t get_negative_z_dirt_face(int x, int y, int z) {
+    static face_t get_negative_z_dirt_face(int x, int y, int z, AmbientMap ambient_map) {
         return {
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  1.0f,  2.0f,  0.6f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  2.0f,  0.6f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.6f },
-                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  2.0f,  0.6f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.6f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  1.0f,  2.0f, (ambient_map.nx_py_nz ? 0.4f : 0.6f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  2.0f, (ambient_map.nx_ny_nz ? 0.4f : 0.6f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  2.0f, (ambient_map.px_py_nz ? 0.4f : 0.6f) },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  2.0f, (ambient_map.px_ny_nz ? 0.4f : 0.6f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  2.0f, (ambient_map.px_py_nz ? 0.4f : 0.6f) },
         };
     }
 
-    static face_t get_positive_x_stone_face(int x, int y, int z) {
+    static face_t get_positive_x_stone_face(int x, int y, int z, AmbientMap ambient_map) {
         return {
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  1.0f,  3.0f,  0.8f },
-                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  3.0f,  0.8f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f,  0.8f },
-                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  0.0f,  3.0f,  0.8f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f,  0.8f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  1.0f,  3.0f, (ambient_map.px_py_nz ? 0.6f : 0.8f) },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  3.0f, (ambient_map.px_ny_nz ? 0.6f : 0.8f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f, (ambient_map.px_py_pz ? 0.6f : 0.8f) },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  0.0f,  3.0f, (ambient_map.px_ny_pz ? 0.6f : 0.8f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f, (ambient_map.px_py_pz ? 0.6f : 0.8f) },
         };
     }
 
-    static face_t get_negative_x_stone_face(int x, int y, int z) {
+    static face_t get_negative_x_stone_face(int x, int y, int z, AmbientMap ambient_map) {
         return {
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  3.0f,  0.8f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  0.0f,  3.0f,  0.8f },
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  3.0f,  0.8f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  3.0f,  0.8f },
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  3.0f,  0.8f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  3.0f, (ambient_map.nx_py_pz ? 0.6f : 0.8f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  0.0f,  3.0f, (ambient_map.nx_ny_pz ? 0.6f : 0.8f) },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  3.0f, (ambient_map.nx_py_nz ? 0.6f : 0.8f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  3.0f, (ambient_map.nx_ny_nz ? 0.6f : 0.8f) },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  3.0f, (ambient_map.nx_py_nz ? 0.6f : 0.8f) },
         };
     }
 
-    static face_t get_positive_y_stone_face(int x, int y, int z) {
+    static face_t get_positive_y_stone_face(int x, int y, int z, AmbientMap ambient_map) {
         return {
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  3.0f,  1.0f },
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  3.0f,  1.0f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f,  1.0f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  3.0f,  1.0f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f,  1.0f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  3.0f, (ambient_map.nx_py_pz ? 0.8f : 1.0f) },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  3.0f, (ambient_map.nx_py_nz ? 0.8f : 1.0f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f, (ambient_map.px_py_pz ? 0.8f : 1.0f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  3.0f, (ambient_map.px_py_nz ? 0.8f : 1.0f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f, (ambient_map.px_py_pz ? 0.8f : 1.0f) },
         };
     }
 
-    static face_t get_negative_y_stone_face(int x, int y, int z) {
+    static face_t get_negative_y_stone_face(int x, int y, int z, AmbientMap ambient_map) {
         return {
-                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  3.0f,  0.4f },
-                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  3.0f,  0.4f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f,  0.4f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  3.0f,  0.4f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f,  0.4f },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  3.0f, (ambient_map.px_ny_pz ? 0.2f : 0.4f) },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  3.0f, (ambient_map.px_ny_nz ? 0.2f : 0.4f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f, (ambient_map.nx_ny_pz ? 0.2f : 0.4f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  3.0f, (ambient_map.nx_ny_nz ? 0.2f : 0.4f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f, (ambient_map.nx_ny_pz ? 0.2f : 0.4f) },
         };
     }
 
-    static face_t get_positive_z_stone_face(int x, int y, int z) {
+    static face_t get_positive_z_stone_face(int x, int y, int z, AmbientMap ambient_map) {
         return {
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  3.0f,  0.6f },
-                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  0.0f,  3.0f,  0.6f },
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f,  0.6f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  0.0f,  3.0f,  0.6f },
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f,  0.6f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  3.0f, (ambient_map.px_py_pz ? 0.4f : 0.6f) },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  0.0f,  3.0f, (ambient_map.px_ny_pz ? 0.4f : 0.6f) },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f, (ambient_map.nx_py_pz ? 0.4f : 0.6f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  0.0f,  3.0f, (ambient_map.nx_ny_pz ? 0.4f : 0.6f) },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f, (ambient_map.nx_py_pz ? 0.4f : 0.6f) },
         };
     }
 
-    static face_t get_negative_z_stone_face(int x, int y, int z) {
+    static face_t get_negative_z_stone_face(int x, int y, int z, AmbientMap ambient_map) {
         return {
-                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  1.0f,  3.0f,  0.6f },
-                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  3.0f,  0.6f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  3.0f,  0.6f },
-                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  3.0f,  0.6f },
-                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  3.0f,  0.6f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  1.0f,  3.0f, (ambient_map.nx_py_nz ? 0.4f : 0.6f) },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  3.0f, (ambient_map.nx_ny_nz ? 0.4f : 0.6f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  3.0f, (ambient_map.px_py_nz ? 0.4f : 0.6f) },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  3.0f, (ambient_map.px_ny_nz ? 0.4f : 0.6f) },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  3.0f, (ambient_map.px_py_nz ? 0.4f : 0.6f) },
         };
     }
 
@@ -260,56 +271,72 @@ public:
         for (int x = 0; x < chunk_size; x++) {
             for (int y = 0; y < chunk_height; y++) {
                 for (int z = 0; z < chunk_size; z++) {
+                    AmbientMap ambient_map{};
+                    if (chunk_data[get_chunk_position(x, y, z)] != 0) {
+                        if (x > 0 && x < chunk_size - 1 && y > 0 && y < chunk_height - 1 && z > 0 && z < chunk_size - 1) {
+                            ambient_map = {
+                                chunk_data[get_chunk_position(x + 1, y + 1, z + 1)] > 0,
+                                chunk_data[get_chunk_position(x + 1, y + 1, z - 1)] > 0,
+                                chunk_data[get_chunk_position(x - 1, y + 1, z + 1)] > 0,
+                                chunk_data[get_chunk_position(x - 1, y + 1, z - 1)] > 0,
+                                chunk_data[get_chunk_position(x + 1, y - 1, z + 1)] > 0,
+                                chunk_data[get_chunk_position(x + 1, y - 1, z - 1)] > 0,
+                                chunk_data[get_chunk_position(x - 1, y - 1, z + 1)] > 0,
+                                chunk_data[get_chunk_position(x - 1, y - 1, z - 1)] > 0,
+                            };
+                        }
+                    }
+
                     if (chunk_data[get_chunk_position(x, y, z)] == 1) {
                         if (x == chunk_size - 1 || (x < chunk_size - 1 && chunk_data[get_chunk_position(x + 1, y, z)] == 0)) {
-                            mesh_data.push_back(get_positive_x_face(x, y, z));
+                            mesh_data.push_back(get_positive_x_face(x, y, z, ambient_map));
                         }
                         if (x == 0 || (x > 0 && chunk_data[get_chunk_position(x - 1, y, z)] == 0))
-                            mesh_data.push_back(get_negative_x_face(x, y, z));
+                            mesh_data.push_back(get_negative_x_face(x, y, z, ambient_map));
                         if (y == chunk_size - 1 || (y < chunk_height - 1 && chunk_data[get_chunk_position(x, y + 1, z)] == 0)) {
-                            mesh_data.push_back(get_positive_y_face(x, y, z));
+                            mesh_data.push_back(get_positive_y_face(x, y, z, ambient_map));
                         }
                         if (y == 0 || (y > 0 && chunk_data[get_chunk_position(x, y - 1, z)] == 0))
-                            mesh_data.push_back(get_negative_y_face(x, y, z));
+                            mesh_data.push_back(get_negative_y_face(x, y, z, ambient_map));
                         if (z == chunk_size - 1 || (z < chunk_size - 1 && chunk_data[get_chunk_position(x, y, z + 1)] == 0)) {
-                            mesh_data.push_back(get_positive_z_face(x, y, z));
+                            mesh_data.push_back(get_positive_z_face(x, y, z, ambient_map));
                         }
                         if (z == 0 || (z > 0 && chunk_data[get_chunk_position(x, y, z - 1)] == 0)) {
-                            mesh_data.push_back(get_negative_z_face(x, y, z));
+                            mesh_data.push_back(get_negative_z_face(x, y, z, ambient_map));
                         }
                     } else if (chunk_data[get_chunk_position(x, y, z)] == 2) {
                         if (x == chunk_size - 1 || (x < chunk_size - 1 && chunk_data[get_chunk_position(x + 1, y, z)] == 0)) {
-                            mesh_data.push_back(get_positive_x_dirt_face(x, y, z));
+                            mesh_data.push_back(get_positive_x_dirt_face(x, y, z, ambient_map));
                         }
                         if (x == 0 || (x > 0 && chunk_data[get_chunk_position(x - 1, y, z)] == 0))
-                            mesh_data.push_back(get_negative_x_dirt_face(x, y, z));
+                            mesh_data.push_back(get_negative_x_dirt_face(x, y, z, ambient_map));
                         if (y == chunk_size - 1 || (y < chunk_height - 1 && chunk_data[get_chunk_position(x, y + 1, z)] == 0)) {
-                            mesh_data.push_back(get_positive_y_dirt_face(x, y, z));
+                            mesh_data.push_back(get_positive_y_dirt_face(x, y, z, ambient_map));
                         }
                         if (y == 0 || (y > 0 && chunk_data[get_chunk_position(x, y - 1, z)] == 0))
-                            mesh_data.push_back(get_negative_y_dirt_face(x, y, z));
+                            mesh_data.push_back(get_negative_y_dirt_face(x, y, z, ambient_map));
                         if (z == chunk_size - 1 || (z < chunk_size - 1 && chunk_data[get_chunk_position(x, y, z + 1)] == 0)) {
-                            mesh_data.push_back(get_positive_z_dirt_face(x, y, z));
+                            mesh_data.push_back(get_positive_z_dirt_face(x, y, z, ambient_map));
                         }
                         if (z == 0 || (z > 0 && chunk_data[get_chunk_position(x, y, z - 1)] == 0)) {
-                            mesh_data.push_back(get_negative_z_dirt_face(x, y, z));
+                            mesh_data.push_back(get_negative_z_dirt_face(x, y, z, ambient_map));
                         }
                     } else if (chunk_data[get_chunk_position(x, y, z)] == 3) {
                         if (x == chunk_size - 1 || (x < chunk_size - 1 && chunk_data[get_chunk_position(x + 1, y, z)] == 0)) {
-                            mesh_data.push_back(get_positive_x_stone_face(x, y, z));
+                            mesh_data.push_back(get_positive_x_stone_face(x, y, z, ambient_map));
                         }
                         if (x == 0 || (x > 0 && chunk_data[get_chunk_position(x - 1, y, z)] == 0))
-                            mesh_data.push_back(get_negative_x_stone_face(x, y, z));
+                            mesh_data.push_back(get_negative_x_stone_face(x, y, z, ambient_map));
                         if (y == chunk_size - 1 || (y < chunk_height - 1 && chunk_data[get_chunk_position(x, y + 1, z)] == 0)) {
-                            mesh_data.push_back(get_positive_y_stone_face(x, y, z));
+                            mesh_data.push_back(get_positive_y_stone_face(x, y, z, ambient_map));
                         }
                         if (y == 0 || (y > 0 && chunk_data[get_chunk_position(x, y - 1, z)] == 0))
-                            mesh_data.push_back(get_negative_y_stone_face(x, y, z));
+                            mesh_data.push_back(get_negative_y_stone_face(x, y, z, ambient_map));
                         if (z == chunk_size - 1 || (z < chunk_size - 1 && chunk_data[get_chunk_position(x, y, z + 1)] == 0)) {
-                            mesh_data.push_back(get_positive_z_stone_face(x, y, z));
+                            mesh_data.push_back(get_positive_z_stone_face(x, y, z, ambient_map));
                         }
                         if (z == 0 || (z > 0 && chunk_data[get_chunk_position(x, y, z - 1)] == 0)) {
-                            mesh_data.push_back(get_negative_z_stone_face(x, y, z));
+                            mesh_data.push_back(get_negative_z_stone_face(x, y, z, ambient_map));
                         }
                     }
                 }
