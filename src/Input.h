@@ -38,6 +38,11 @@ public:
             }
         }
 
+        if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
+            WindowContext::terminate();
+            exit(0);
+        }
+
         input->keys[key] = action;
     }
 
@@ -60,8 +65,6 @@ public:
                 Action::do_action(key.first, window_context, game_context);
             }
         }
-
-//        game_context->model_angle += 0.01f;
 
         if (!game_context->paused) {
             game_context->camera_angle.y = M_PI * ((float) game_context->camera_cursor_x / (float) window_context->window_height);

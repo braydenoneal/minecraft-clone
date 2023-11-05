@@ -42,7 +42,7 @@ public:
 
         for (unsigned int i = 0; i < count; i++) {
             for (unsigned int j = 0; j < count; j++) {
-                float y = roundf(Chunk::size * glm::perlin(glm::vec2((float) i / Chunk::size, (float) j / Chunk::size)));
+                float y = roundf(Chunk::size * 3 * glm::perlin(glm::vec2((float) i / Chunk::size, (float) j / Chunk::size)));
                 glm::mat4 model_translate = Transform::translate(glm::vec3(model_position.x + ((float) i - (float) count / 2.0f) * Chunk::size, model_position.y + y, model_position.z + ((float) j - (float) count / 2.0f) * Chunk::size));
                 shader.set_uniform_matrix_4fv("u_mt", model_translate);
 
