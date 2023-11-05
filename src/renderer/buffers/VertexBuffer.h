@@ -10,7 +10,7 @@ public:
         glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
     }
 
-    void terminate() {
+    ~VertexBuffer() {
         glDeleteBuffers(1, &renderer_id);
     }
 

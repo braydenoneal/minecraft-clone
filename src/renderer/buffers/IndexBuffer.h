@@ -10,7 +10,7 @@ public:
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(GLuint), data, GL_STATIC_DRAW);
     }
 
-    void terminate() {
+    ~IndexBuffer() {
         glDeleteBuffers(1, &renderer_id);
     }
 

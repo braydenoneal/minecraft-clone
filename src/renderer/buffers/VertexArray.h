@@ -7,7 +7,7 @@ public:
         glBindVertexArray(renderer_id);
     }
 
-    void terminate() {
+    ~VertexArray() {
         glDeleteVertexArrays(1, &renderer_id);
     }
 
