@@ -21,7 +21,7 @@ int main() {
         input.do_actions();
         renderer.render();
         // draw each chunk mesh on the shared draw setup
-        glm::mat4 perspective = Transform::perspective_transformation(window_context.field_of_view, window_context.get_aspect_ratio(), 0.0001f, 10000.0f);
+        glm::mat4 perspective = Transform::perspective_transformation(window_context.field_of_view, window_context.get_aspect_ratio(), 0.01f, 10000.0f);
         UniformsPackage uniforms_package = { perspective, game_context.camera_position, game_context.camera_angle };
         draw_chunk.draw_all(uniforms_package, meshes, game_context.cube_count);
         gui_context.render();

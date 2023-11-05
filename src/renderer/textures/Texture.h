@@ -47,12 +47,4 @@ public:
     static void unbind() {
         glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
     }
-
-    [[nodiscard]] int GetWidth() const {
-        return width;
-    }
-
-    [[nodiscard]] int GetHeight() const {
-        return height;
-    }
 };

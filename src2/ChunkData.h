@@ -9,7 +9,7 @@ public:
     typedef unsigned int block_id_t;
     typedef std::array<block_id_t, chunk_size * chunk_size * chunk_size> chunk_data_t;
 
-    typedef std::array<float, 10> vertex_t;
+    typedef std::array<float, 7> vertex_t;
     typedef std::array<vertex_t, 5> face_t;
 
     typedef std::vector<face_t> mesh_data_t;
@@ -57,61 +57,61 @@ public:
 
     static face_t get_positive_x_face(int x, int y, int z) {
         return {
-                vertex_t { 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.8f, (float) x, (float) y, (float) z },
-                vertex_t { 0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f,  0.8f, (float) x, (float) y, (float) z },
-                vertex_t { 0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.8f, (float) x, (float) y, (float) z },
-                vertex_t { 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.8f, (float) x, (float) y, (float) z },
-                vertex_t { 0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.8f, (float) x, (float) y, (float) z },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  1.0f,  0.0f,  0.8f },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  0.0f,  0.8f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.8f },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  0.0f,  0.0f,  0.8f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.8f },
         };
     }
 
     static face_t get_negative_x_face(int x, int y, int z) {
         return {
-                vertex_t { -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.8f, (float) x, (float) y, (float) z },
-                vertex_t { -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  0.0f,  0.8f, (float) x, (float) y, (float) z },
-                vertex_t { -0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.8f, (float) x, (float) y, (float) z },
-                vertex_t { -0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.8f, (float) x, (float) y, (float) z },
-                vertex_t { -0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.8f, (float) x, (float) y, (float) z },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  0.0f,  0.8f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  0.0f,  0.0f,  0.8f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.8f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  0.0f,  0.8f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.8f },
         };
     }
 
     static face_t get_positive_y_face(int x, int y, int z) {
         return {
-                vertex_t { -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  1.0f,  1.0f, (float) x, (float) y, (float) z },
-                vertex_t { -0.5f,  0.5f, -0.5f,  0.0f,  0.0f,  1.0f,  1.0f, (float) x, (float) y, (float) z },
-                vertex_t {  0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  1.0f,  1.0f, (float) x, (float) y, (float) z },
-                vertex_t {  0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  1.0f,  1.0f, (float) x, (float) y, (float) z },
-                vertex_t {  0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  1.0f,  1.0f, (float) x, (float) y, (float) z },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  1.0f,  1.0f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  1.0f,  1.0f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  1.0f,  1.0f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  1.0f,  1.0f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  1.0f,  1.0f },
         };
     }
 
     static face_t get_negative_y_face(int x, int y, int z) {
         return {
-                vertex_t {  0.5f, -0.5f,  0.5f,  0.0f,  1.0f,  2.0f,  0.4f, (float) x, (float) y, (float) z },
-                vertex_t {  0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  2.0f,  0.4f, (float) x, (float) y, (float) z },
-                vertex_t { -0.5f, -0.5f,  0.5f,  1.0f,  1.0f,  2.0f,  0.4f, (float) x, (float) y, (float) z },
-                vertex_t { -0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  2.0f,  0.4f, (float) x, (float) y, (float) z },
-                vertex_t { -0.5f, -0.5f,  0.5f,  1.0f,  1.0f,  2.0f,  0.4f, (float) x, (float) y, (float) z },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  2.0f,  0.4f },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  2.0f,  0.4f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.4f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  2.0f,  0.4f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.4f },
         };
     }
 
     static face_t get_positive_z_face(int x, int y, int z) {
         return {
-                vertex_t {  0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.6f, (float) x, (float) y, (float) z },
-                vertex_t {  0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  0.0f,  0.6f, (float) x, (float) y, (float) z },
-                vertex_t { -0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.6f, (float) x, (float) y, (float) z },
-                vertex_t { -0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.6f, (float) x, (float) y, (float) z },
-                vertex_t { -0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.6f, (float) x, (float) y, (float) z },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  0.0f,  0.6f },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  0.0f,  0.0f,  0.6f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.6f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  0.0f,  0.0f,  0.6f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.6f },
         };
     }
 
     static face_t get_negative_z_face(int x, int y, int z) {
         return {
-                vertex_t { -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.6f, (float) x, (float) y, (float) z },
-                vertex_t { -0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f,  0.6f, (float) x, (float) y, (float) z },
-                vertex_t {  0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.6f, (float) x, (float) y, (float) z },
-                vertex_t {  0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.6f, (float) x, (float) y, (float) z },
-                vertex_t {  0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.6f, (float) x, (float) y, (float) z },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  1.0f,  0.0f,  0.6f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  0.0f,  0.6f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.6f },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  0.0f,  0.6f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.6f },
         };
     }
 

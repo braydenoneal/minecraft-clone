@@ -4,7 +4,6 @@
 layout (location = 0) in vec4 position;
 layout (location = 1) in vec3 textureCoordinates;
 layout (location = 2) in float brightness;
-layout (location = 3) in vec4 transform;
 
 out vec3 v_TextureCoordinates;
 out float f_Brightness;
@@ -13,7 +12,7 @@ uniform mat4 u_mt;
 uniform mat4 u_all;
 
 void main() {
-    gl_Position = u_all * u_mt * (position + transform);
+    gl_Position = u_all * u_mt * position;
     v_TextureCoordinates = textureCoordinates;
     f_Brightness = brightness;
 }

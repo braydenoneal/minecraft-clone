@@ -24,7 +24,6 @@ public:
         layout.push(GL_FLOAT, 3, GL_FALSE);
         layout.push(GL_FLOAT, 3, GL_FALSE);
         layout.push(GL_FLOAT, 1, GL_FALSE);
-        layout.push(GL_FLOAT, 3, GL_FALSE);
 
         textures.bind(0);
         shader.set_uniform_1i("u_Textures", 0);
@@ -32,18 +31,14 @@ public:
 
     void draw(const ChunkData::mesh_data_t &mesh_data, int chunk_x, int chunk_z) {
         VertexArray vertex_array;
-        VertexBuffer vertex_buffer(mesh_data.data(), mesh_data.size() * 5 * 10 * sizeof(float));
+        VertexBuffer vertex_buffer(mesh_data.data(), mesh_data.size() * 5 * 7 * sizeof(float));
         IndexBuffer index_buffer(ChunkData::get_indices_of_size(mesh_data.size()).data(), mesh_data.size() * 6);
         vertex_array.add_buffer(vertex_buffer, layout);
 
-        glm::mat4 model_translate = Transform::translate(glm::vec3(((float) chunk_x - 8) * Chunk::size * 0.5f, 0.0f, ((float) chunk_z - 8) * Chunk::size * 0.5f));
+        glm::mat4 model_translate = Transform::translate(glm::vec3(((float) chunk_x) * 16, 0.0f, ((float) chunk_z) * 16));
         shader.set_uniform_matrix_4fv("u_mt", model_translate);
 
         glDrawElements(GL_TRIANGLES, index_buffer.get_count(), GL_UNSIGNED_INT, nullptr);
-
-        VertexArray::unbind();
-        VertexBuffer::unbind();
-        IndexBuffer::unbind();
     }
 
     void draw_all(UniformsPackage &uniforms_package, const std::vector<ChunkData::mesh_data_t> &mesh_datas, int count) {
@@ -55,7 +50,7 @@ public:
 
         for (int x = 0; x < count; x++) {
             for (int z = 0; z < count; z++) {
-                draw(mesh_datas[x * count + z], x, z);
+                draw(mesh_datas[x * count + z], x - count / 2, z - count / 2);
             }
         }
     }
