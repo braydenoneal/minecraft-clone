@@ -17,6 +17,7 @@ add_executable(glengine
         lib/stb/src/stb_image.cpp
         ${IMGUI_SOURCE}
         src/Run.cpp
+        src2/Chunk.h
 )
 
 include_directories(lib/glad/include)

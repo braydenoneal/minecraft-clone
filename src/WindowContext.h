@@ -11,11 +11,9 @@ public:
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-//        glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
+        glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
 
-        const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-
-        window = glfwCreateWindow(mode->width, mode->height, "Minecraft", glfwGetPrimaryMonitor(), nullptr);
+        window = glfwCreateWindow(window_width, window_height, "Minecraft", nullptr, nullptr);
 
         glfwMakeContextCurrent(window);
 

@@ -42,8 +42,9 @@ public:
 
         for (unsigned int i = 0; i < count; i++) {
             for (unsigned int j = 0; j < count; j++) {
-                float y = roundf(Chunk::size * 3 * glm::perlin(glm::vec2((float) i / Chunk::size, (float) j / Chunk::size)));
-                glm::mat4 model_translate = Transform::translate(glm::vec3(model_position.x + ((float) i - (float) count / 2.0f) * Chunk::size, model_position.y + y, model_position.z + ((float) j - (float) count / 2.0f) * Chunk::size));
+//                float y = roundf(Chunk::size * 3 * glm::perlin(glm::vec2((float) i / Chunk::size, (float) j / Chunk::size)));
+//                glm::mat4 model_translate = Transform::translate(glm::vec3(model_position.x + ((float) i - (float) count / 2.0f) * Chunk::size, model_position.y + y, model_position.z + ((float) j - (float) count / 2.0f) * Chunk::size));
+                glm::mat4 model_translate = Transform::translate(glm::vec3(model_position.x + ((float) i - (float) count / 2.0f) * Chunk::size, model_position.y, model_position.z + ((float) j - (float) count / 2.0f) * Chunk::size));
                 shader.set_uniform_matrix_4fv("u_mt", model_translate);
 
                 glDrawElements(GL_TRIANGLES, ib.get_count(), GL_UNSIGNED_INT, nullptr);
@@ -52,10 +53,6 @@ public:
     }
 
     void static_draw(glm::mat4 perspective, glm::vec3 camera_position, glm::vec3 camera_angle, glm::vec3 model_position, glm::vec3 model_angle, int chunk_x, int chunk_z) {
-        int quad_count = 6 * Chunk::size * Chunk::size;
-        auto positions = Chunk::flat_chunk_positions(chunk_x, chunk_z);
-        auto indices = Chunk::flat_chunk_indices();
-
 //        glEnable(GL_BLEND);
 //        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 //
@@ -65,10 +62,10 @@ public:
 //        glEnable(GL_CULL_FACE);
 //        glCullFace(GL_FRONT);
 
-        VertexArray va_1 = VertexArray();
+//        VertexArray va_1 = VertexArray();
 //        VertexBufferLayout layout = VertexBufferLayout();
-        VertexBuffer vb_1 = VertexBuffer(&positions[0], quad_count * 5 * 7 * sizeof(float));
-        IndexBuffer ib_1 = IndexBuffer(&indices[0], quad_count * 6);
+//        VertexBuffer vb_1 = VertexBuffer(&positions[0], quad_count * 5 * 7 * sizeof(float));
+//        IndexBuffer ib_1 = IndexBuffer(&indices[0], quad_count * 6);
 //        Shader shader_1 = Shader("../res/shaders/Basic.glsl");
 //        std::vector<std::string> texture_paths = {"../res/textures/grass_block_side.png", "../res/textures/grass_block_top.png", "../res/textures/dirt.png"};
 //        Texture textures_1 = Texture(texture_paths);
@@ -76,7 +73,7 @@ public:
 //        layout.push(GL_FLOAT, 3, GL_FALSE);
 //        layout.push(GL_FLOAT, 3, GL_FALSE);
 //        layout.push(GL_FLOAT, 1, GL_FALSE);
-        va_1.add_buffer(vb_1, layout);
+//        va_1.add_buffer(vb_1, layout);
 
 //        textures_1.bind(0);
 //        shader_1.set_uniform_1i("u_Textures", 0);
@@ -91,6 +88,6 @@ public:
         glm::mat4 model_translate = Transform::translate(glm::vec3(model_position.x + ((float) chunk_x) * Chunk::size, model_position.y, model_position.z + ((float) chunk_z) * Chunk::size));
         shader.set_uniform_matrix_4fv("u_mt", model_translate);
 
-        glDrawElements(GL_TRIANGLES, ib_1.get_count(), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, ib.get_count(), GL_UNSIGNED_INT, nullptr);
     }
 };

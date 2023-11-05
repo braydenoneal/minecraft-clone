@@ -35,13 +35,12 @@ struct Face {
 
 class Chunk {
 public:
-    static std::array<std::array<std::array<unsigned int, 16>, 16>, 16> flat_chunk_blocks() {
+    static std::array<std::array<std::array<unsigned int, 16>, 16>, 16> flat_chunk_blocks(int cx, int cz) {
         std::array<std::array<std::array<unsigned int, 16>, 16>, 16> blocks{0};
 
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-
-                blocks[x][8 + (int) roundf(size / 4 * glm::perlin(glm::vec2((float) (x) / size, (float) (z) / size)))][z] = 1;
+                blocks[x][8 + (int) roundf(size / 4 * glm::perlin(glm::vec2((float) (x + cx * size) / size, (float) (z + cz * size) / size)))][z] = 1;
             }
         }
 
@@ -228,13 +227,13 @@ public:
         return floats;
     }
 
-    static std::vector<float> get_flat_chunk_vertices() {
+    static std::vector<float> get_flat_chunk_vertices(int cx, int cz) {
 //        std::vector<Face> faces = get_chunk_vertices(get_block_faces(flat_chunk_blocks()));
-        return faces_to_floats(get_chunk_vertices(get_block_faces(flat_chunk_blocks())));
+        return faces_to_floats(get_chunk_vertices(get_block_faces(flat_chunk_blocks(cx, cz))));
     }
 
-    static std::vector<unsigned int> get_flat_chunk_indices() {
-        return get_indices_of_size(get_flat_chunk_vertices().size());
+    static std::vector<unsigned int> get_flat_chunk_indices(int cx, int cz) {
+        return get_indices_of_size(get_flat_chunk_vertices(cx, cz).size());
     }
 
     static const unsigned int size = 16;
