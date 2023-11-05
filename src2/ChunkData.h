@@ -47,7 +47,13 @@ public:
 
                 chunk_data[get_chunk_position(x, y, z)] = 1;
 
-                for (int i = 0 ; i < y; i++) {
+                int sy = std::floor((float) y * 0.98f);
+
+                for (int i = 0 ; i < sy; i++) {
+                    chunk_data[get_chunk_position(x, i, z)] = 3;
+                }
+
+                for (int i = sy ; i < y; i++) {
                     chunk_data[get_chunk_position(x, i, z)] = 2;
                 }
             }
@@ -188,6 +194,66 @@ public:
         };
     }
 
+    static face_t get_positive_x_stone_face(int x, int y, int z) {
+        return {
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  1.0f,  3.0f,  0.8f },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  3.0f,  0.8f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f,  0.8f },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  0.0f,  3.0f,  0.8f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f,  0.8f },
+        };
+    }
+
+    static face_t get_negative_x_stone_face(int x, int y, int z) {
+        return {
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  3.0f,  0.8f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  0.0f,  3.0f,  0.8f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  3.0f,  0.8f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  3.0f,  0.8f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  3.0f,  0.8f },
+        };
+    }
+
+    static face_t get_positive_y_stone_face(int x, int y, int z) {
+        return {
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  3.0f,  1.0f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  3.0f,  1.0f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f,  1.0f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  3.0f,  1.0f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f,  1.0f },
+        };
+    }
+
+    static face_t get_negative_y_stone_face(int x, int y, int z) {
+        return {
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  3.0f,  0.4f },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  3.0f,  0.4f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f,  0.4f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  3.0f,  0.4f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f,  0.4f },
+        };
+    }
+
+    static face_t get_positive_z_stone_face(int x, int y, int z) {
+        return {
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  3.0f,  0.6f },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  0.0f,  3.0f,  0.6f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f,  0.6f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  0.0f,  3.0f,  0.6f },
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  3.0f,  0.6f },
+        };
+    }
+
+    static face_t get_negative_z_stone_face(int x, int y, int z) {
+        return {
+                vertex_t { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  1.0f,  3.0f,  0.6f },
+                vertex_t { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  3.0f,  0.6f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  3.0f,  0.6f },
+                vertex_t {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  3.0f,  0.6f },
+                vertex_t {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  3.0f,  0.6f },
+        };
+    }
+
     static mesh_data_t get_chunk_mesh(chunk_data_t chunk_data) {
         mesh_data_t mesh_data{};
 
@@ -227,6 +293,23 @@ public:
                         }
                         if (z == 0 || (z > 0 && chunk_data[get_chunk_position(x, y, z - 1)] == 0)) {
                             mesh_data.push_back(get_negative_z_dirt_face(x, y, z));
+                        }
+                    } else if (chunk_data[get_chunk_position(x, y, z)] == 3) {
+                        if (x == chunk_size - 1 || (x < chunk_size - 1 && chunk_data[get_chunk_position(x + 1, y, z)] == 0)) {
+                            mesh_data.push_back(get_positive_x_stone_face(x, y, z));
+                        }
+                        if (x == 0 || (x > 0 && chunk_data[get_chunk_position(x - 1, y, z)] == 0))
+                            mesh_data.push_back(get_negative_x_stone_face(x, y, z));
+                        if (y == chunk_size - 1 || (y < chunk_height - 1 && chunk_data[get_chunk_position(x, y + 1, z)] == 0)) {
+                            mesh_data.push_back(get_positive_y_stone_face(x, y, z));
+                        }
+                        if (y == 0 || (y > 0 && chunk_data[get_chunk_position(x, y - 1, z)] == 0))
+                            mesh_data.push_back(get_negative_y_stone_face(x, y, z));
+                        if (z == chunk_size - 1 || (z < chunk_size - 1 && chunk_data[get_chunk_position(x, y, z + 1)] == 0)) {
+                            mesh_data.push_back(get_positive_z_stone_face(x, y, z));
+                        }
+                        if (z == 0 || (z > 0 && chunk_data[get_chunk_position(x, y, z - 1)] == 0)) {
+                            mesh_data.push_back(get_negative_z_stone_face(x, y, z));
                         }
                     }
                 }

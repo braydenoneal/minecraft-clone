@@ -21,6 +21,7 @@ public:
 
     static void clear() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(0.5f, 0.8f, 1.0f, 1.0f);
+//        glClearColor(0.5f, 0.8f, 1.0f, 1.0f);
+        glClearColor(141.0f / 255.0f, 159.0f / 255.0f, 1.0f, 1.0f);
     }
 };

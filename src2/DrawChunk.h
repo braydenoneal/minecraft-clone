@@ -6,7 +6,7 @@ struct UniformsPackage {
 
 class DrawChunk {
 public:
-    std::vector<std::string> texture_paths = {"../res/textures/grass_block_side.png", "../res/textures/grass_block_top.png", "../res/textures/dirt.png"};
+    std::vector<std::string> texture_paths = {"../res/textures/grass_block_side_beta.png", "../res/textures/grass_block_top_beta.png", "../res/textures/dirt.png", "../res/textures/stone.png"};
     VertexBufferLayout layout = VertexBufferLayout();
     Shader shader = Shader("../res/shaders/Basic2.glsl");
     Texture textures = Texture(texture_paths);
