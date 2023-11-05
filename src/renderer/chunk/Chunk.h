@@ -36,11 +36,12 @@ struct Face {
 class Chunk {
 public:
     static std::array<std::array<std::array<unsigned int, 16>, 16>, 16> flat_chunk_blocks() {
-        std::array<std::array<std::array<unsigned int, 16>, 16>, 16> blocks{};
+        std::array<std::array<std::array<unsigned int, 16>, 16>, 16> blocks{0};
 
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-                blocks[x][0][z] = 1;
+
+                blocks[x][8 + (int) roundf(size / 4 * glm::perlin(glm::vec2((float) (x) / size, (float) (z) / size)))][z] = 1;
             }
         }
 
@@ -53,193 +54,112 @@ public:
         for (int x = 0; x < 16; x++) {
             for (int y = 0; y < 16; y++) {
                 for (int z = 0; z < 16; z++) {
-                    bool positive_x = true;
-                    if (x < 15 && chunk_blocks[x + 1][y][z] > 0) {
-                        positive_x = false;
-                    }
-                    bool negative_x = true;
-                    if (x > 0 && chunk_blocks[x - 1][y][z] > 0) {
-                        positive_x = false;
-                    }
-                    bool positive_y = true;
-                    if (y < 15 && chunk_blocks[x][y + 1][z] > 0) {
-                        positive_y = false;
-                    }
-                    bool negative_y = true;
-                    if (y > 0 && chunk_blocks[x][y - 1][z] > 0) {
-                        positive_y = false;
-                    }
-                    bool positive_z = true;
-                    if (z < 15 && chunk_blocks[x][y][z + 1] > 0) {
-                        positive_z = false;
-                    }
-                    bool negative_z = true;
-                    if (z > 0 && chunk_blocks[x][y][z - 1] > 0) {
-                        positive_z = false;
-                    }
+                    if (chunk_blocks[x][y][z] == 1) {
+                        bool positive_x = (x == 15 || (x < 15 && chunk_blocks[x + 1][y][z] != 1));
+                        bool negative_x = (x == 0 || (x > 0 && chunk_blocks[x - 1][y][z] != 1));
+                        bool positive_y = (y == 15 || (y < 15 && chunk_blocks[x][y + 1][z] != 1));
+                        bool negative_y = (y == 0 || (y > 0 && chunk_blocks[x][y - 1][z] != 1));
+                        bool positive_z = (z == 15 || (z < 15 && chunk_blocks[x][y][z + 1] != 1));
+                        bool negative_z = (z == 0 || (z > 0 && chunk_blocks[x][y][z - 1] != 1));
 
-                    block_faces[x][y][z] = {
-                            chunk_blocks[x][y][z], (unsigned int) x, (unsigned int) y, (unsigned int) z,
-                            positive_x, negative_x, positive_y, negative_y, positive_z, negative_z
-                    };
+                        block_faces[x][y][z] = {
+                                chunk_blocks[x][y][z], (unsigned int) x, (unsigned int) y, (unsigned int) z,
+                                positive_x, negative_x, positive_y, negative_y, positive_z, negative_z
+                        };
+                    }
                 }
             }
         }
+
+        return block_faces;
     }
 
-    static Face get_positive_x_face() {
+    static Face get_positive_x_face(int x, int y, int z) {
         return {
-                { 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.8f },
-                { 0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f,  0.8f },
-                { 0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.8f },
-                { 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.8f },
-                { 0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.8f },
+                { 0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  1.0f,  0.0f,  0.8f },
+                { 0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  0.0f,  0.8f },
+                { 0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.8f },
+                { 0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  0.0f,  0.0f,  0.8f },
+                { 0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.8f },
         };
     }
 
-    static Face get_negative_x_face() {
+    static Face get_negative_x_face(int x, int y, int z) {
         return {
-                { -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.8f },
-                { -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  0.0f,  0.8f },
-                { -0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.8f },
-                { -0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.8f },
-                { -0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.8f },
+                { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  0.0f,  0.8f },
+                { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  0.0f,  0.0f,  0.8f },
+                { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.8f },
+                { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  0.0f,  0.8f },
+                { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.8f },
         };
     }
 
-    static Face get_positive_y_face() {
+    static Face get_positive_y_face(int x, int y, int z) {
         return {
-                { -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  1.0f,  1.0f },
-                { -0.5f,  0.5f, -0.5f,  0.0f,  0.0f,  1.0f,  1.0f },
-                {  0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  1.0f,  1.0f },
-                {  0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  1.0f,  1.0f },
-                {  0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  1.0f,  1.0f },
+                { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  1.0f,  1.0f },
+                { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  1.0f,  1.0f },
+                {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  1.0f,  1.0f },
+                {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  1.0f,  1.0f },
+                {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  1.0f,  1.0f },
         };
     }
 
-    static Face get_negative_y_face() {
+    static Face get_negative_y_face(int x, int y, int z) {
         return {
-                {  0.5f, -0.5f,  0.5f,  0.0f,  1.0f,  2.0f,  0.4f },
-                {  0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  2.0f,  0.4f },
-                { -0.5f, -0.5f,  0.5f,  1.0f,  1.0f,  2.0f,  0.4f },
-                { -0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  2.0f,  0.4f },
-                { -0.5f, -0.5f,  0.5f,  1.0f,  1.0f,  2.0f,  0.4f },
+                {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  2.0f,  0.4f },
+                {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  2.0f,  0.4f },
+                { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.4f },
+                { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  2.0f,  0.4f },
+                { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  2.0f,  0.4f },
         };
     }
 
-    static Face get_positive_z_face() {
+    static Face get_positive_z_face(int x, int y, int z) {
         return {
-                {  0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.6f },
-                {  0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  0.0f,  0.6f },
-                { -0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.6f },
-                { -0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.6f },
-                { -0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.6f },
+                {  0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  0.0f,  1.0f,  0.0f,  0.6f },
+                {  0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  0.0f,  0.0f,  0.0f,  0.6f },
+                { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.6f },
+                { -0.5f + (float) x, -0.5f + (float) y,  0.5f + (float) z,  1.0f,  0.0f,  0.0f,  0.6f },
+                { -0.5f + (float) x,  0.5f + (float) y,  0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.6f },
         };
     }
 
-    static Face get_negative_z_face() {
+    static Face get_negative_z_face(int x, int y, int z) {
         return {
-                { -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.6f },
-                { -0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f,  0.6f },
-                {  0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.6f },
-                {  0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.6f },
-                {  0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.6f },
+                { -0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  0.0f,  1.0f,  0.0f,  0.6f },
+                { -0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  0.0f,  0.0f,  0.0f,  0.6f },
+                {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.6f },
+                {  0.5f + (float) x, -0.5f + (float) y, -0.5f + (float) z,  1.0f,  0.0f,  0.0f,  0.6f },
+                {  0.5f + (float) x,  0.5f + (float) y, -0.5f + (float) z,  1.0f,  1.0f,  0.0f,  0.6f },
         };
     }
 
-    static std::array<std::array<std::array<float, 7>, 5>, 6> cube_vertices() {
-        std::array<std::array<std::array<float, 7>, 5>, 6> vertices = {
-                std::array<std::array<float, 7>, 5> {  // -Z
-                    std::array<float, 7> { -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.6f, },
-                    std::array<float, 7> { -0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f,  0.6f, },
-                    std::array<float, 7> {  0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.6f, },
-                    std::array<float, 7> {  0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.6f, },
-                    std::array<float, 7> {  0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.6f, },
-                },
-                std::array<std::array<float, 7>, 5> {  // +Z
-                    std::array<float, 7> {  0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.6f, },
-                    std::array<float, 7> {  0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  0.0f,  0.6f, },
-                    std::array<float, 7> { -0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.6f, },
-                    std::array<float, 7> { -0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.6f, },
-                    std::array<float, 7> { -0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.6f, },
-                },
-                std::array<std::array<float, 7>, 5> {  // -X
-                    std::array<float, 7> { -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.8f, },
-                    std::array<float, 7> { -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  0.0f,  0.8f, },
-                    std::array<float, 7> { -0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.8f, },
-                    std::array<float, 7> { -0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.8f, },
-                    std::array<float, 7> { -0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.8f, },
-                },
-                std::array<std::array<float, 7>, 5> {  // +X
-                    std::array<float, 7> {  0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.8f, },
-                    std::array<float, 7> {  0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f,  0.8f, },
-                    std::array<float, 7> {  0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.8f, },
-                    std::array<float, 7> {  0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.8f, },
-                    std::array<float, 7> {  0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.8f, },
-                },
-                std::array<std::array<float, 7>, 5> {  // +Y
-                    std::array<float, 7> { -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  1.0f,  1.0f, },
-                    std::array<float, 7> { -0.5f,  0.5f, -0.5f,  0.0f,  0.0f,  1.0f,  1.0f, },
-                    std::array<float, 7> {  0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  1.0f,  1.0f, },
-                    std::array<float, 7> {  0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  1.0f,  1.0f, },
-                    std::array<float, 7> {  0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  1.0f,  1.0f, },
-                },
-                std::array<std::array<float, 7>, 5> {  // -Y
-                    std::array<float, 7> {  0.5f, -0.5f,  0.5f,  0.0f,  1.0f,  2.0f,  0.4f, },
-                    std::array<float, 7> {  0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  2.0f,  0.4f, },
-                    std::array<float, 7> { -0.5f, -0.5f,  0.5f,  1.0f,  1.0f,  2.0f,  0.4f, },
-                    std::array<float, 7> { -0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  2.0f,  0.4f, },
-                    std::array<float, 7> { -0.5f, -0.5f,  0.5f,  1.0f,  1.0f,  2.0f,  0.4f, },
-                },
-        };
-
-        return vertices;
-    }
-
-    static std::array<std::array<std::array<std::array<std::array<std::array<float, 7>, 5>, 6>, 16>, 16>, 16> chunk_vertices(std::array<std::array<std::array<BlockFaces, 16>, 16>, 16> chunk_faces) {
-        std::array<std::array<std::array<std::array<std::array<std::array<float, 7>, 5>, 6>, 16>, 16>, 16> vertices{};
-        std::array<std::array<std::array<float, 7>, 5>, 6> default_cube_vertices = cube_vertices();
+    static std::vector<Face> get_chunk_vertices(std::array<std::array<std::array<BlockFaces, 16>, 16>, 16> chunk_faces) {
+        std::vector<Face> vertices{};
 
         for (int x = 0; x < 16; x++) {
             for (int y = 0; y < 16; y++) {
                 for (int z = 0; z < 16; z++) {
                     BlockFaces block_faces = chunk_faces[x][y][z];
 
-                    if (block_faces.positive_x) {
-                        vertices[x][y][z][3] = default_cube_vertices[3];
-                    }
-                    if (block_faces.negative_x) {
-                        vertices[x][y][z][2] = default_cube_vertices[2];
-                    }
-                    if (block_faces.positive_y) {
-                        vertices[x][y][z][4] = default_cube_vertices[4];
-                    }
-                    if (block_faces.negative_y) {
-                        vertices[x][y][z][5] = default_cube_vertices[5];
-                    }
-                    if (block_faces.positive_z) {
-                        vertices[x][y][z][1] = default_cube_vertices[1];
-                    }
-                    if (block_faces.negative_z) {
-                        vertices[x][y][z][0] = default_cube_vertices[0];
-                    }
-                }
-            }
-        }
-
-        return vertices;
-    }
-
-    static std::list<std::array<std::array<float, 7>, 5>> mutable_vertices(std::array<std::array<std::array<std::array<std::array<std::array<float, 7>, 5>, 6>, 16>, 16>, 16> chunk_vertices) {
-        std::list<std::array<std::array<float, 7>, 5>> vertices{};
-        std::list<std::array<unsigned int, 6>> indices{};
-
-        for (int x = 0; x < 16; x++) {
-            for (int y = 0; y < 16; y++) {
-                for (int z = 0; z < 16; z++) {
-                    for (int face = 0; face < 6; face++) {
-                        if (!chunk_vertices[x][y][z][face].empty()) {
-                            vertices.push_back(chunk_vertices[x][y][z][face]);
+                    if (block_faces.block == 1) {
+                        if (block_faces.positive_x) {
+                            vertices.push_back(get_positive_x_face(x, y, z));
+                        }
+                        if (block_faces.negative_x) {
+                            vertices.push_back(get_negative_x_face(x, y, z));
+                        }
+                        if (block_faces.positive_y) {
+                            vertices.push_back(get_positive_y_face(x, y, z));
+                        }
+                        if (block_faces.negative_y) {
+                            vertices.push_back(get_negative_y_face(x, y, z));
+                        }
+                        if (block_faces.positive_z) {
+                            vertices.push_back(get_positive_z_face(x, y, z));
+                        }
+                        if (block_faces.negative_z) {
+                            vertices.push_back(get_negative_z_face(x, y, z));
                         }
                     }
                 }
@@ -249,37 +169,72 @@ public:
         return vertices;
     }
 
-    static std::list<Face> get_chunk_vertices(std::array<std::array<std::array<BlockFaces, 16>, 16>, 16> chunk_faces) {
-        std::list<Face> vertices{};
+    static std::vector<unsigned int> get_indices_of_size(unsigned long long faces_count) {
+        std::vector<unsigned int> indices{};
 
-        for (int x = 0; x < 16; x++) {
-            for (int y = 0; y < 16; y++) {
-                for (int z = 0; z < 16; z++) {
-                    BlockFaces block_faces = chunk_faces[x][y][z];
-
-                    if (block_faces.positive_x) {
-                        vertices.push_back(get_positive_x_face());
-                    }
-                    if (block_faces.negative_x) {
-                        vertices.push_back(get_negative_x_face());
-                    }
-                    if (block_faces.positive_y) {
-                        vertices.push_back(get_positive_y_face());
-                    }
-                    if (block_faces.negative_y) {
-                        vertices.push_back(get_negative_y_face());
-                    }
-                    if (block_faces.positive_z) {
-                        vertices.push_back(get_positive_z_face());
-                    }
-                    if (block_faces.negative_z) {
-                        vertices.push_back(get_negative_z_face());
-                    }
-                }
-            }
+        for (int i = 0; i < faces_count; i++) {
+            indices.push_back(i * 5 + 0);
+            indices.push_back(i * 5 + 1);
+            indices.push_back(i * 5 + 2);
+            indices.push_back(i * 5 + 3);
+            indices.push_back(i * 5 + 4);
+            indices.push_back(i * 5 + 1);
         }
 
-        return vertices;
+        return indices;
+    }
+
+    static std::vector<float> faces_to_floats(std::vector<Face> faces) {
+        std::vector<float> floats;
+
+        for (Face face : faces) {
+            floats.push_back(face.vertex0.x);
+            floats.push_back(face.vertex0.y);
+            floats.push_back(face.vertex0.z);
+            floats.push_back(face.vertex0.s);
+            floats.push_back(face.vertex0.t);
+            floats.push_back(face.vertex0.texture);
+            floats.push_back(face.vertex0.brightness);
+            floats.push_back(face.vertex1.x);
+            floats.push_back(face.vertex1.y);
+            floats.push_back(face.vertex1.z);
+            floats.push_back(face.vertex1.s);
+            floats.push_back(face.vertex1.t);
+            floats.push_back(face.vertex1.texture);
+            floats.push_back(face.vertex1.brightness);
+            floats.push_back(face.vertex2.x);
+            floats.push_back(face.vertex2.y);
+            floats.push_back(face.vertex2.z);
+            floats.push_back(face.vertex2.s);
+            floats.push_back(face.vertex2.t);
+            floats.push_back(face.vertex2.texture);
+            floats.push_back(face.vertex2.brightness);
+            floats.push_back(face.vertex3.x);
+            floats.push_back(face.vertex3.y);
+            floats.push_back(face.vertex3.z);
+            floats.push_back(face.vertex3.s);
+            floats.push_back(face.vertex3.t);
+            floats.push_back(face.vertex3.texture);
+            floats.push_back(face.vertex3.brightness);
+            floats.push_back(face.vertex4.x);
+            floats.push_back(face.vertex4.y);
+            floats.push_back(face.vertex4.z);
+            floats.push_back(face.vertex4.s);
+            floats.push_back(face.vertex4.t);
+            floats.push_back(face.vertex4.texture);
+            floats.push_back(face.vertex4.brightness);
+        }
+
+        return floats;
+    }
+
+    static std::vector<float> get_flat_chunk_vertices() {
+//        std::vector<Face> faces = get_chunk_vertices(get_block_faces(flat_chunk_blocks()));
+        return faces_to_floats(get_chunk_vertices(get_block_faces(flat_chunk_blocks())));
+    }
+
+    static std::vector<unsigned int> get_flat_chunk_indices() {
+        return get_indices_of_size(get_flat_chunk_vertices().size());
     }
 
     static const unsigned int size = 16;

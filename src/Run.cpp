@@ -9,7 +9,14 @@ int main() {
 
     int quad_count = 6 * Chunk::size * Chunk::size;
 
-    Cube cube(quad_count, &Chunk::flat_chunk_positions()[0], &Chunk::flat_chunk_indices()[0]);
+//    std::vector<float> floats = Chunk::get_flat_chunk_vertices();
+//    for (float value : floats) {
+//        std::cout << value << std::endl;
+//    }
+
+//    Cube cube(quad_count, &Chunk::flat_chunk_positions()[0], &Chunk::flat_chunk_indices()[0]);
+    Cube cube(Chunk::get_chunk_vertices(Chunk::get_block_faces(Chunk::flat_chunk_blocks())).size(), Chunk::get_flat_chunk_vertices().data(), Chunk::get_flat_chunk_indices().data());
+//    Cube cube(quad_count, &Chunk::flat_chunk_positions()[0], Chunk::get_indices_of_size(6 * 256).data());
     Draw draw(&window_context, &game_context, &cube);
 
     while(!window_context.window_should_close()) {
