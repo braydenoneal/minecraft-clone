@@ -10,9 +10,9 @@ static std::string title = "Graphics Application Template";
 static int width = 640;
 static int height = 480;
 
-static GLFWwindow *window;
+static GLFWwindow *glfw_window;
 
-namespace Window {
+namespace window {
     void create_context() {
         glfwInit();
 
@@ -21,9 +21,9 @@ namespace Window {
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_MAXIMIZED, maximized ? GL_TRUE : GLFW_FALSE);
 
-        window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+        glfw_window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 
-        glfwMakeContextCurrent(window);
+        glfwMakeContextCurrent(glfw_window);
 
         gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 
@@ -36,13 +36,13 @@ namespace Window {
         glDepthFunc(GL_LESS);
 
         ImGui::CreateContext();
-        ImGui_ImplGlfw_InitForOpenGL(window, true);
+        ImGui_ImplGlfw_InitForOpenGL(glfw_window, true);
         ImGui_ImplOpenGL3_Init("#version 330 core");
         ImGui::StyleColorsDark();
     }
 
     int should_close() {
-        return glfwWindowShouldClose(window);
+        return glfwWindowShouldClose(glfw_window);
     }
 
     void update() {}
@@ -63,7 +63,7 @@ namespace Window {
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(glfw_window);
     }
 
     void terminate() {

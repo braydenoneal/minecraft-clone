@@ -18,7 +18,7 @@ add_executable(${PROJECT_NAME}
         lib/glad/src/glad.c
         lib/stb/src/stb_image.cpp
         ${IMGUI_SOURCE}
-        src/Run.cpp
+        src/run.cpp
 )
 
 include_directories(lib/glad/include)
