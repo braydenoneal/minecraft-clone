@@ -1,3 +1,5 @@
+#pragma once
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <imgui.h>
@@ -69,7 +71,24 @@ namespace window {
     void terminate() {
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
-
         glfwTerminate();
+    }
+
+    void close() {
+        glfwSetWindowShouldClose(glfw_window, GLFW_TRUE);
+    }
+
+    GLFWwindow *get_glfw_window() {
+        return glfw_window;
+    }
+
+    void toggle_maximize() {
+        if (maximized) {
+            maximized = false;
+            glfwRestoreWindow(glfw_window);
+        } else {
+            maximized = true;
+            glfwMaximizeWindow(glfw_window);
+        }
     }
 }
