@@ -1,7 +1,7 @@
-#include "window.hpp"
-#include "input.hpp"
-#include "physics.hpp"
-#include "matter.hpp"
+#include "window/window.hpp"
+#include "input/input.hpp"
+#include "physics/physics.hpp"
+#include "matter/matter.hpp"
 
 int main() {
     window::create_context();

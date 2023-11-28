@@ -1,7 +1,9 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#pragma once
 
-#include "window.hpp"
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
+
+#include "../window/window.hpp"
 
 namespace input {
     void key_callback(GLFWwindow* glfw_window, int key, int scancode, int action, int mods) {
@@ -25,9 +27,5 @@ namespace input {
 
     void poll_events() {
         glfwPollEvents();
-    }
-
-    void maximize() {
-        int previous_key_state = glfwGetKey(window::get_glfw_window(), GLFW_KEY_F11);
     }
 }
