@@ -1,13 +1,16 @@
 #pragma once
 
 #include <string>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <imgui.h>
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
-#include "imgui.h"
-#include "backends/imgui_impl_glfw.h"
-#include "backends/imgui_impl_opengl3.h"
 #include "graphics/shader.hpp"
+#include "../matter/matter.hpp"
 
 static bool maximized = false;
 static std::string title = "Graphics Application Template";
@@ -95,15 +98,29 @@ namespace window {
                 GL_FLOAT,   // GLenum	    type,
                 GL_FALSE,   // GLboolean	normalized,
                 4 * 3,      // GLsizei	    stride,
-                (GLvoid *) 0
+                (GLvoid *) nullptr
         );
 
         GLuint program = shader::create_shaders(
-                "./window/graphics/shaders/default/vertex.glsl",
-                "./window/graphics/shaders/default/fragment.glsl"
+                "../res/vertex.glsl",
+                "../res/fragment.glsl"
         );
 
+        glm::mat4 perspective = glm::perspective(glm::radians(70.0f), 640.0f / 480.0f, 0.0001f, 10000.0f);
+        auto camera_rotate = glm::mat4(1.0f);
+        camera_rotate = glm::rotate(camera_rotate, matter::camera_angle.x, glm::vec3(1.0f, 0.0f, 0.0f));
+        camera_rotate = glm::rotate(camera_rotate, matter::camera_angle.y, glm::vec3(0.0f, 1.0f, 0.0f));
+        camera_rotate = glm::rotate(camera_rotate, matter::camera_angle.z, glm::vec3(0.0f, 0.0f, 1.0f));
+        glm::mat4 camera_translate = glm::translate(
+            glm::mat4(1.0f),
+            glm::vec3(-matter::camera_position.x, -matter::camera_position.y, matter::camera_position.z)
+        );
+        glm::mat4 camera_matrix = perspective * camera_rotate * camera_translate;
+
         shader::bind(program);
+
+        int location = glGetUniformLocation(program, "u_camera");
+        glUniformMatrix4fv(location, 1, GL_FALSE, &camera_matrix[0][0]);
 
         glDrawArrays(GL_TRIANGLES, 0, 9 * 4);
 
@@ -117,6 +134,8 @@ namespace window {
                 toggle_maximize();
             }
             ImGui::Text("%.3f ms/frame %.1f FPS", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            ImGui::SliderFloat3("Position", &matter::camera_position[0], -10.0f, 10.0f);
+            ImGui::SliderFloat3("Camera", &matter::camera_angle[0], -glm::pi<float>() / 2.0f, glm::pi<float>() / 2.0f);
             ImGui::End();
         }
 

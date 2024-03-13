@@ -15,6 +15,24 @@ namespace input {
                 case GLFW_KEY_Q:
                     window::close();
                     break;
+                case GLFW_KEY_A:
+                    matter::camera_position.x -= 0.5f;
+                    break;
+                case GLFW_KEY_D:
+                    matter::camera_position.x += 0.5f;
+                    break;
+                case GLFW_KEY_SPACE:
+                    matter::camera_position.y += 0.5f;
+                    break;
+                case GLFW_KEY_LEFT_SHIFT:
+                    matter::camera_position.y -= 0.5f;
+                    break;
+                case GLFW_KEY_S:
+                    matter::camera_position.z -= 0.5f;
+                    break;
+                case GLFW_KEY_W:
+                    matter::camera_position.z += 0.5f;
+                    break;
                 default:
                     break;
             }
