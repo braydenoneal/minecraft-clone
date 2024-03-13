@@ -97,7 +97,49 @@ namespace window {
         GLuint vertex_buffer;
         glGenBuffers(1, &vertex_buffer);
         glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-        float vertex_buffer_data[9] = {0, 0, 0, 0, 1, 0, 1, 1, 0};
+        float vertex_buffer_data[4 * 6 * 6] = {
+                -0.5f, -0.5f, -0.5f, 0.8f,
+                -0.5f, 0.5f, -0.5f, 0.8f,
+                -0.5f, -0.5f, 0.5f, 0.8f,
+                -0.5f, 0.5f, 0.5f, 0.8f,
+                -0.5f, -0.5f, 0.5f, 0.8f,
+                -0.5f, 0.5f, -0.5f, 0.8f,
+
+                0.5f, 0.5f, -0.5f, 0.8f,
+                0.5f, -0.5f, -0.5f, 0.8f,
+                0.5f, 0.5f, 0.5f, 0.8f,
+                0.5f, -0.5f, 0.5f, 0.8f,
+                0.5f, 0.5f, 0.5f, 0.8f,
+                0.5f, -0.5f, -0.5f, 0.8f,
+
+                -0.5f, -0.5f, -0.5f, 0.4f,
+                -0.5f, -0.5f, 0.5f, 0.4f,
+                0.5f, -0.5f, -0.5f, 0.4f,
+                0.5f, -0.5f, 0.5f, 0.4f,
+                0.5f, -0.5f, -0.5f, 0.4f,
+                -0.5f, -0.5f, 0.5f, 0.4f,
+
+                -0.5f, 0.5f, 0.5f, 1.0f,
+                -0.5f, 0.5f, -0.5f, 1.0f,
+                0.5f, 0.5f, 0.5f, 1.0f,
+                0.5f, 0.5f, -0.5f, 1.0f,
+                0.5f, 0.5f, 0.5f, 1.0f,
+                -0.5f, 0.5f, -0.5f, 1.0f,
+
+                -0.5f, -0.5f, -0.5f, 0.6f,
+                0.5f, -0.5f, -0.5f, 0.6f,
+                -0.5f, 0.5f, -0.5f, 0.6f,
+                0.5f, 0.5f, -0.5f, 0.6f,
+                -0.5f, 0.5f, -0.5f, 0.6f,
+                0.5f, -0.5f, -0.5f, 0.6f,
+
+                0.5f, -0.5f, 0.5f, 0.6f,
+                -0.5f, -0.5f, 0.5f, 0.6f,
+                0.5f, 0.5f, 0.5f, 0.6f,
+                -0.5f, 0.5f, 0.5f, 0.6f,
+                0.5f, 0.5f, 0.5f, 0.6f,
+                -0.5f, -0.5f, 0.5f, 0.6f,
+        };
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data), vertex_buffer_data, GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(0); // index
@@ -106,8 +148,18 @@ namespace window {
                 3,          // GLint	    size,
                 GL_FLOAT,   // GLenum	    type,
                 GL_FALSE,   // GLboolean	normalized,
-                4 * 3,      // GLsizei	    stride,
+                4 * 4,      // GLsizei	    stride,
                 (GLvoid *) nullptr
+        );
+
+        glEnableVertexAttribArray(1); // index
+        glVertexAttribPointer(
+                1,          // GLuint	    index,
+                1,          // GLint	    size,
+                GL_FLOAT,   // GLenum	    type,
+                GL_FALSE,   // GLboolean	normalized,
+                4 * 4,      // GLsizei	    stride,
+                (const void *) (intptr_t) (4 * 3)
         );
 
         GLuint program = shader::create_shaders(
@@ -131,24 +183,15 @@ namespace window {
         int location = glGetUniformLocation(program, "u_camera");
         glUniformMatrix4fv(location, 1, GL_FALSE, &camera_matrix[0][0]);
 
-        glDrawArrays(GL_TRIANGLES, 0, 9 * 4);
+        glDrawArrays(GL_TRIANGLES, 0, 12 * 4);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        {
-            ImGui::Begin("Debug");
-            if (ImGui::Button("Maximize")) {
-                toggle_maximize();
-            }
-            ImGui::Text("%.3f ms/frame %.1f FPS", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-            ImGui::Text("Delta X: %.0f", cursor_difference_x);
-            ImGui::Text("Delta Y: %.0f", cursor_difference_y);
-            ImGui::SliderFloat3("Position", &matter::camera_position[0], -10.0f, 10.0f);
-            ImGui::SliderFloat3("Camera", &matter::camera_angle[0], -M_PI / 2.0f, M_PI / 2.0f);
-            ImGui::End();
-        }
+        ImGui::Begin("Debug");
+        ImGui::Text("%.0f FPS", ImGui::GetIO().Framerate);
+        ImGui::End();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
