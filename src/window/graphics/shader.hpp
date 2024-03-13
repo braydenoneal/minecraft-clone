@@ -41,4 +41,12 @@ namespace shader {
     void bind(GLuint program) {
         glUseProgram(program);
     }
+
+    void unbind() {
+        glUseProgram(0);
+    }
+
+    void terminate(GLuint program) {
+        glDeleteProgram(program);
+    }
 }
