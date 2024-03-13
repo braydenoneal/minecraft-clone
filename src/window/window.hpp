@@ -113,43 +113,25 @@ namespace window {
         };
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data), vertex_buffer_data, GL_STATIC_DRAW);
 
-        glEnableVertexAttribArray(0); // index
-        glVertexAttribPointer(
-                0,          // GLuint	    index,
-                3,          // GLint	    size,
-                GL_FLOAT,   // GLenum	    type,
-                GL_FALSE,   // GLboolean	normalized,
-                4 * 7,      // GLsizei	    stride,
-                (GLvoid *) nullptr
-        );
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * 7, (GLvoid *) nullptr);
 
-        glEnableVertexAttribArray(1); // index
-        glVertexAttribPointer(
-                1,          // GLuint	    index,
-                3,          // GLint	    size,
-                GL_FLOAT,   // GLenum	    type,
-                GL_FALSE,   // GLboolean	normalized,
-                4 * 7,      // GLsizei	    stride,
-                (const void *) (intptr_t) (4 * 3)
-        );
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 4 * 7, (const void *) (intptr_t) (4 * 3));
 
-        glEnableVertexAttribArray(2); // index
-        glVertexAttribPointer(
-                2,          // GLuint	    index,
-                1,          // GLint	    size,
-                GL_FLOAT,   // GLenum	    type,
-                GL_FALSE,   // GLboolean	normalized,
-                4 * 7,      // GLsizei	    stride,
-                (const void *) (intptr_t) (4 * 6)
-        );
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 4 * 7, (const void *) (intptr_t) (4 * 6));
 
         program = shader::create_shaders(
                 "../res/vertex.glsl",
                 "../res/fragment.glsl"
         );
 
+        shader::bind(program);
+
         // Textures
-        std::vector<std::string> texture_paths = {"../res/textures/grass_block_side.png", "../res/textures/grass_block_top.png", "../res/textures/dirt.png"};
+        std::vector<std::string> texture_paths = {"../res/textures/grass_block_side.png",
+                                                  "../res/textures/grass_block_top.png", "../res/textures/dirt.png"};
         stbi_set_flip_vertically_on_load(1);
 
         GLuint texture;
@@ -164,7 +146,8 @@ namespace window {
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, 16, 16, (int) texture_paths.size(), 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, nullptr);
+        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, 16, 16, (int) texture_paths.size(), 0, GL_RGBA,
+                     GL_UNSIGNED_INT_8_8_8_8_REV, nullptr);
 
         unsigned char *local_buffer;
 
@@ -174,7 +157,8 @@ namespace window {
 
         for (int i = 0; i < texture_paths.size(); i++) {
             local_buffer = stbi_load(texture_paths[i].c_str(), &texture_width, &texture_height, &texture_bbp, 4);
-            glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, texture_width, texture_height, 1, GL_RGBA, GL_UNSIGNED_BYTE, local_buffer);
+            glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, texture_width, texture_height, 1, GL_RGBA,
+                            GL_UNSIGNED_BYTE, local_buffer);
         }
 
         glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
@@ -188,8 +172,6 @@ namespace window {
 
         int texture_uniform = glGetUniformLocation(program, "u_textures");
         glUniform1i(texture_uniform, 0);
-
-        shader::bind(program);
     }
 
     int should_close() {
@@ -233,14 +215,15 @@ namespace window {
     void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 perspective = glm::perspective(glm::radians(70.0f), (float) width / (float) height, 0.0001f, 10000.0f);
+        glm::mat4 perspective = glm::perspective(glm::radians(70.0f), (float) width / (float) height, 0.01f,
+                                                 10000.0f);
         auto camera_rotate = glm::mat4(1.0f);
         camera_rotate = glm::rotate(camera_rotate, matter::camera_angle.x, glm::vec3(1.0f, 0.0f, 0.0f));
         camera_rotate = glm::rotate(camera_rotate, matter::camera_angle.y, glm::vec3(0.0f, 1.0f, 0.0f));
         camera_rotate = glm::rotate(camera_rotate, matter::camera_angle.z, glm::vec3(0.0f, 0.0f, 1.0f));
         glm::mat4 camera_translate = glm::translate(
-            glm::mat4(1.0f),
-            glm::vec3(-matter::camera_position.x, -matter::camera_position.y, matter::camera_position.z)
+                glm::mat4(1.0f),
+                glm::vec3(-matter::camera_position.x, -matter::camera_position.y, matter::camera_position.z)
         );
         glm::mat4 camera_matrix = perspective * camera_rotate * camera_translate;
 
