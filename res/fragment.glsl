@@ -3,7 +3,11 @@
 layout (location = 0) out vec4 color;
 
 in float f_Brightness;
+in vec3 v_texture_coordinates;
+
+uniform sampler2DArray u_textures;
 
 void main() {
-    color = vec4(1.0f, 0.0f, 0.0f, 1.0f) * f_Brightness;
+    vec4 texture_color = texture(u_textures, v_texture_coordinates);
+    color = texture_color * f_Brightness;
 }

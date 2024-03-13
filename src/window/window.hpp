@@ -8,6 +8,8 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <stb_image.h>
+#include <vector>
 
 #include "graphics/shader.hpp"
 #include "../matter/matter.hpp"
@@ -21,6 +23,9 @@ namespace window {
     static double cursor_y = 0.0;
     static double cursor_difference_x = 0.0;
     static double cursor_difference_y = 0.0;
+    static GLuint program;
+    static GLuint vertex_array;
+    static GLuint vertex_buffer;
 
     static GLFWwindow *glfw_window;
 
@@ -55,6 +60,136 @@ namespace window {
         ImGui_ImplGlfw_InitForOpenGL(glfw_window, true);
         ImGui_ImplOpenGL3_Init("#version 330 core");
         ImGui::StyleColorsDark();
+
+        // Render Setup
+        glGenVertexArrays(1, &vertex_array);
+        glBindVertexArray(vertex_array);
+
+        glGenBuffers(1, &vertex_buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+        float vertex_buffer_data[7 * 6 * 6] = {
+                // Left -X
+                -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.8f,
+                -0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.8f,
+                -0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, 0.8f,
+                -0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, 0.8f,
+                -0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, 0.8f,
+                -0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.8f,
+                // Right +X
+                +0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.8f,
+                +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.8f,
+                +0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, 0.8f,
+                +0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, 0.8f,
+                +0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, 0.8f,
+                +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.8f,
+                // Bottom -Y
+                -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 2.0f, 0.4f,
+                -0.5f, -0.5f, +0.5f, 0.0f, 1.0f, 2.0f, 0.4f,
+                +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 2.0f, 0.4f,
+                +0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 2.0f, 0.4f,
+                +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 2.0f, 0.4f,
+                -0.5f, -0.5f, +0.5f, 0.0f, 1.0f, 2.0f, 0.4f,
+                // Top +Y
+                -0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 1.0f, 1.0f,
+                -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f,
+                +0.5f, +0.5f, +0.5f, 1.0f, 0.0f, 1.0f, 1.0f,
+                +0.5f, +0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
+                +0.5f, +0.5f, +0.5f, 1.0f, 0.0f, 1.0f, 1.0f,
+                -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f,
+                // Front -Z
+                -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.6f,
+                +0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.6f,
+                -0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.6f,
+                +0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.6f,
+                -0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.6f,
+                +0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.6f,
+                // Back +Z
+                +0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, 0.6f,
+                -0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, 0.6f,
+                +0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, 0.6f,
+                -0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, 0.6f,
+                +0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, 0.6f,
+                -0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, 0.6f,
+        };
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data), vertex_buffer_data, GL_STATIC_DRAW);
+
+        glEnableVertexAttribArray(0); // index
+        glVertexAttribPointer(
+                0,          // GLuint	    index,
+                3,          // GLint	    size,
+                GL_FLOAT,   // GLenum	    type,
+                GL_FALSE,   // GLboolean	normalized,
+                4 * 7,      // GLsizei	    stride,
+                (GLvoid *) nullptr
+        );
+
+        glEnableVertexAttribArray(1); // index
+        glVertexAttribPointer(
+                1,          // GLuint	    index,
+                3,          // GLint	    size,
+                GL_FLOAT,   // GLenum	    type,
+                GL_FALSE,   // GLboolean	normalized,
+                4 * 7,      // GLsizei	    stride,
+                (const void *) (intptr_t) (4 * 3)
+        );
+
+        glEnableVertexAttribArray(2); // index
+        glVertexAttribPointer(
+                2,          // GLuint	    index,
+                1,          // GLint	    size,
+                GL_FLOAT,   // GLenum	    type,
+                GL_FALSE,   // GLboolean	normalized,
+                4 * 7,      // GLsizei	    stride,
+                (const void *) (intptr_t) (4 * 6)
+        );
+
+        program = shader::create_shaders(
+                "../res/vertex.glsl",
+                "../res/fragment.glsl"
+        );
+
+        // Textures
+        std::vector<std::string> texture_paths = {"../res/textures/grass_block_side.png", "../res/textures/grass_block_top.png", "../res/textures/dirt.png"};
+        stbi_set_flip_vertically_on_load(1);
+
+        GLuint texture;
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
+
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, 16);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, 16, 16, (int) texture_paths.size(), 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, nullptr);
+
+        unsigned char *local_buffer;
+
+        int texture_width;
+        int texture_height;
+        int texture_bbp;
+
+        for (int i = 0; i < texture_paths.size(); i++) {
+            local_buffer = stbi_load(texture_paths[i].c_str(), &texture_width, &texture_height, &texture_bbp, 4);
+            glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, texture_width, texture_height, 1, GL_RGBA, GL_UNSIGNED_BYTE, local_buffer);
+        }
+
+        glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+
+        if (local_buffer) {
+            stbi_image_free(local_buffer);
+        }
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
+
+        int texture_uniform = glGetUniformLocation(program, "u_textures");
+        glUniform1i(texture_uniform, 0);
+
+        shader::bind(program);
     }
 
     int should_close() {
@@ -65,6 +200,14 @@ namespace window {
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
         glfwTerminate();
+
+        glDeleteProgram(program);
+        glDeleteBuffers(1, &vertex_buffer);
+        glDeleteVertexArrays(1, &vertex_array);
+
+        glUseProgram(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
     }
 
     void close() {
@@ -90,83 +233,6 @@ namespace window {
     void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        GLuint vertex_array;
-        glGenVertexArrays(1, &vertex_array);
-        glBindVertexArray(vertex_array);
-
-        GLuint vertex_buffer;
-        glGenBuffers(1, &vertex_buffer);
-        glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-        float vertex_buffer_data[4 * 6 * 6] = {
-                -0.5f, -0.5f, -0.5f, 0.8f,
-                -0.5f, 0.5f, -0.5f, 0.8f,
-                -0.5f, -0.5f, 0.5f, 0.8f,
-                -0.5f, 0.5f, 0.5f, 0.8f,
-                -0.5f, -0.5f, 0.5f, 0.8f,
-                -0.5f, 0.5f, -0.5f, 0.8f,
-
-                0.5f, 0.5f, -0.5f, 0.8f,
-                0.5f, -0.5f, -0.5f, 0.8f,
-                0.5f, 0.5f, 0.5f, 0.8f,
-                0.5f, -0.5f, 0.5f, 0.8f,
-                0.5f, 0.5f, 0.5f, 0.8f,
-                0.5f, -0.5f, -0.5f, 0.8f,
-
-                -0.5f, -0.5f, -0.5f, 0.4f,
-                -0.5f, -0.5f, 0.5f, 0.4f,
-                0.5f, -0.5f, -0.5f, 0.4f,
-                0.5f, -0.5f, 0.5f, 0.4f,
-                0.5f, -0.5f, -0.5f, 0.4f,
-                -0.5f, -0.5f, 0.5f, 0.4f,
-
-                -0.5f, 0.5f, 0.5f, 1.0f,
-                -0.5f, 0.5f, -0.5f, 1.0f,
-                0.5f, 0.5f, 0.5f, 1.0f,
-                0.5f, 0.5f, -0.5f, 1.0f,
-                0.5f, 0.5f, 0.5f, 1.0f,
-                -0.5f, 0.5f, -0.5f, 1.0f,
-
-                -0.5f, -0.5f, -0.5f, 0.6f,
-                0.5f, -0.5f, -0.5f, 0.6f,
-                -0.5f, 0.5f, -0.5f, 0.6f,
-                0.5f, 0.5f, -0.5f, 0.6f,
-                -0.5f, 0.5f, -0.5f, 0.6f,
-                0.5f, -0.5f, -0.5f, 0.6f,
-
-                0.5f, -0.5f, 0.5f, 0.6f,
-                -0.5f, -0.5f, 0.5f, 0.6f,
-                0.5f, 0.5f, 0.5f, 0.6f,
-                -0.5f, 0.5f, 0.5f, 0.6f,
-                0.5f, 0.5f, 0.5f, 0.6f,
-                -0.5f, -0.5f, 0.5f, 0.6f,
-        };
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data), vertex_buffer_data, GL_STATIC_DRAW);
-
-        glEnableVertexAttribArray(0); // index
-        glVertexAttribPointer(
-                0,          // GLuint	    index,
-                3,          // GLint	    size,
-                GL_FLOAT,   // GLenum	    type,
-                GL_FALSE,   // GLboolean	normalized,
-                4 * 4,      // GLsizei	    stride,
-                (GLvoid *) nullptr
-        );
-
-        glEnableVertexAttribArray(1); // index
-        glVertexAttribPointer(
-                1,          // GLuint	    index,
-                1,          // GLint	    size,
-                GL_FLOAT,   // GLenum	    type,
-                GL_FALSE,   // GLboolean	normalized,
-                4 * 4,      // GLsizei	    stride,
-                (const void *) (intptr_t) (4 * 3)
-        );
-
-        GLuint program = shader::create_shaders(
-                "../res/vertex.glsl",
-                "../res/fragment.glsl"
-        );
-
         glm::mat4 perspective = glm::perspective(glm::radians(70.0f), (float) width / (float) height, 0.0001f, 10000.0f);
         auto camera_rotate = glm::mat4(1.0f);
         camera_rotate = glm::rotate(camera_rotate, matter::camera_angle.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -178,12 +244,10 @@ namespace window {
         );
         glm::mat4 camera_matrix = perspective * camera_rotate * camera_translate;
 
-        shader::bind(program);
-
         int location = glGetUniformLocation(program, "u_camera");
         glUniformMatrix4fv(location, 1, GL_FALSE, &camera_matrix[0][0]);
 
-        glDrawArrays(GL_TRIANGLES, 0, 12 * 4);
+        glDrawArrays(GL_TRIANGLES, 0, 6 * 6);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -195,14 +259,6 @@ namespace window {
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        glDeleteProgram(program);
-        glDeleteBuffers(1, &vertex_buffer);
-        glDeleteVertexArrays(1, &vertex_array);
-
-        glUseProgram(0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
 
         glfwSwapBuffers(glfw_window);
     }
