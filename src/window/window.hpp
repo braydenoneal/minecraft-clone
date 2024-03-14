@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <string>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -23,6 +24,29 @@
 
 namespace window {
     int cube_count = 1;
+    int x_region = 0;
+    int z_region = 0;
+    int chunk_radius = 8;
+    int size = chunk_radius * 16 * 2;
+
+    void rerender() {
+        std::vector<glm::vec3> positions = {};
+
+        for (int x = 0; x < size; x++) {
+            for (int z = 0; z < size; z++) {
+                float x_eval = (float) x + (float) x_region * ((float) size / 4.0f) - ((float) size / 2.0f);
+                float z_eval = (float) z - (float) z_region * ((float) size / 4.0f) - ((float) size / 2.0f);
+                float y = 6 * glm::perlin(glm::vec2((float) x_eval / 16.0f, (float) z_eval / 16.0f));
+                positions.emplace_back(x_eval, roundf(y), z_eval);
+            }
+        }
+
+        cube_count = (int) positions.size();
+
+        std::vector<float> vertex_buffer_data = cube::get_buffer_data_at_positions(positions);
+
+        glBufferData(GL_ARRAY_BUFFER, 4 * 7 * 6 * 6 * cube_count, &vertex_buffer_data[0], GL_STATIC_DRAW);
+    }
 
     void create_context() {
         glfwInit();
@@ -64,23 +88,7 @@ namespace window {
         glGenBuffers(1, &render_state::vertex_buffer);
         glBindBuffer(GL_ARRAY_BUFFER, render_state::vertex_buffer);
 
-        std::vector<glm::vec3> positions = {};
-
-        int chunk_radius = 32;
-        int size = chunk_radius * 16 * 2;
-
-        for (int x = 0; x < size; x++) {
-            for (int z = 0; z < size; z++) {
-                float y = 6 * glm::perlin(glm::vec2((float) x / 16.0f, (float) z / 16.0f));
-                positions.emplace_back((float) x, roundf(y), (float) z);
-            }
-        }
-
-        cube_count = (int) positions.size();
-
-        std::vector<float> vertex_buffer_data = cube::get_buffer_data_at_positions(positions);
-
-        glBufferData(GL_ARRAY_BUFFER, 4 * 7 * 6 * 6 * cube_count, &vertex_buffer_data[0], GL_STATIC_DRAW);
+        rerender();
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * 7, (GLvoid *) nullptr);
@@ -198,6 +206,17 @@ namespace window {
         // Clear screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(127.0f / 255.0f, 204.0f / 255.0f, 1.0f, 1.0f);
+
+        // Dynamic test
+        int next_x_region = std::floor(game_state::camera_position.x / ((float) size / 4.0f));
+        int next_z_region = std::floor(game_state::camera_position.z / ((float) size / 4.0f));
+
+        if (next_x_region != x_region || next_z_region != z_region) {
+            rerender();
+        }
+
+        x_region = next_x_region;
+        z_region = next_z_region;
 
         // Setup camera uniform
         glm::mat4 perspective = glm::perspective(glm::radians(user_state::field_of_view),
