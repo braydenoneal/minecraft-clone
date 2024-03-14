@@ -27,6 +27,11 @@ namespace window {
     static GLuint vertex_array;
     static GLuint vertex_buffer;
 
+    // Jump Test
+    static bool jumping = false;
+    static int jump_counter = 0;
+    // End Jump Test
+
     static GLFWwindow *glfw_window;
 
     void create_context() {
@@ -122,10 +127,7 @@ namespace window {
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 4 * 7, (const void *) (intptr_t) (4 * 6));
 
-        program = shader::create_shaders(
-                "../res/vertex.glsl",
-                "../res/fragment.glsl"
-        );
+        program = shader::create_shaders("../res/vertex.glsl", "../res/fragment.glsl");
 
         shader::bind(program);
 
@@ -215,8 +217,7 @@ namespace window {
     void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 perspective = glm::perspective(glm::radians(70.0f), (float) width / (float) height, 0.01f,
-                                                 10000.0f);
+        glm::mat4 perspective = glm::perspective(glm::radians(70.0f), (float) width / (float) height, 0.01f, 10000.0f);
         auto camera_rotate = glm::mat4(1.0f);
         camera_rotate = glm::rotate(camera_rotate, matter::camera_angle.x, glm::vec3(1.0f, 0.0f, 0.0f));
         camera_rotate = glm::rotate(camera_rotate, matter::camera_angle.y, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -231,6 +232,21 @@ namespace window {
         glUniformMatrix4fv(location, 1, GL_FALSE, &camera_matrix[0][0]);
 
         glDrawArrays(GL_TRIANGLES, 0, 6 * 6);
+
+        // Jump Test
+        if (jumping) {
+            jump_counter++;
+
+            if (jump_counter < 32) {
+                matter::camera_position.y += 0.1f;
+            } else {
+                jump_counter = 0;
+                jumping = false;
+            }
+        } else {
+            matter::camera_position.y = std::max(0.0f, matter::camera_position.y - 0.1f);
+        }
+        // End Jump Test
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();

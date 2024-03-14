@@ -64,7 +64,10 @@ namespace input {
                         );
                         break;
                     case GLFW_KEY_SPACE:
-                        matter::camera_position.y += matter::camera_speed;
+//                        matter::camera_position.y += matter::camera_speed;
+                        if (matter::camera_position.y == 0.0f) {
+                            window::jumping = true;
+                        }
                         break;
                     case GLFW_KEY_LEFT_SHIFT:
                         matter::camera_position.y -= matter::camera_speed;
