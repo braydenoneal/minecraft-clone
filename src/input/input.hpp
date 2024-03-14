@@ -49,7 +49,7 @@ namespace input {
                                     glm::vec3(game_state::camera_speed, 0.0f, 0.0f));
                             break;
                         case GLFW_KEY_SPACE:
-                            if (game_state::camera_position.y == 2.125f) {
+                            if (game_state::camera_position.y == game_state::camera_height) {
                                 game_state::jumping = true;
                             }
                             break;
@@ -66,13 +66,13 @@ namespace input {
                 game_state::jump_counter++;
 
                 if (game_state::jump_counter < 32) {
-                    game_state::camera_position.y += 0.1f;
+                    game_state::camera_position.y += game_state::camera_speed;
                 } else {
                     game_state::jump_counter = 0;
                     game_state::jumping = false;
                 }
             } else {
-                game_state::camera_position.y = std::max(2.125f, game_state::camera_position.y - 0.1f);
+                game_state::camera_position.y = std::max(game_state::camera_height, game_state::camera_position.y - game_state::camera_speed);
             }
         }
     }

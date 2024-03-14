@@ -33,7 +33,7 @@ namespace window {
 
         gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 
-        glfwSwapInterval(1);
+        glfwSwapInterval(user_state::vsync_enabled);
 
         glfwGetWindowSize(input_state::glfw_window, &input_state::window_width, &input_state::window_height);
         glfwGetCursorPos(input_state::glfw_window, &input_state::cursor_x, &input_state::cursor_y);
@@ -205,6 +205,11 @@ namespace window {
         }
     }
 
+    void toggle_vsync() {
+            user_state::vsync_enabled = !user_state::vsync_enabled;
+            glfwSwapInterval(user_state::vsync_enabled);
+    }
+
     void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(127.0f / 255.0f, 204.0f / 255.0f, 1.0f, 1.0f);
@@ -239,6 +244,11 @@ namespace window {
             ImGui::Begin("Pause");
             if (ImGui::Button("Resume")) {
                 toggle_pause();
+            }
+            std::string vsync = "Vsync: ";
+            vsync += user_state::vsync_enabled ? "Enabled" : "Disabled";
+            if (ImGui::Button(vsync.c_str())) {
+                toggle_vsync();
             }
             ImGui::SliderFloat("Field of view", &user_state::field_of_view, 10.0f, 120.0f);
             if (ImGui::Button("Quit")) {
