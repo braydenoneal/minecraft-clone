@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cmath>
+#include <algorithm>
+
 #include "../math/math.hpp"
 
 namespace input {
@@ -19,11 +22,14 @@ namespace input {
 
     void update_game_state() {
         if (!input_state::paused) {
-            game_state::camera_angle.x += (float) input_state::cursor_difference_y / ((float) M_PI * 200.0f);
-            game_state::camera_angle.y += (float) input_state::cursor_difference_x / ((float) M_PI * 200.0f);
+            // TODO: This is from Minecraft
+            float mouse_scale = std::pow(user_state::mouse_sensitivity * 0.6f + 0.2f, 3.0f) * 0.008f;
 
-            game_state::camera_angle.x = std::max(-(float) M_PI / 2.0f, game_state::camera_angle.x);
-            game_state::camera_angle.x = std::min((float) M_PI / 2.0f, game_state::camera_angle.x);
+            game_state::camera_angle.x += (float) input_state::cursor_difference_y * mouse_scale;
+            game_state::camera_angle.y += (float) input_state::cursor_difference_x * mouse_scale;
+
+            game_state::camera_angle.x = std::clamp(game_state::camera_angle.x, -(float) M_PI / 2.0f,
+                                                    (float) M_PI / 2.0f);
 
             for (std::pair<const int, int> key: input_state::keys) {
                 if (key.second) {
@@ -72,7 +78,8 @@ namespace input {
                     game_state::jumping = false;
                 }
             } else {
-                game_state::camera_position.y = std::max(game_state::camera_height, game_state::camera_position.y - game_state::camera_speed);
+                game_state::camera_position.y = std::max(game_state::camera_height,
+                                                         game_state::camera_position.y - game_state::camera_speed);
             }
         }
     }

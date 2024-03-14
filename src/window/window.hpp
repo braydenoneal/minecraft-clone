@@ -251,6 +251,7 @@ namespace window {
                 toggle_vsync();
             }
             ImGui::SliderFloat("Field of view", &user_state::field_of_view, 10.0f, 120.0f);
+            ImGui::SliderFloat("Mouse sensitivity", &user_state::mouse_sensitivity, 0.0f, 1.0f);
             if (ImGui::Button("Quit")) {
                 close();
             }
