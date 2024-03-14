@@ -10,14 +10,20 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <stb_image.h>
 #include <vector>
+#include <iostream>
+#include <glm/gtc/noise.hpp>
 
-#include "graphics/shader.hpp"
+#include "../render/shader.hpp"
 #include "../storage/game_state.hpp"
 #include "../storage/input_state.hpp"
 #include "../storage/user_state.hpp"
 #include "../storage/render_state.hpp"
 
+#include "../render/models/cube.hpp"
+
 namespace window {
+    int cube_count = 1;
+
     void create_context() {
         glfwInit();
 
@@ -57,51 +63,27 @@ namespace window {
 
         glGenBuffers(1, &render_state::vertex_buffer);
         glBindBuffer(GL_ARRAY_BUFFER, render_state::vertex_buffer);
-        float vertex_buffer_data[7 * 6 * 6] = {
-                // Left -X
-                -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.8f,
-                -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.8f,
-                -0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, 0.8f,
-                -0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, 0.8f,
-                -0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, 0.8f,
-                -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.8f,
-                // Right +X
-                +0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.8f,
-                +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.8f,
-                +0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, 0.8f,
-                +0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, 0.8f,
-                +0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, 0.8f,
-                +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.8f,
-                // Bottom -Y
-                -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 2.0f, 0.4f,
-                -0.5f, -0.5f, +0.5f, 0.0f, 1.0f, 2.0f, 0.4f,
-                +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 2.0f, 0.4f,
-                +0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 2.0f, 0.4f,
-                +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 2.0f, 0.4f,
-                -0.5f, -0.5f, +0.5f, 0.0f, 1.0f, 2.0f, 0.4f,
-                // Top +Y
-                -0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 1.0f, 1.0f,
-                -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f,
-                +0.5f, +0.5f, +0.5f, 1.0f, 0.0f, 1.0f, 1.0f,
-                +0.5f, +0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
-                +0.5f, +0.5f, +0.5f, 1.0f, 0.0f, 1.0f, 1.0f,
-                -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f,
-                // Front -Z
-                -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.6f,
-                +0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.6f,
-                -0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.6f,
-                +0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.6f,
-                -0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.6f,
-                +0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.6f,
-                // Back +Z
-                +0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, 0.6f,
-                -0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, 0.6f,
-                +0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, 0.6f,
-                -0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, 0.6f,
-                +0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, 0.6f,
-                -0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, 0.6f,
-        };
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data), vertex_buffer_data, GL_STATIC_DRAW);
+
+        std::vector<glm::vec3> positions = {};
+
+        int chunk_radius = 32;
+        int size = chunk_radius * 16 * 2;
+
+        for (int x = 0; x < size; x++) {
+            for (int z = 0; z < size; z++) {
+                float y = 6 * glm::perlin(glm::vec2((float) x / 16.0f, (float) z / 16.0f));
+                positions.emplace_back((float) x, roundf(y), (float) z);
+            }
+        }
+
+        cube_count = (int) positions.size();
+
+        std::vector<float> vertex_buffer_data = cube::get_buffer_data_at_positions(positions);
+
+//        std::array<float, 7 * 6 * 6> vertex_buffer_data = cube::get_buffer_data_at_position(glm::vec3(0.0f, 0.0f, 0.0f));
+
+//        glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data), &vertex_buffer_data, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, 4 * 7 * 6 * 6 * cube_count, &vertex_buffer_data[0], GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * 7, (GLvoid *) nullptr);
@@ -206,14 +188,16 @@ namespace window {
     }
 
     void toggle_vsync() {
-            user_state::vsync_enabled = !user_state::vsync_enabled;
-            glfwSwapInterval(user_state::vsync_enabled);
+        user_state::vsync_enabled = !user_state::vsync_enabled;
+        glfwSwapInterval(user_state::vsync_enabled);
     }
 
     void render() {
+        // Clear screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(127.0f / 255.0f, 204.0f / 255.0f, 1.0f, 1.0f);
 
+        // Setup camera uniform
         glm::mat4 perspective = glm::perspective(glm::radians(user_state::field_of_view),
                                                  (float) input_state::window_width / (float) input_state::window_height,
                                                  0.01f, 10000.0f);
@@ -230,8 +214,10 @@ namespace window {
         int location = glGetUniformLocation(render_state::program, "u_camera");
         glUniformMatrix4fv(location, 1, GL_FALSE, &camera_matrix[0][0]);
 
-        glDrawArrays(GL_TRIANGLES, 0, 6 * 6);
+        // Draw geometry
+        glDrawArrays(GL_TRIANGLES, 0, 6 * 6 * cube_count);
 
+        // GUI
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -261,6 +247,7 @@ namespace window {
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
+        // Next frame
         glfwSwapBuffers(input_state::glfw_window);
     }
 }

@@ -55,9 +55,7 @@ namespace input {
                                     glm::vec3(game_state::camera_speed, 0.0f, 0.0f));
                             break;
                         case GLFW_KEY_SPACE:
-                            if (game_state::camera_position.y == game_state::camera_height) {
-                                game_state::jumping = true;
-                            }
+                            game_state::camera_position.y += game_state::camera_speed;
                             break;
                         case GLFW_KEY_LEFT_SHIFT:
                             game_state::camera_position.y -= game_state::camera_speed;
@@ -66,20 +64,6 @@ namespace input {
                             break;
                     }
                 }
-            }
-
-            if (game_state::jumping) {
-                game_state::jump_counter++;
-
-                if (game_state::jump_counter < 32) {
-                    game_state::camera_position.y += game_state::camera_speed;
-                } else {
-                    game_state::jump_counter = 0;
-                    game_state::jumping = false;
-                }
-            } else {
-                game_state::camera_position.y = std::max(game_state::camera_height,
-                                                         game_state::camera_position.y - game_state::camera_speed);
             }
         }
     }
@@ -98,6 +82,17 @@ namespace input {
                     break;
                 case GLFW_KEY_Q:
                     window::close();
+                    break;
+                case GLFW_KEY_TAB:
+                    game_state::camera_speed += 2.0f;
+                    break;
+                default:
+                    break;
+            }
+        } else if (action == GLFW_RELEASE) {
+            switch (key) {
+                case GLFW_KEY_TAB:
+                    game_state::camera_speed -= 2.0f;
                     break;
                 default:
                     break;
