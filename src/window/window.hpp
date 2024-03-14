@@ -80,9 +80,6 @@ namespace window {
 
         std::vector<float> vertex_buffer_data = cube::get_buffer_data_at_positions(positions);
 
-//        std::array<float, 7 * 6 * 6> vertex_buffer_data = cube::get_buffer_data_at_position(glm::vec3(0.0f, 0.0f, 0.0f));
-
-//        glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data), &vertex_buffer_data, GL_STATIC_DRAW);
         glBufferData(GL_ARRAY_BUFFER, 4 * 7 * 6 * 6 * cube_count, &vertex_buffer_data[0], GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(0);
@@ -99,24 +96,21 @@ namespace window {
         shader::bind(render_state::program);
 
         // Textures
+        int texture_size = 16;
         std::vector<std::string> texture_paths = {"../res/textures/grass_block_side.png",
                                                   "../res/textures/grass_block_top.png", "../res/textures/dirt.png"};
+
         stbi_set_flip_vertically_on_load(1);
 
         GLuint texture;
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
 
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, 16);
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, texture_size);
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, 16, 16, (int) texture_paths.size(), 0, GL_RGBA,
-                     GL_UNSIGNED_INT_8_8_8_8_REV, nullptr);
+        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, texture_size, texture_size, (int) texture_paths.size(), 0,
+                     GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
         unsigned char *local_buffer;
 
@@ -129,6 +123,14 @@ namespace window {
             glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, texture_width, texture_height, 1, GL_RGBA,
                             GL_UNSIGNED_BYTE, local_buffer);
         }
+
+        glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
@@ -200,7 +202,7 @@ namespace window {
         // Setup camera uniform
         glm::mat4 perspective = glm::perspective(glm::radians(user_state::field_of_view),
                                                  (float) input_state::window_width / (float) input_state::window_height,
-                                                 0.01f, 10000.0f);
+                                                 0.05f, 2048.0f);
         auto camera_rotate = glm::mat4(1.0f);
         camera_rotate = glm::rotate(camera_rotate, game_state::camera_angle.x, glm::vec3(1.0f, 0.0f, 0.0f));
         camera_rotate = glm::rotate(camera_rotate, game_state::camera_angle.y, glm::vec3(0.0f, 1.0f, 0.0f));
