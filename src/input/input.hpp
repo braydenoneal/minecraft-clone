@@ -86,6 +86,7 @@ namespace input {
                     window::toggle_maximize();
                     break;
                 case GLFW_KEY_ESCAPE:
+                case GLFW_KEY_E:
                     window::toggle_pause();
                     break;
                 case GLFW_KEY_Q:

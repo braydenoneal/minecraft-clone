@@ -232,8 +232,16 @@ namespace window {
 
         ImGui::Begin("Debug");
         ImGui::Text("%.0f FPS", ImGui::GetIO().Framerate);
-        ImGui::SliderFloat("Field of view", &user_state::field_of_view, 10.0f, 120.0f);
         ImGui::End();
+
+        if (input_state::paused) {
+            ImGui::Begin("Pause");
+            if (ImGui::Button("Resume")) {
+                toggle_pause();
+            }
+            ImGui::SliderFloat("Field of view", &user_state::field_of_view, 10.0f, 120.0f);
+            ImGui::End();
+        }
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
