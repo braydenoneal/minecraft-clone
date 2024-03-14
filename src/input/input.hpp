@@ -24,56 +24,56 @@ namespace input {
 
             game_state::camera_angle.x = std::max(-(float) M_PI / 2.0f, game_state::camera_angle.x);
             game_state::camera_angle.x = std::min((float) M_PI / 2.0f, game_state::camera_angle.x);
-        }
 
-        for (std::pair<const int, int> key: input_state::keys) {
-            if (key.second) {
-                switch (key.first) {
-                    case GLFW_KEY_W:
-                        game_state::camera_position = math::translate_in_direction_by_amount(
-                                game_state::camera_position, game_state::camera_angle.y,
-                                glm::vec3(0.0f, 0.0f, game_state::camera_speed));
-                        break;
-                    case GLFW_KEY_A:
-                        game_state::camera_position = math::translate_in_direction_by_amount(
-                                game_state::camera_position, game_state::camera_angle.y,
-                                glm::vec3(-game_state::camera_speed, 0.0f, 0.0f));
-                        break;
-                    case GLFW_KEY_S:
-                        game_state::camera_position = math::translate_in_direction_by_amount(
-                                game_state::camera_position, game_state::camera_angle.y,
-                                glm::vec3(0.0f, 0.0f, -game_state::camera_speed));
-                        break;
-                    case GLFW_KEY_D:
-                        game_state::camera_position = math::translate_in_direction_by_amount(
-                                game_state::camera_position, game_state::camera_angle.y,
-                                glm::vec3(game_state::camera_speed, 0.0f, 0.0f));
-                        break;
-                    case GLFW_KEY_SPACE:
-                        if (game_state::camera_position.y == 2.125f) {
-                            game_state::jumping = true;
-                        }
-                        break;
-                    case GLFW_KEY_LEFT_SHIFT:
-                        game_state::camera_position.y -= game_state::camera_speed;
-                        break;
-                    default:
-                        break;
+            for (std::pair<const int, int> key: input_state::keys) {
+                if (key.second) {
+                    switch (key.first) {
+                        case GLFW_KEY_W:
+                            game_state::camera_position = math::translate_in_direction_by_amount(
+                                    game_state::camera_position, game_state::camera_angle.y,
+                                    glm::vec3(0.0f, 0.0f, game_state::camera_speed));
+                            break;
+                        case GLFW_KEY_A:
+                            game_state::camera_position = math::translate_in_direction_by_amount(
+                                    game_state::camera_position, game_state::camera_angle.y,
+                                    glm::vec3(-game_state::camera_speed, 0.0f, 0.0f));
+                            break;
+                        case GLFW_KEY_S:
+                            game_state::camera_position = math::translate_in_direction_by_amount(
+                                    game_state::camera_position, game_state::camera_angle.y,
+                                    glm::vec3(0.0f, 0.0f, -game_state::camera_speed));
+                            break;
+                        case GLFW_KEY_D:
+                            game_state::camera_position = math::translate_in_direction_by_amount(
+                                    game_state::camera_position, game_state::camera_angle.y,
+                                    glm::vec3(game_state::camera_speed, 0.0f, 0.0f));
+                            break;
+                        case GLFW_KEY_SPACE:
+                            if (game_state::camera_position.y == 2.125f) {
+                                game_state::jumping = true;
+                            }
+                            break;
+                        case GLFW_KEY_LEFT_SHIFT:
+                            game_state::camera_position.y -= game_state::camera_speed;
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
-        }
 
-        if (game_state::jumping) {
-            game_state::jump_counter++;
+            if (game_state::jumping) {
+                game_state::jump_counter++;
 
-            if (game_state::jump_counter < 32) {
-                game_state::camera_position.y += 0.1f;
+                if (game_state::jump_counter < 32) {
+                    game_state::camera_position.y += 0.1f;
+                } else {
+                    game_state::jump_counter = 0;
+                    game_state::jumping = false;
+                }
             } else {
-                game_state::jump_counter = 0;
-                game_state::jumping = false;
+                game_state::camera_position.y = std::max(2.125f, game_state::camera_position.y - 0.1f);
             }
-        } else {
-            game_state::camera_position.y = std::max(2.125f, game_state::camera_position.y - 0.1f);
         }
     }
 

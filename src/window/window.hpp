@@ -59,12 +59,12 @@ namespace window {
         glBindBuffer(GL_ARRAY_BUFFER, render_state::vertex_buffer);
         float vertex_buffer_data[7 * 6 * 6] = {
                 // Left -X
-                -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.8f,
-                -0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.8f,
-                -0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, 0.8f,
-                -0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, 0.8f,
-                -0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, 0.8f,
-                -0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.8f,
+                -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.8f,
+                -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.8f,
+                -0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, 0.8f,
+                -0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, 0.8f,
+                -0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, 0.8f,
+                -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.8f,
                 // Right +X
                 +0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.8f,
                 +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.8f,
@@ -207,6 +207,7 @@ namespace window {
 
     void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(127.0f / 255.0f, 204.0f / 255.0f, 1.0f, 1.0f);
 
         glm::mat4 perspective = glm::perspective(glm::radians(user_state::field_of_view),
                                                  (float) input_state::window_width / (float) input_state::window_height,
@@ -240,6 +241,9 @@ namespace window {
                 toggle_pause();
             }
             ImGui::SliderFloat("Field of view", &user_state::field_of_view, 10.0f, 120.0f);
+            if (ImGui::Button("Quit")) {
+                close();
+            }
             ImGui::End();
         }
 
