@@ -1,15 +1,8 @@
 #pragma once
 
-#include <map>
-#include <iostream>
-
-#include "../window/window.hpp"
-
 namespace input {
-    static std::map<int, int> keys;
-
     void key_callback(GLFWwindow* glfw_window, int key, int scancode, int action, int mods) {
-        keys[key] = action;
+        input_state::keys[key] = action;
 
         if (action == GLFW_PRESS) {
             switch (key) {
@@ -36,52 +29,51 @@ namespace input {
         glfwPollEvents();
         double current_x;
         double current_y;
-        glfwGetCursorPos(window::get_glfw_window(), &current_x, &current_y);
-        window::cursor_difference_x = current_x - window::cursor_x;
-        window::cursor_difference_y = current_y - window::cursor_y;
-        window::cursor_x = current_x;
-        window::cursor_y = current_y;
+        glfwGetCursorPos(input_state::glfw_window, &current_x, &current_y);
+        input_state::cursor_difference_x = current_x - input_state::cursor_x;
+        input_state::cursor_difference_y = current_y - input_state::cursor_y;
+        input_state::cursor_x = current_x;
+        input_state::cursor_y = current_y;
 
-        matter::camera_angle.x += (float) window::cursor_difference_y / ((float) M_PI * 200.0f);
-        matter::camera_angle.y += (float) window::cursor_difference_x / ((float) M_PI * 200.0f);
+        game_state::camera_angle.x += (float) input_state::cursor_difference_y / ((float) M_PI * 200.0f);
+        game_state::camera_angle.y += (float) input_state::cursor_difference_x / ((float) M_PI * 200.0f);
 
-        matter::camera_angle.x = std::max(-(float) M_PI / 2.0f, matter::camera_angle.x);
-        matter::camera_angle.x = std::min( (float) M_PI / 2.0f, matter::camera_angle.x);
+        game_state::camera_angle.x = std::max(-(float) M_PI / 2.0f, game_state::camera_angle.x);
+        game_state::camera_angle.x = std::min( (float) M_PI / 2.0f, game_state::camera_angle.x);
 
-        for (std::pair<const int, int> key : keys) {
+        for (std::pair<const int, int> key : input_state::keys) {
             if (key.second) {
                 switch (key.first) {
                     case GLFW_KEY_A:
-                        matter::camera_position = translate_in_direction_by_amount(
-                            matter::camera_position, matter::camera_angle.y,
-                            glm::vec3(-matter::camera_speed, 0.0f, 0.0f)
+                        game_state::camera_position = translate_in_direction_by_amount(
+                            game_state::camera_position, game_state::camera_angle.y,
+                            glm::vec3(-game_state::camera_speed, 0.0f, 0.0f)
                         );
                         break;
                     case GLFW_KEY_D:
-                        matter::camera_position = translate_in_direction_by_amount(
-                            matter::camera_position, matter::camera_angle.y,
-                            glm::vec3(matter::camera_speed, 0.0f, 0.0f)
+                        game_state::camera_position = translate_in_direction_by_amount(
+                            game_state::camera_position, game_state::camera_angle.y,
+                            glm::vec3(game_state::camera_speed, 0.0f, 0.0f)
                         );
                         break;
                     case GLFW_KEY_SPACE:
-//                        matter::camera_position.y += matter::camera_speed;
-                        if (matter::camera_position.y == 0.0f) {
-                            window::jumping = true;
+                        if (game_state::camera_position.y == 0.0f) {
+                            game_state::jumping = true;
                         }
                         break;
                     case GLFW_KEY_LEFT_SHIFT:
-                        matter::camera_position.y -= matter::camera_speed;
+                        game_state::camera_position.y -= game_state::camera_speed;
                         break;
                     case GLFW_KEY_S:
-                        matter::camera_position = translate_in_direction_by_amount(
-                            matter::camera_position, matter::camera_angle.y,
-                            glm::vec3(0.0f, 0.0f, -matter::camera_speed)
+                        game_state::camera_position = translate_in_direction_by_amount(
+                            game_state::camera_position, game_state::camera_angle.y,
+                            glm::vec3(0.0f, 0.0f, -game_state::camera_speed)
                         );
                         break;
                     case GLFW_KEY_W:
-                        matter::camera_position = translate_in_direction_by_amount(
-                            matter::camera_position, matter::camera_angle.y,
-                            glm::vec3(0.0f, 0.0f, matter::camera_speed)
+                        game_state::camera_position = translate_in_direction_by_amount(
+                            game_state::camera_position, game_state::camera_angle.y,
+                            glm::vec3(0.0f, 0.0f, game_state::camera_speed)
                         );
                         break;
                     default:
@@ -94,13 +86,13 @@ namespace input {
     void resize_callback(GLFWwindow* window, int width, int height) {
         if (width > 0 && height > 0) {
             glViewport(0, 0, width, height);
-            window::width = width;
-            window::height = height;
+            input_state::window_width = width;
+            input_state::window_height = height;
         }
     }
 
     void create_context() {
-        glfwSetKeyCallback(window::get_glfw_window(), key_callback);
-        glfwSetFramebufferSizeCallback(window::get_glfw_window(), resize_callback);
+        glfwSetKeyCallback(input_state::glfw_window, key_callback);
+        glfwSetFramebufferSizeCallback(input_state::glfw_window, resize_callback);
     }
 }

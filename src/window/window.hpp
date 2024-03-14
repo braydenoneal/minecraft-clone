@@ -12,48 +12,32 @@
 #include <vector>
 
 #include "graphics/shader.hpp"
-#include "../matter/matter.hpp"
+#include "../storage/game_state.hpp"
+#include "../storage/input_state.hpp"
+#include "../storage/user_state.hpp"
+#include "../storage/render_state.hpp"
 
 namespace window {
-    static bool maximized = true;
-    static std::string title = "Graphics Application Template";
-    static int width = 1920;
-    static int height = 1080;
-    static double cursor_x = 0.0;
-    static double cursor_y = 0.0;
-    static double cursor_difference_x = 0.0;
-    static double cursor_difference_y = 0.0;
-    static GLuint program;
-    static GLuint vertex_array;
-    static GLuint vertex_buffer;
-
-    // Jump Test
-    static bool jumping = false;
-    static int jump_counter = 0;
-    // End Jump Test
-
-    static GLFWwindow *glfw_window;
-
     void create_context() {
         glfwInit();
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        glfwWindowHint(GLFW_MAXIMIZED, maximized ? GL_TRUE : GLFW_FALSE);
+        glfwWindowHint(GLFW_MAXIMIZED, input_state::maximized ? GL_TRUE : GLFW_FALSE);
 
-        glfw_window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+        input_state::glfw_window = glfwCreateWindow(input_state::window_width, input_state::window_height, user_state::title.c_str(), nullptr, nullptr);
 
-        glfwMakeContextCurrent(glfw_window);
+        glfwMakeContextCurrent(input_state::glfw_window);
 
         gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 
         glfwSwapInterval(1);
 
-        glfwGetWindowSize(glfw_window, &width, &height);
-        glfwGetCursorPos(glfw_window, &cursor_x, &cursor_y);
-        glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        glfwSetInputMode(glfw_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+        glfwGetWindowSize(input_state::glfw_window, &input_state::window_width, &input_state::window_height);
+        glfwGetCursorPos(input_state::glfw_window, &input_state::cursor_x, &input_state::cursor_y);
+        glfwSetInputMode(input_state::glfw_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetInputMode(input_state::glfw_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
@@ -62,16 +46,16 @@ namespace window {
         glDepthFunc(GL_LESS);
 
         ImGui::CreateContext();
-        ImGui_ImplGlfw_InitForOpenGL(glfw_window, true);
+        ImGui_ImplGlfw_InitForOpenGL(input_state::glfw_window, true);
         ImGui_ImplOpenGL3_Init("#version 330 core");
         ImGui::StyleColorsDark();
 
         // Render Setup
-        glGenVertexArrays(1, &vertex_array);
-        glBindVertexArray(vertex_array);
+        glGenVertexArrays(1, &render_state::vertex_array);
+        glBindVertexArray(render_state::vertex_array);
 
-        glGenBuffers(1, &vertex_buffer);
-        glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+        glGenBuffers(1, &render_state::vertex_buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, render_state::vertex_buffer);
         float vertex_buffer_data[7 * 6 * 6] = {
                 // Left -X
                 -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.8f,
@@ -127,9 +111,9 @@ namespace window {
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 4 * 7, (const void *) (intptr_t) (4 * 6));
 
-        program = shader::create_shaders("../res/vertex.glsl", "../res/fragment.glsl");
+        render_state::program = shader::create_shaders("../res/vertex.glsl", "../res/fragment.glsl");
 
-        shader::bind(program);
+        shader::bind(render_state::program);
 
         // Textures
         std::vector<std::string> texture_paths = {"../res/textures/grass_block_side.png",
@@ -172,12 +156,12 @@ namespace window {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
 
-        int texture_uniform = glGetUniformLocation(program, "u_textures");
+        int texture_uniform = glGetUniformLocation(render_state::program, "u_textures");
         glUniform1i(texture_uniform, 0);
     }
 
     int should_close() {
-        return glfwWindowShouldClose(glfw_window);
+        return glfwWindowShouldClose(input_state::glfw_window);
     }
 
     void terminate() {
@@ -185,9 +169,9 @@ namespace window {
         ImGui::DestroyContext();
         glfwTerminate();
 
-        glDeleteProgram(program);
-        glDeleteBuffers(1, &vertex_buffer);
-        glDeleteVertexArrays(1, &vertex_array);
+        glDeleteProgram(render_state::program);
+        glDeleteBuffers(1, &render_state::vertex_buffer);
+        glDeleteVertexArrays(1, &render_state::vertex_array);
 
         glUseProgram(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -195,20 +179,16 @@ namespace window {
     }
 
     void close() {
-        glfwSetWindowShouldClose(glfw_window, GLFW_TRUE);
-    }
-
-    GLFWwindow *get_glfw_window() {
-        return glfw_window;
+        glfwSetWindowShouldClose(input_state::glfw_window, GLFW_TRUE);
     }
 
     void toggle_maximize() {
-        maximized = !maximized;
+        input_state::maximized = !input_state::maximized;
 
-        if (maximized) {
-            glfwMaximizeWindow(glfw_window);
+        if (input_state::maximized) {
+            glfwMaximizeWindow(input_state::glfw_window);
         } else {
-            glfwRestoreWindow(glfw_window);
+            glfwRestoreWindow(input_state::glfw_window);
         }
     }
 
@@ -217,34 +197,34 @@ namespace window {
     void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 perspective = glm::perspective(glm::radians(70.0f), (float) width / (float) height, 0.01f, 10000.0f);
+        glm::mat4 perspective = glm::perspective(glm::radians(70.0f), (float) input_state::window_width / (float) input_state::window_height, 0.01f, 10000.0f);
         auto camera_rotate = glm::mat4(1.0f);
-        camera_rotate = glm::rotate(camera_rotate, matter::camera_angle.x, glm::vec3(1.0f, 0.0f, 0.0f));
-        camera_rotate = glm::rotate(camera_rotate, matter::camera_angle.y, glm::vec3(0.0f, 1.0f, 0.0f));
-        camera_rotate = glm::rotate(camera_rotate, matter::camera_angle.z, glm::vec3(0.0f, 0.0f, 1.0f));
+        camera_rotate = glm::rotate(camera_rotate, game_state::camera_angle.x, glm::vec3(1.0f, 0.0f, 0.0f));
+        camera_rotate = glm::rotate(camera_rotate, game_state::camera_angle.y, glm::vec3(0.0f, 1.0f, 0.0f));
+        camera_rotate = glm::rotate(camera_rotate, game_state::camera_angle.z, glm::vec3(0.0f, 0.0f, 1.0f));
         glm::mat4 camera_translate = glm::translate(
                 glm::mat4(1.0f),
-                glm::vec3(-matter::camera_position.x, -matter::camera_position.y, matter::camera_position.z)
+                glm::vec3(-game_state::camera_position.x, -game_state::camera_position.y, game_state::camera_position.z)
         );
         glm::mat4 camera_matrix = perspective * camera_rotate * camera_translate;
 
-        int location = glGetUniformLocation(program, "u_camera");
+        int location = glGetUniformLocation(render_state::program, "u_camera");
         glUniformMatrix4fv(location, 1, GL_FALSE, &camera_matrix[0][0]);
 
         glDrawArrays(GL_TRIANGLES, 0, 6 * 6);
 
         // Jump Test
-        if (jumping) {
-            jump_counter++;
+        if (game_state::jumping) {
+            game_state::jump_counter++;
 
-            if (jump_counter < 32) {
-                matter::camera_position.y += 0.1f;
+            if (game_state::jump_counter < 32) {
+                game_state::camera_position.y += 0.1f;
             } else {
-                jump_counter = 0;
-                jumping = false;
+                game_state::jump_counter = 0;
+                game_state::jumping = false;
             }
         } else {
-            matter::camera_position.y = std::max(0.0f, matter::camera_position.y - 0.1f);
+            game_state::camera_position.y = std::max(0.0f, game_state::camera_position.y - 0.1f);
         }
         // End Jump Test
 
@@ -259,6 +239,6 @@ namespace window {
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-        glfwSwapBuffers(glfw_window);
+        glfwSwapBuffers(input_state::glfw_window);
     }
 }
