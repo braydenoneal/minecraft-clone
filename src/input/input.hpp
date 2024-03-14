@@ -18,11 +18,13 @@ namespace input {
     }
 
     void update_game_state() {
-        game_state::camera_angle.x += (float) input_state::cursor_difference_y / ((float) M_PI * 200.0f);
-        game_state::camera_angle.y += (float) input_state::cursor_difference_x / ((float) M_PI * 200.0f);
+        if (!input_state::paused) {
+            game_state::camera_angle.x += (float) input_state::cursor_difference_y / ((float) M_PI * 200.0f);
+            game_state::camera_angle.y += (float) input_state::cursor_difference_x / ((float) M_PI * 200.0f);
 
-        game_state::camera_angle.x = std::max(-(float) M_PI / 2.0f, game_state::camera_angle.x);
-        game_state::camera_angle.x = std::min((float) M_PI / 2.0f, game_state::camera_angle.x);
+            game_state::camera_angle.x = std::max(-(float) M_PI / 2.0f, game_state::camera_angle.x);
+            game_state::camera_angle.x = std::min((float) M_PI / 2.0f, game_state::camera_angle.x);
+        }
 
         for (std::pair<const int, int> key: input_state::keys) {
             if (key.second) {
@@ -61,7 +63,6 @@ namespace input {
             }
         }
 
-        // Jump Test
         if (game_state::jumping) {
             game_state::jump_counter++;
 
@@ -74,7 +75,6 @@ namespace input {
         } else {
             game_state::camera_position.y = std::max(2.125f, game_state::camera_position.y - 0.1f);
         }
-        // End Jump Test
     }
 
     void key_callback(GLFWwindow *glfw_window, int key, int scancode, int action, int mods) {
@@ -84,6 +84,9 @@ namespace input {
             switch (key) {
                 case GLFW_KEY_F11:
                     window::toggle_maximize();
+                    break;
+                case GLFW_KEY_ESCAPE:
+                    window::toggle_pause();
                     break;
                 case GLFW_KEY_Q:
                     window::close();

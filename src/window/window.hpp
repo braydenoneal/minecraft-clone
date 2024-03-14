@@ -193,6 +193,18 @@ namespace window {
         }
     }
 
+    void toggle_pause() {
+        input_state::paused = !input_state::paused;
+
+        if (input_state::paused) {
+            glfwSetInputMode(input_state::glfw_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            glfwSetInputMode(input_state::glfw_window, GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
+        } else {
+            glfwSetInputMode(input_state::glfw_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            glfwSetInputMode(input_state::glfw_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+        }
+    }
+
     void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

@@ -4,6 +4,7 @@
 
 namespace input_state {
     static bool maximized = true;
+    static bool paused = false;
     static int window_width = 1920;
     static int window_height = 1080;
     static double cursor_x = 0.0;
