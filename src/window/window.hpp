@@ -26,7 +26,8 @@ namespace window {
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_MAXIMIZED, input_state::maximized ? GL_TRUE : GLFW_FALSE);
 
-        input_state::glfw_window = glfwCreateWindow(input_state::window_width, input_state::window_height, user_state::title.c_str(), nullptr, nullptr);
+        input_state::glfw_window = glfwCreateWindow(input_state::window_width, input_state::window_height,
+                                                    user_state::title.c_str(), nullptr, nullptr);
 
         glfwMakeContextCurrent(input_state::glfw_window);
 
@@ -192,12 +193,12 @@ namespace window {
         }
     }
 
-    void update() {}
-
     void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 perspective = glm::perspective(glm::radians(70.0f), (float) input_state::window_width / (float) input_state::window_height, 0.01f, 10000.0f);
+        glm::mat4 perspective = glm::perspective(glm::radians(user_state::field_of_view),
+                                                 (float) input_state::window_width / (float) input_state::window_height,
+                                                 0.01f, 10000.0f);
         auto camera_rotate = glm::mat4(1.0f);
         camera_rotate = glm::rotate(camera_rotate, game_state::camera_angle.x, glm::vec3(1.0f, 0.0f, 0.0f));
         camera_rotate = glm::rotate(camera_rotate, game_state::camera_angle.y, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -213,27 +214,13 @@ namespace window {
 
         glDrawArrays(GL_TRIANGLES, 0, 6 * 6);
 
-        // Jump Test
-        if (game_state::jumping) {
-            game_state::jump_counter++;
-
-            if (game_state::jump_counter < 32) {
-                game_state::camera_position.y += 0.1f;
-            } else {
-                game_state::jump_counter = 0;
-                game_state::jumping = false;
-            }
-        } else {
-            game_state::camera_position.y = std::max(0.0f, game_state::camera_position.y - 0.1f);
-        }
-        // End Jump Test
-
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
         ImGui::Begin("Debug");
         ImGui::Text("%.0f FPS", ImGui::GetIO().Framerate);
+        ImGui::SliderFloat("Field of view", &user_state::field_of_view, 10.0f, 120.0f);
         ImGui::End();
 
         ImGui::Render();

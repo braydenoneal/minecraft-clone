@@ -6,8 +6,8 @@ int main() {
     input::create_context();
 
     while (!window::should_close()) {
-        input::poll_events();
-        window::update();
+        input::get_input();
+        input::update_game_state();
         window::render();
     }
 
