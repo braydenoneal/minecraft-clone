@@ -86,6 +86,10 @@ namespace input {
                 case GLFW_KEY_TAB:
                     game_state::camera_speed += 2.0f;
                     break;
+                case GLFW_KEY_C:
+                    user_state::field_of_view = 30.0f;
+                    user_state::mouse_sensitivity /= 2.0f;
+                    break;
                 default:
                     break;
             }
@@ -93,6 +97,10 @@ namespace input {
             switch (key) {
                 case GLFW_KEY_TAB:
                     game_state::camera_speed -= 2.0f;
+                    break;
+                case GLFW_KEY_C:
+                    user_state::field_of_view = 70.0f;
+                    user_state::mouse_sensitivity *= 2.0f;
                     break;
                 default:
                     break;
