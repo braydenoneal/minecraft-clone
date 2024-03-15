@@ -107,7 +107,7 @@ namespace cube {
 
                 float y = (float) sea_level + 6 * glm::perlin(glm::vec2(x_position / 16.0f, z_position / 16.0f));
 
-                for (int by = (int) roundf(y); by >= 0; by--) {
+                for (int by = 0; by <= (int) roundf(y); by++) {
                     block_types[x][by][z] = 1.0f;
                 }
             }
@@ -124,7 +124,8 @@ namespace cube {
                 for (int z = 0; z < chunk_size; z++) {
                     bool nx = block_types[x + 0][y][z + 1] == 0.0f;
                     bool px = block_types[x + 2][y][z + 1] == 0.0f;
-                    bool ny, py = false;
+                    bool ny = true;
+                    bool py = true;
                     if (y > 0) {
                         ny = block_types[x + 1][y - 1][z + 1] == 0.0f;
                     }
@@ -137,7 +138,7 @@ namespace cube {
                     if (block_types[x + 1][y][z + 1] > 0.0f) {
                         std::vector<float> block_mesh = get_block(nx, px, ny, py, nz, pz);
 
-                        block_mesh = position_mesh(block_mesh, (float) (x + chunk_x * chunk_size), (float) (y), (float) (z + chunk_z * chunk_size));
+                        block_mesh = position_mesh(block_mesh, (float) (x + 1 + chunk_x * chunk_size), (float) (y), (float) (z + 1 + chunk_z * chunk_size));
 
                         for (float value: block_mesh) {
                             all_mesh.emplace_back(value);
