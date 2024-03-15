@@ -2,8 +2,11 @@
 
 #include <array>
 #include <vector>
+#include <map>
 
 namespace cube {
+    static int chunk_size = 16;
+
     std::array<float, 7 * 6 * 6> get_buffer_data() {
         return {
                 // Left -X
@@ -71,6 +74,60 @@ namespace cube {
 
             for (float value: position_buffer_data) {
                 buffer_data.push_back(value);
+            }
+        }
+
+        return buffer_data;
+    }
+
+    std::vector<float> get_chunk_buffer_data_at_position(int chunk_x, int chunk_z) {
+        std::vector<glm::vec3> positions = {};
+
+        for (int x = 0; x < chunk_size; x++) {
+            for (int z = 0; z < chunk_size; z++) {
+                auto x_position = (float) (x + chunk_x * chunk_size);
+                auto z_position = (float) (z + chunk_z * chunk_size);
+
+                float y = 6 * glm::perlin(glm::vec2(x_position / 16.0f, z_position / 16.0f));
+
+                positions.emplace_back(x_position, roundf(y), z_position);
+            }
+        }
+
+        return cube::get_buffer_data_at_positions(positions);
+    }
+
+    std::vector<float> get_chunk_buffer_data_combined(const std::vector<std::vector<float>> &chunk_buffer_datas) {
+        std::vector<float> buffer_data = {};
+
+        for (const std::vector<float> &chunk_buffer_data: chunk_buffer_datas) {
+            for (float value: chunk_buffer_data) {
+                buffer_data.push_back(value);
+            }
+        }
+
+        return buffer_data;
+    }
+
+    std::map<std::array<int, 2>, std::vector<float>>
+    chunk_locations_to_buffer_data(const std::vector<std::array<int, 2>> &chunk_locations) {
+        std::map<std::array<int, 2>, std::vector<float>> chunk_locations_to_buffer_data = {};
+
+        for (std::array<int, 2> chunk_location: chunk_locations) {
+            chunk_locations_to_buffer_data[chunk_location] =
+                    get_chunk_buffer_data_at_position(chunk_location[0], chunk_location[1]);
+        }
+
+        return chunk_locations_to_buffer_data;
+    }
+
+    std::vector<float>
+    combine_chunks(const std::map<std::array<int, 2>, std::vector<float>> &chunk_locations_to_buffer_data) {
+        std::vector<float> buffer_data = {};
+
+        for (const auto &[key, value]: chunk_locations_to_buffer_data) {
+            for (float val: value) {
+                buffer_data.push_back(val);
             }
         }
 

@@ -26,24 +26,62 @@ namespace window {
     int cube_count = 1;
     int x_region = 0;
     int z_region = 0;
-    int chunk_radius = 8;
-    int size = chunk_radius * 16 * 2;
+    int chunk_radius = 16;
+
+    std::map<std::array<int, 2>, std::vector<float>> chunk_locations_to_buffer_data;
+    std::vector<float> vertex_buffer_data;
 
     void rerender() {
-        std::vector<glm::vec3> positions = {};
+        std::vector<std::array<int, 2>> chunk_locations = {};
 
-        for (int x = 0; x < size; x++) {
-            for (int z = 0; z < size; z++) {
-                float x_eval = (float) x + (float) x_region * ((float) size / 4.0f) - ((float) size / 2.0f);
-                float z_eval = (float) z - (float) z_region * ((float) size / 4.0f) - ((float) size / 2.0f);
-                float y = 6 * glm::perlin(glm::vec2((float) x_eval / 16.0f, (float) z_eval / 16.0f));
-                positions.emplace_back(x_eval, roundf(y), z_eval);
+        int chunk_x = (int) (game_state::camera_position.x / (float) cube::chunk_size);
+        int chunk_z = (int) (-game_state::camera_position.z / (float) cube::chunk_size);
+
+        for (int x = chunk_x - chunk_radius; x < chunk_x + chunk_radius; x++) {
+            for (int z = chunk_z - chunk_radius; z < chunk_z + chunk_radius; z++) {
+                if (pow(x - chunk_x, 2) + pow(z - chunk_z, 2) < chunk_radius * chunk_radius) {
+                    chunk_locations.push_back({x, z});
+                }
             }
         }
 
-        cube_count = (int) positions.size();
+        // Unload chunks
+        std::vector<std::array<int, 2>> unload_chunks = {};
 
-        std::vector<float> vertex_buffer_data = cube::get_buffer_data_at_positions(positions);
+        for (const auto &[key, value]: chunk_locations_to_buffer_data) {
+            bool del = true;
+
+            for (std::array<int, 2> chunk_location: chunk_locations) {
+                if (key == chunk_location) {
+                    del = false;
+                }
+            }
+
+            if (del) {
+                unload_chunks.push_back(key);
+            }
+        }
+
+        for (std::array<int, 2> chunk_location: unload_chunks) {
+            chunk_locations_to_buffer_data.erase(chunk_location);
+        }
+
+        std::vector<std::array<int, 2>> new_chunk_locations = {};
+
+        // Load new chunks
+        for (std::array<int, 2> chunk_location: chunk_locations) {
+            if (!chunk_locations_to_buffer_data.count(chunk_location)) {
+                new_chunk_locations.push_back(chunk_location);
+            }
+        }
+
+        std::map<std::array<int, 2>, std::vector<float>> new_data = cube::chunk_locations_to_buffer_data(new_chunk_locations);
+
+        chunk_locations_to_buffer_data.merge(new_data);
+
+        vertex_buffer_data = cube::combine_chunks(chunk_locations_to_buffer_data);
+
+        cube_count = (int) (cube::chunk_size * cube::chunk_size * chunk_locations.size());
 
         glBufferData(GL_ARRAY_BUFFER, 4 * 7 * 6 * 6 * cube_count, &vertex_buffer_data[0], GL_STATIC_DRAW);
     }
@@ -208,8 +246,8 @@ namespace window {
         glClearColor(127.0f / 255.0f, 204.0f / 255.0f, 1.0f, 1.0f);
 
         // Dynamic test
-        int next_x_region = std::floor(game_state::camera_position.x / ((float) size / 4.0f));
-        int next_z_region = std::floor(game_state::camera_position.z / ((float) size / 4.0f));
+        int next_x_region = std::floor(game_state::camera_position.x / 16.0f);
+        int next_z_region = std::floor(game_state::camera_position.z / 16.0f);
 
         if (next_x_region != x_region || next_z_region != z_region) {
             rerender();
