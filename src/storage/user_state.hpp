@@ -6,4 +6,5 @@ namespace user_state {
     static bool vsync_enabled = true;
     static float mouse_sensitivity = 0.5f;
     static int chunk_radius = 6;
+    static bool pause_chunk_loading = false;
 }

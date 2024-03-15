@@ -240,7 +240,6 @@ namespace window {
     }
 
     void toggle_vsync() {
-        user_state::vsync_enabled = !user_state::vsync_enabled;
         glfwSwapInterval(user_state::vsync_enabled);
     }
 
@@ -253,12 +252,12 @@ namespace window {
         int next_x_region = std::floor(game_state::camera_position.x / (float) cube::chunk_size);
         int next_z_region = std::ceil(-game_state::camera_position.z / (float) cube::chunk_size);
 
-        if (next_x_region != x_region || next_z_region != z_region) {
+        if (!user_state::pause_chunk_loading && next_x_region != x_region || next_z_region != z_region) {
             chunks_to_load = {};
             rerender();
         }
 
-        if (!chunks_to_load.empty()) {
+        if (!user_state::pause_chunk_loading && !chunks_to_load.empty()) {
             render_queue();
         }
 
@@ -299,17 +298,15 @@ namespace window {
         ImGui::End();
 
         int previous_chunk_radius = user_state::chunk_radius;
+        int previous_vsync_enabled = user_state::vsync_enabled;
 
         if (input_state::paused) {
             ImGui::Begin("Pause");
             if (ImGui::Button("Resume")) {
                 toggle_pause();
             }
-            std::string vsync = "Vsync: ";
-            vsync += user_state::vsync_enabled ? "Enabled" : "Disabled";
-            if (ImGui::Button(vsync.c_str())) {
-                toggle_vsync();
-            }
+            ImGui::Checkbox("Vsync", &user_state::vsync_enabled);
+            ImGui::Checkbox("Pause chunk loading", &user_state::pause_chunk_loading);
             ImGui::SliderInt("Chunk radius", &user_state::chunk_radius, 2, 32);
             ImGui::SliderFloat("Field of view", &user_state::field_of_view, 10.0f, 120.0f);
             ImGui::SliderFloat("Mouse sensitivity", &user_state::mouse_sensitivity, 0.0f, 1.0f);
@@ -319,9 +316,13 @@ namespace window {
             ImGui::End();
         }
 
-        if (previous_chunk_radius != user_state::chunk_radius) {
+        if (!user_state::pause_chunk_loading && previous_chunk_radius != user_state::chunk_radius) {
             chunks_to_load = {};
             rerender();
+        }
+
+        if (previous_vsync_enabled != user_state::vsync_enabled) {
+            toggle_vsync();
         }
 
         ImGui::Render();
