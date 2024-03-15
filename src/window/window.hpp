@@ -255,6 +255,7 @@ namespace window {
         int next_z_region = std::floor(-game_state::camera_position.z / (float) cube::chunk_size);
 
         if (next_x_region != x_region || next_z_region != z_region) {
+            chunks_to_load = {};
             rerender();
         }
 
@@ -283,15 +284,7 @@ namespace window {
         glUniformMatrix4fv(location, 1, GL_FALSE, &camera_matrix[0][0]);
 
         // Draw geometry
-
-//        glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr) vertex_buffer_data.size() * 4, &vertex_buffer_data[0], GL_STATIC_DRAW);
-
         glDrawArrays(GL_TRIANGLES, 0, 6 * 6 * cube_count);
-
-//        for (const auto &[key, value]: chunk_locations_to_buffer_data) {
-//            glBufferData(GL_ARRAY_BUFFER, 4 * 7 * 6 * 6 * 16 * 16, &value[0], GL_STATIC_DRAW);
-//            glDrawArrays(GL_TRIANGLES, 0, 6 * 6 * 16 * 16);
-//        }
 
         // GUI
         ImGui_ImplOpenGL3_NewFrame();
