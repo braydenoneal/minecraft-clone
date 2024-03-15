@@ -5,5 +5,5 @@ namespace user_state {
     static float field_of_view = 70.0f;
     static bool vsync_enabled = true;
     static float mouse_sensitivity = 0.5f;
-    static int chunk_radius = 8;
+    static int chunk_radius = 6;
 }

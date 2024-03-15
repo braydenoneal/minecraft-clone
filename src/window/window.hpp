@@ -83,7 +83,7 @@ namespace window {
 
         vertex_buffer_data = cube::combine_chunks(chunk_locations_to_buffer_data);
 
-        cube_count = (int) (cube::chunk_size * cube::chunk_size * chunk_locations_to_buffer_data.size());
+        cube_count = std::ceil((float) vertex_buffer_data.size() / 7.0f);
 
         glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr) vertex_buffer_data.size() * 4, &vertex_buffer_data[0], GL_STATIC_DRAW);
 
@@ -283,7 +283,7 @@ namespace window {
         glUniformMatrix4fv(location, 1, GL_FALSE, &camera_matrix[0][0]);
 
         // Draw geometry
-        glDrawArrays(GL_TRIANGLES, 0, 6 * 6 * cube_count);
+        glDrawArrays(GL_TRIANGLES, 0, cube_count);
 
         // GUI
         ImGui_ImplOpenGL3_NewFrame();
@@ -320,6 +320,7 @@ namespace window {
         }
 
         if (previous_chunk_radius != user_state::chunk_radius) {
+            chunks_to_load = {};
             rerender();
         }
 
