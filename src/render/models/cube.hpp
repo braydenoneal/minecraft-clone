@@ -6,7 +6,8 @@
 
 namespace cube {
     static int chunk_size = 16;
-    static int chunk_height = 64;
+    static int chunk_height = 128;
+    static int sea_level = 64;
 
     std::vector<float> get_block(bool nx, bool px, bool ny, bool py, bool nz, bool pz) {
         std::vector<float> block_mesh = {};
@@ -97,14 +98,14 @@ namespace cube {
     }
 
     std::vector<std::vector<std::vector<float>>> chunk_location_to_block_types(int chunk_x, int chunk_z) {
-        std::vector<std::vector<std::vector<float>>> block_types(chunk_size, std::vector<std::vector<float>>(chunk_height, std::vector<float>(chunk_size)));
+        std::vector<std::vector<std::vector<float>>> block_types(chunk_size + 2, std::vector<std::vector<float>>(chunk_height, std::vector<float>(chunk_size + 2)));
 
-        for (int x = 0; x < chunk_size; x++) {
-            for (int z = 0; z < chunk_size; z++) {
-                auto x_position = (float) (x + chunk_x * chunk_size);
-                auto z_position = (float) (z + chunk_z * chunk_size);
+        for (int x = 0; x < chunk_size + 2; x++) {
+            for (int z = 0; z < chunk_size + 2; z++) {
+                auto x_position = (float) (x - 1 + chunk_x * chunk_size);
+                auto z_position = (float) (z - 1 + chunk_z * chunk_size);
 
-                float y = 6 * (glm::perlin(glm::vec2(x_position / 16.0f, z_position / 16.0f)) + 1);
+                float y = (float) sea_level + 6 * glm::perlin(glm::vec2(x_position / 16.0f, z_position / 16.0f));
 
                 for (int by = (int) roundf(y); by >= 0; by--) {
                     block_types[x][by][z] = 1.0f;
@@ -121,28 +122,19 @@ namespace cube {
         for (int x = 0; x < chunk_size; x++) {
             for (int y = 0; y < chunk_height; y++) {
                 for (int z = 0; z < chunk_size; z++) {
-                    bool nx, px, ny, py, nz, pz = true;
-
-                    if (x > 0) {
-                        nx = block_types[x - 1][y][z] == 0.0f;
-                    }
-                    if (x < chunk_size - 1) {
-                        px = block_types[x + 1][y][z] == 0.0f;
-                    }
+                    bool nx = block_types[x + 0][y][z + 1] == 0.0f;
+                    bool px = block_types[x + 2][y][z + 1] == 0.0f;
+                    bool ny, py = false;
                     if (y > 0) {
-                        ny = block_types[x][y - 1][z] == 0.0f;
+                        ny = block_types[x + 1][y - 1][z + 1] == 0.0f;
                     }
                     if (y < chunk_height - 1) {
-                        py = block_types[x][y + 1][z] == 0.0f;
+                        py = block_types[x + 1][y + 1][z + 1] == 0.0f;
                     }
-                    if (z > 0) {
-                        nz = block_types[x][y][z - 1] == 0.0f;
-                    }
-                    if (z < chunk_size - 1) {
-                        pz = block_types[x][y][z + 1] == 0.0f;
-                    }
+                    bool nz = block_types[x + 1][y][z + 0] == 0.0f;
+                    bool pz = block_types[x + 1][y][z + 2] == 0.0f;
 
-                    if (block_types[x][y][z] > 0.0f) {
+                    if (block_types[x + 1][y][z + 1] > 0.0f) {
                         std::vector<float> block_mesh = get_block(nx, px, ny, py, nz, pz);
 
                         block_mesh = position_mesh(block_mesh, (float) (x + chunk_x * chunk_size), (float) (y), (float) (z + chunk_z * chunk_size));
