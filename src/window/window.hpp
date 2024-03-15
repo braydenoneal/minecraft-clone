@@ -2,44 +2,44 @@
 
 #include <cmath>
 #include <string>
+#include <vector>
+#include <iostream>
+#include <queue>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <stb_image.h>
-#include <vector>
-#include <iostream>
 #include <glm/gtc/noise.hpp>
+#include <stb_image.h>
 
 #include "../render/shader.hpp"
 #include "../storage/game_state.hpp"
 #include "../storage/input_state.hpp"
 #include "../storage/user_state.hpp"
 #include "../storage/render_state.hpp"
-
 #include "../render/models/cube.hpp"
 
 namespace window {
     int cube_count = 1;
     int x_region = 0;
     int z_region = 0;
-    int chunk_radius = 16;
+    int chunk_radius = 4;
 
     std::map<std::array<int, 2>, std::vector<float>> chunk_locations_to_buffer_data;
     std::vector<float> vertex_buffer_data;
+    std::queue<std::array<int, 2>> chunks_to_load;
 
     void rerender() {
         std::vector<std::array<int, 2>> chunk_locations = {};
 
-        int chunk_x = (int) (game_state::camera_position.x / (float) cube::chunk_size);
-        int chunk_z = (int) (-game_state::camera_position.z / (float) cube::chunk_size);
-
-        for (int x = chunk_x - chunk_radius; x < chunk_x + chunk_radius; x++) {
-            for (int z = chunk_z - chunk_radius; z < chunk_z + chunk_radius; z++) {
-                if (pow(x - chunk_x, 2) + pow(z - chunk_z, 2) < chunk_radius * chunk_radius) {
+        for (int x = x_region - chunk_radius; x < x_region + chunk_radius; x++) {
+            for (int z = z_region - chunk_radius; z < z_region + chunk_radius; z++) {
+                if (pow(x - x_region, 2) + pow(z - z_region, 2) < chunk_radius * chunk_radius) {
                     chunk_locations.push_back({x, z});
                 }
             }
@@ -66,24 +66,28 @@ namespace window {
             chunk_locations_to_buffer_data.erase(chunk_location);
         }
 
-        std::vector<std::array<int, 2>> new_chunk_locations = {};
-
         // Load new chunks
         for (std::array<int, 2> chunk_location: chunk_locations) {
             if (!chunk_locations_to_buffer_data.count(chunk_location)) {
-                new_chunk_locations.push_back(chunk_location);
+                chunks_to_load.push(chunk_location);
             }
         }
+    }
 
-        std::map<std::array<int, 2>, std::vector<float>> new_data = cube::chunk_locations_to_buffer_data(new_chunk_locations);
+    void render_queue() {
+        std::vector<std::array<int, 2>> next_chunk = {chunks_to_load.front()};
+
+        std::map<std::array<int, 2>, std::vector<float>> new_data = cube::chunk_locations_to_buffer_data(next_chunk);
 
         chunk_locations_to_buffer_data.merge(new_data);
 
         vertex_buffer_data = cube::combine_chunks(chunk_locations_to_buffer_data);
 
-        cube_count = (int) (cube::chunk_size * cube::chunk_size * chunk_locations.size());
+        cube_count = (int) (cube::chunk_size * cube::chunk_size * chunk_locations_to_buffer_data.size());
 
         glBufferData(GL_ARRAY_BUFFER, 4 * 7 * 6 * 6 * cube_count, &vertex_buffer_data[0], GL_STATIC_DRAW);
+
+        chunks_to_load.pop();
     }
 
     void create_context() {
@@ -246,11 +250,15 @@ namespace window {
         glClearColor(127.0f / 255.0f, 204.0f / 255.0f, 1.0f, 1.0f);
 
         // Dynamic test
-        int next_x_region = std::floor(game_state::camera_position.x / 16.0f);
-        int next_z_region = std::floor(game_state::camera_position.z / 16.0f);
+        int next_x_region = std::floor(game_state::camera_position.x / (float) cube::chunk_size);
+        int next_z_region = std::floor(-game_state::camera_position.z / (float) cube::chunk_size);
 
         if (next_x_region != x_region || next_z_region != z_region) {
             rerender();
+        }
+
+        if (!chunks_to_load.empty()) {
+            render_queue();
         }
 
         x_region = next_x_region;
@@ -283,6 +291,10 @@ namespace window {
 
         ImGui::Begin("Debug");
         ImGui::Text("%.0f FPS", ImGui::GetIO().Framerate);
+        ImGui::Text("X: %.2f Y: %.2f Z: %.2f", game_state::camera_position.x, game_state::camera_position.y,
+                    game_state::camera_position.z);
+        ImGui::Text("P: %.2f° Y: %.2f°", -game_state::camera_angle.x / (float) M_PI * 180,
+                    game_state::camera_angle.y / (float) M_PI * 180);
         ImGui::End();
 
         if (input_state::paused) {
