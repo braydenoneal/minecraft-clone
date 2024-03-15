@@ -97,18 +97,6 @@ namespace cube {
         return cube::get_buffer_data_at_positions(positions);
     }
 
-    std::vector<float> get_chunk_buffer_data_combined(const std::vector<std::vector<float>> &chunk_buffer_datas) {
-        std::vector<float> buffer_data = {};
-
-        for (const std::vector<float> &chunk_buffer_data: chunk_buffer_datas) {
-            for (float value: chunk_buffer_data) {
-                buffer_data.push_back(value);
-            }
-        }
-
-        return buffer_data;
-    }
-
     std::map<std::array<int, 2>, std::vector<float>>
     chunk_locations_to_buffer_data(const std::vector<std::array<int, 2>> &chunk_locations) {
         std::map<std::array<int, 2>, std::vector<float>> chunk_locations_to_buffer_data = {};
@@ -125,10 +113,16 @@ namespace cube {
     combine_chunks(const std::map<std::array<int, 2>, std::vector<float>> &chunk_locations_to_buffer_data) {
         std::vector<float> buffer_data = {};
 
+        int reserve_space = 0;
+
         for (const auto &[key, value]: chunk_locations_to_buffer_data) {
-            for (float val: value) {
-                buffer_data.push_back(val);
-            }
+            reserve_space += (int) value.size();
+        }
+
+        buffer_data.reserve(reserve_space);
+
+        for (const auto &[key, value]: chunk_locations_to_buffer_data) {
+            buffer_data.insert(buffer_data.end(), value.begin(), value.end());
         }
 
         return buffer_data;
