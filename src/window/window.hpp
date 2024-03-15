@@ -297,6 +297,8 @@ namespace window {
                     game_state::camera_angle.y / (float) M_PI * 180);
         ImGui::End();
 
+        int previous_chunk_radius = chunk_radius;
+
         if (input_state::paused) {
             ImGui::Begin("Pause");
             if (ImGui::Button("Resume")) {
@@ -307,12 +309,17 @@ namespace window {
             if (ImGui::Button(vsync.c_str())) {
                 toggle_vsync();
             }
+            ImGui::SliderInt("Chunk radius", &chunk_radius, 2, 32);
             ImGui::SliderFloat("Field of view", &user_state::field_of_view, 10.0f, 120.0f);
             ImGui::SliderFloat("Mouse sensitivity", &user_state::mouse_sensitivity, 0.0f, 1.0f);
             if (ImGui::Button("Quit")) {
                 close();
             }
             ImGui::End();
+        }
+
+        if (previous_chunk_radius != chunk_radius) {
+            rerender();
         }
 
         ImGui::Render();
