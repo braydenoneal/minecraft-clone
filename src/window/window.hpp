@@ -27,9 +27,8 @@
 
 namespace window {
     int cube_count = 1;
-    int x_region = 0;
+    int x_region = 1;
     int z_region = 0;
-    int chunk_radius = 4;
 
     std::map<std::array<int, 2>, std::vector<float>> chunk_locations_to_buffer_data;
     std::vector<float> vertex_buffer_data;
@@ -38,9 +37,9 @@ namespace window {
     void rerender() {
         std::vector<std::array<int, 2>> chunk_locations = {};
 
-        for (int x = x_region - chunk_radius; x <= x_region + chunk_radius; x++) {
-            for (int z = z_region - chunk_radius; z <= z_region + chunk_radius; z++) {
-                if (pow(x - x_region, 2) + pow(z - z_region, 2) < chunk_radius * chunk_radius) {
+        for (int x = x_region - user_state::chunk_radius; x <= x_region + user_state::chunk_radius; x++) {
+            for (int z = z_region - user_state::chunk_radius; z <= z_region + user_state::chunk_radius; z++) {
+                if (pow((float) x + 0.5f - (float) x_region + 0.5f, 2) + pow((float) z + 0.5f - (float) z_region + 0.5f, 2) < user_state::chunk_radius * user_state::chunk_radius) {
                     chunk_locations.push_back({x, z});
                 }
             }
@@ -252,7 +251,7 @@ namespace window {
 
         // Dynamic test
         int next_x_region = std::floor(game_state::camera_position.x / (float) cube::chunk_size);
-        int next_z_region = std::floor(-game_state::camera_position.z / (float) cube::chunk_size);
+        int next_z_region = std::ceil(-game_state::camera_position.z / (float) cube::chunk_size);
 
         if (next_x_region != x_region || next_z_region != z_region) {
             chunks_to_load = {};
@@ -299,7 +298,7 @@ namespace window {
                     game_state::camera_angle.y / (float) M_PI * 180);
         ImGui::End();
 
-        int previous_chunk_radius = chunk_radius;
+        int previous_chunk_radius = user_state::chunk_radius;
 
         if (input_state::paused) {
             ImGui::Begin("Pause");
@@ -311,7 +310,7 @@ namespace window {
             if (ImGui::Button(vsync.c_str())) {
                 toggle_vsync();
             }
-            ImGui::SliderInt("Chunk radius", &chunk_radius, 2, 32);
+            ImGui::SliderInt("Chunk radius", &user_state::chunk_radius, 2, 32);
             ImGui::SliderFloat("Field of view", &user_state::field_of_view, 10.0f, 120.0f);
             ImGui::SliderFloat("Mouse sensitivity", &user_state::mouse_sensitivity, 0.0f, 1.0f);
             if (ImGui::Button("Quit")) {
@@ -320,7 +319,7 @@ namespace window {
             ImGui::End();
         }
 
-        if (previous_chunk_radius != chunk_radius) {
+        if (previous_chunk_radius != user_state::chunk_radius) {
             rerender();
         }
 
