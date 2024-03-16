@@ -113,7 +113,6 @@ namespace cube {
         return new_mesh;
     }
 
-    // Chunk location to block data
     chunk::chunk chunk_location_to_block_data(int chunk_x, int chunk_z) {
         chunk::chunk chunk_data = {chunk_x, chunk_z};
 
@@ -140,25 +139,102 @@ namespace cube {
         return chunk_data;
     }
 
-    // Chunk data to mesh
-    chunk::chunk_mesh chunk_data_to_mesh(chunk::chunk chunk_data) {
+    int pos(int x, int y, int z) {
+        return (x + 1) * (chunk_size + 1) * chunk_height + y * (chunk_size + 1) + z + 1;
+    }
+
+    chunk::chunk_mesh chunk_data_to_mesh(chunk::chunk chunk_data, const std::vector<chunk::chunk> &chunk_datas) {
         std::vector<float> mesh = {};
 
+        chunk::block block_data[(chunk_size + 1) * chunk_height * (chunk_size + 1)];
+
         for (int x = 0; x < chunk_size; x++) {
-            for (int y = 0; y < chunk_height; y++) {
+            for (int y = 0; y < chunk_size; y++) {
                 for (int z = 0; z < chunk_size; z++) {
+                    block_data[pos(x, y, z)] = chunk_data.blocks[chunk::pos(x, y, z)];
+                }
+            }
+        }
+
+        for (const auto &adjacent_chunk: chunk_datas) {
+            if (chunk_data.x == adjacent_chunk.x - 1 && chunk_data.z == adjacent_chunk.z) {
+                for (int y = 0; y < chunk_size; y++) {
+                    for (int z = 0; z < chunk_size; z++) {
+                        block_data[pos(0, y, z)] = adjacent_chunk.blocks[chunk::pos(chunk_size - 1, y, z)];
+                    }
+                }
+            } else if (chunk_data.x == adjacent_chunk.x + 1 && chunk_data.z == adjacent_chunk.z) {
+                for (int y = 0; y < chunk_size; y++) {
+                    for (int z = 0; z < chunk_size; z++) {
+                        block_data[pos(chunk_size - 1, y, z)] = adjacent_chunk.blocks[chunk::pos(0, y, z)];
+                    }
+                }
+            } else if (chunk_data.x == adjacent_chunk.x && chunk_data.z == adjacent_chunk.z - 1) {
+                for (int x = 0; x < chunk_size; x++) {
+                    for (int y = 0; y < chunk_size; y++) {
+                        block_data[pos(x, y, chunk_size - 1)] = adjacent_chunk.blocks[chunk::pos(x, y, 0)];
+                    }
+                }
+            } else if (chunk_data.x == adjacent_chunk.x && chunk_data.z == adjacent_chunk.z + 1) {
+                for (int x = 0; x < chunk_size; x++) {
+                    for (int y = 0; y < chunk_size; y++) {
+                        block_data[pos(x, y, 0)] = adjacent_chunk.blocks[chunk::pos(x, y, chunk_size - 1)];
+                    }
+                }
+            }
+        }
+
+        for (int x = 1; x < chunk_size - 1; x++) {
+            for (int y = 1; y < chunk_height - 1; y++) {
+                for (int z = 1; z < chunk_size - 1; z++) {
                     auto block = (float) chunk_data.blocks[chunk::pos(x, y, z)].id;
 
                     if (block != 0) {
-                        std::vector<float> block_mesh = get_block(block, true, true, true, true, true, true, false,
-                                                                  false,
-                                                                  false, false, false, false, false, false, false,
-                                                                  false, false,
-                                                                  false, false, false, false, false, false, false,
-                                                                  false, false);
+                        bool nx = chunk_data.blocks[chunk::pos(x - 1, y, z)].id == 0;
+                        bool px = chunk_data.blocks[chunk::pos(x + 1, y, z)].id == 0;
+                        bool ny = chunk_data.blocks[chunk::pos(x, y - 1, z)].id == 0;
+                        bool py = chunk_data.blocks[chunk::pos(x, y + 1, z)].id == 0;
+                        bool nz = chunk_data.blocks[chunk::pos(x, y, z - 1)].id == 0;
+                        bool pz = chunk_data.blocks[chunk::pos(x, y, z + 1)].id == 0;
 
-                        block_mesh = position_mesh(block_mesh, (float) (x + 1 + chunk_data.x * chunk_size), (float) (y),
-                                                   (float) (z + 1 + chunk_data.z * chunk_size));
+                        // XY
+                        bool nx_ny = chunk_data.blocks[chunk::pos(x - 1, y - 1, z)].id != 0;
+                        bool nx_py = chunk_data.blocks[chunk::pos(x - 1, y + 1, z)].id != 0;
+                        bool px_ny = chunk_data.blocks[chunk::pos(x + 1, y - 1, z)].id != 0;
+                        bool px_py = chunk_data.blocks[chunk::pos(x + 1, y + 1, z)].id != 0;
+
+                        // XZ
+                        bool nx_nz = chunk_data.blocks[chunk::pos(x - 1, y, z - 1)].id != 0;
+                        bool nx_pz = chunk_data.blocks[chunk::pos(x - 1, y, z + 1)].id != 0;
+                        bool px_nz = chunk_data.blocks[chunk::pos(x + 1, y, z - 1)].id != 0;
+                        bool px_pz = chunk_data.blocks[chunk::pos(x + 1, y, z + 1)].id != 0;
+
+                        // YZ
+                        bool ny_nz = chunk_data.blocks[chunk::pos(x, y - 1, z - 1)].id != 0;
+                        bool ny_pz = chunk_data.blocks[chunk::pos(x, y - 1, z + 1)].id != 0;
+                        bool py_nz = chunk_data.blocks[chunk::pos(x, y + 1, z - 1)].id != 0;
+                        bool py_pz = chunk_data.blocks[chunk::pos(x, y + 1, z + 1)].id != 0;
+
+                        // XYZ
+                        bool nx_ny_nz = chunk_data.blocks[chunk::pos(x - 1, y - 1, z - 1)].id != 0;
+                        bool nx_ny_pz = chunk_data.blocks[chunk::pos(x - 1, y - 1, z + 1)].id != 0;
+                        bool nx_py_nz = chunk_data.blocks[chunk::pos(x - 1, y + 1, z - 1)].id != 0;
+                        bool nx_py_pz = chunk_data.blocks[chunk::pos(x - 1, y + 1, z + 1)].id != 0;
+                        bool px_ny_nz = chunk_data.blocks[chunk::pos(x + 1, y - 1, z - 1)].id != 0;
+                        bool px_ny_pz = chunk_data.blocks[chunk::pos(x + 1, y - 1, z + 1)].id != 0;
+                        bool px_py_nz = chunk_data.blocks[chunk::pos(x + 1, y + 1, z - 1)].id != 0;
+                        bool px_py_pz = chunk_data.blocks[chunk::pos(x + 1, y + 1, z + 1)].id != 0;
+
+                        std::vector<float> block_mesh = get_block(
+                            block, nx, px, ny, py, nz, pz, nx_ny, nx_py, px_ny, px_py, nx_nz, nx_pz, px_nz, px_pz,
+                            ny_nz, ny_pz, py_nz, py_pz, nx_ny_nz, nx_ny_pz, nx_py_nz, nx_py_pz, px_ny_nz, px_ny_pz,
+                            px_py_nz, px_py_pz
+                        );
+
+                        auto x_position = (float) (x + chunk_data.x * chunk_size);
+                        auto z_position = (float) (z + chunk_data.z * chunk_size);
+
+                        block_mesh = position_mesh(block_mesh, x_position, (float) (y),z_position);
 
                         for (float value: block_mesh) {
                             mesh.emplace_back(value);
@@ -171,7 +247,6 @@ namespace cube {
         return {chunk_data.x, chunk_data.z, mesh};
     }
 
-    // Chunk datas to mesh
     std::vector<float> chunk_meshes_to_total_mesh(const std::vector<chunk::chunk_mesh> &chunk_meshes) {
         std::vector<float> mesh = {};
 

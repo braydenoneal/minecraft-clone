@@ -130,7 +130,7 @@ namespace window {
 
         chunks.push_back(chunk_data);
 
-        chunk::chunk_mesh chunk_mesh = cube::chunk_data_to_mesh(chunk_data);
+        chunk::chunk_mesh chunk_mesh = cube::chunk_data_to_mesh(chunk_data, chunks);
 
         chunk_meshes.push_back(chunk_mesh);
 
