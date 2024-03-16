@@ -146,8 +146,8 @@ namespace window {
 
         // Textures
         int texture_size = 16;
-        std::vector<std::string> texture_paths = {"../res/textures/grass_block_side.png",
-                                                  "../res/textures/grass_block_top.png", "../res/textures/dirt.png"};
+        std::vector<std::string> texture_paths = {"../res/textures/grass_block_side_forest.png",
+                                                  "../res/textures/grass_block_top_forest.png", "../res/textures/dirt.png"};
 
         stbi_set_flip_vertically_on_load(1);
 
@@ -245,7 +245,8 @@ namespace window {
     void render() {
         // Clear screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(127.0f / 255.0f, 204.0f / 255.0f, 1.0f, 1.0f);
+        glClearColor(138.0f / 255.0f, 163.0f / 255.0f, 1.0f, 1.0f);
+//        glClearColor(127.0f / 255.0f, 204.0f / 255.0f, 1.0f, 1.0f);
 
         // Chunk loading
         {
