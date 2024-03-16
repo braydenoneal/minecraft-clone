@@ -18,96 +18,136 @@ namespace cube {
 
         /*
          nx
-             ny_nz : nx
-             ny_pz : nx
-             py_nz : nx
-             py_pz : nx
+             -0.5f, -0.5f, -0.5f : (nx_ny || nx_nz || nx_ny_nz) ? 0.8f : 0.5f,
+             -0.5f, -0.5f, +0.5f : (nx_ny || nx_pz || nx_ny_pz) ? 0.8f : 0.5f,
+             -0.5f, +0.5f, -0.5f : (nx_py || nx_nz || nx_py_nz) ? 0.8f : 0.5f,
+             -0.5f, +0.5f, +0.5f : (nx_py || nx_pz || nx_py_pz) ? 0.8f : 0.5f,
          px
-             ny_nz : px
-             ny_pz : px
-             py_nz : px
-             py_pz : px
+             +0.5f, -0.5f, -0.5f : (px_ny || px_nz || px_ny_nz) ? 0.8f : 0.5f,
+             +0.5f, -0.5f, +0.5f : (px_ny || px_pz || px_ny_pz) ? 0.8f : 0.5f,
+             +0.5f, +0.5f, -0.5f : (px_py || px_nz || px_py_nz) ? 0.8f : 0.5f,
+             +0.5f, +0.5f, +0.5f : (px_py || px_pz || px_py_pz) ? 0.8f : 0.5f,
          ny
-             nx_nz : ny
-             nx_pz : ny
-             px_nz : ny
-             px_pz : ny
+             -0.5f, -0.5f, -0.5f : (nx_ny || ny_nz || nx_ny_nz) ? 0.4f : 0.1f,
+             -0.5f, -0.5f, +0.5f : (nx_ny || ny_pz || nx_ny_pz) ? 0.4f : 0.1f,
+             +0.5f, -0.5f, -0.5f : (px_ny || ny_nz || px_ny_nz) ? 0.4f : 0.1f,
+             +0.5f, -0.5f, +0.5f : (px_ny || ny_pz || px_ny_pz) ? 0.4f : 0.1f,
          py
-             nx_nz : py
-             nx_pz : py
-             px_nz : py
-             px_pz : py
+             -0.5f, +0.5f, -0.5f : (nx_py || py_nz || nx_py_nz) ? 1.0f : 0.7f,
+             -0.5f, +0.5f, +0.5f : (nx_py || py_pz || nx_py_pz) ? 1.0f : 0.7f,
+             +0.5f, +0.5f, -0.5f : (px_py || py_nz || px_py_nz) ? 1.0f : 0.7f,
+             +0.5f, +0.5f, +0.5f : (px_py || py_pz || px_py_pz) ? 1.0f : 0.7f,
          nz
-             nx_ny : nz
-             nx_py : nz
-             px_ny : nz
-             px_py : nz
+             -0.5f, -0.5f, -0.5f : (nx_nz || ny_nz || nx_ny_nz) ? 0.6f : 0.3f,
+             -0.5f, +0.5f, -0.5f : (nx_nz || py_nz || nx_py_nz) ? 0.6f : 0.3f,
+             +0.5f, -0.5f, -0.5f : (px_nz || ny_nz || px_ny_nz) ? 0.6f : 0.3f,
+             +0.5f, +0.5f, -0.5f : (px_nz || py_nz || px_py_nz) ? 0.6f : 0.3f,
          pz
-             nx_ny : pz
-             nx_py : pz
-             px_ny : pz
-             px_py : pz
+             -0.5f, -0.5f, +0.5f : (nx_pz || ny_pz || nx_ny_pz) ? 0.6f : 0.3f,
+             -0.5f, +0.5f, +0.5f : (nx_pz || py_pz || nx_py_pz) ? 0.6f : 0.3f,
+             +0.5f, -0.5f, +0.5f : (px_pz || ny_pz || px_ny_pz) ? 0.6f : 0.3f,
+             +0.5f, +0.5f, +0.5f : (px_pz || py_pz || px_py_pz) ? 0.6f : 0.3f,
          */
 
         /*
-         -0.5f, -0.5f, -0.5f : (nx_ny || nx_nz || ny_nz || nx_ny_nz) ? 0.f :
-         -0.5f, -0.5f, +0.5f : (nx_ny || nx_pz || ny_pz || nx_ny_pz) ? 0.f :
-         -0.5f, +0.5f, -0.5f : (nx_py || nx_nz || py_nz || nx_py_nz) ? 0.f :
-         -0.5f, +0.5f, +0.5f : (nx_py || nx_pz || py_pz || nx_py_pz) ? 0.f :
-         +0.5f, -0.5f, -0.5f : (px_ny || px_nz || ny_nz || px_ny_nz) ? 0.f :
-         +0.5f, -0.5f, +0.5f : (px_ny || px_pz || ny_pz || px_ny_pz) ? 0.f :
-         +0.5f, +0.5f, -0.5f : (px_py || px_nz || py_nz || px_py_nz) ? 0.f :
-         +0.5f, +0.5f, +0.5f : (px_py || px_pz || py_pz || px_py_pz) ? 0.f :
+         {
+                        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, (nx_ny || nx_nz || nx_ny_nz) ? 0.8f : 0.5f,
+                        -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, (nx_py || nx_nz || nx_py_nz) ? 0.8f : 0.5f,
+                        -0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, (nx_ny || nx_pz || nx_ny_pz) ? 0.8f : 0.5f,
+                        -0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, (nx_py || nx_pz || nx_py_pz) ? 0.8f : 0.5f,
+                        -0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, (nx_ny || nx_pz || nx_ny_pz) ? 0.8f : 0.5f,
+                        -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, (nx_py || nx_nz || nx_py_nz) ? 0.8f : 0.5f,
+                },
+                {
+                        +0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, (px_py || px_nz || px_py_nz) ? 0.8f : 0.5f,
+                        +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, (px_ny || px_nz || px_ny_nz) ? 0.8f : 0.5f,
+                        +0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, (px_py || px_pz || px_py_pz) ? 0.8f : 0.5f,
+                        +0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, (px_ny || px_pz || px_ny_pz) ? 0.8f : 0.5f,
+                        +0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, (px_py || px_pz || px_py_pz) ? 0.8f : 0.5f,
+                        +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, (px_ny || px_nz || px_ny_nz) ? 0.8f : 0.5f,
+                },
+                {
+                        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 2.0f, (nx_ny || ny_nz || nx_ny_nz) ? 0.4f : 0.1f,
+                        -0.5f, -0.5f, +0.5f, 0.0f, 1.0f, 2.0f, (nx_ny || ny_pz || nx_ny_pz) ? 0.4f : 0.1f,
+                        +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 2.0f, (px_ny || ny_nz || px_ny_nz) ? 0.4f : 0.1f,
+                        +0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 2.0f, (px_ny || ny_pz || px_ny_pz) ? 0.4f : 0.1f,
+                        +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 2.0f, (px_ny || ny_nz || px_ny_nz) ? 0.4f : 0.1f,
+                        -0.5f, -0.5f, +0.5f, 0.0f, 1.0f, 2.0f, (nx_ny || ny_pz || nx_ny_pz) ? 0.4f : 0.1f,
+                },
+                {
+                        -0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 1.0f, (nx_py || py_pz || nx_py_pz) ? 1.0f : 0.7f,
+                        -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 1.0f, (nx_py || py_nz || nx_py_nz) ? 1.0f : 0.7f,
+                        +0.5f, +0.5f, +0.5f, 1.0f, 0.0f, 1.0f, (px_py || py_pz || px_py_pz) ? 1.0f : 0.7f,
+                        +0.5f, +0.5f, -0.5f, 0.0f, 0.0f, 1.0f, (px_py || py_nz || px_py_nz) ? 1.0f : 0.7f,
+                        +0.5f, +0.5f, +0.5f, 1.0f, 0.0f, 1.0f, (px_py || py_pz || px_py_pz) ? 1.0f : 0.7f,
+                        -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 1.0f, (nx_py || py_nz || nx_py_nz) ? 1.0f : 0.7f,
+                },
+                {
+                        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, (nx_nz || ny_nz || nx_ny_nz) ? 0.6f : 0.3f,
+                        +0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, (px_nz || ny_nz || px_ny_nz) ? 0.6f : 0.3f,
+                        -0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, (nx_nz || py_nz || nx_py_nz) ? 0.6f : 0.3f,
+                        +0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, (px_nz || py_nz || px_py_nz) ? 0.6f : 0.3f,
+                        -0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, (nx_nz || py_nz || nx_py_nz) ? 0.6f : 0.3f,
+                        +0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, (px_nz || ny_nz || px_ny_nz) ? 0.6f : 0.3f,
+                },
+                {
+                        +0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, (px_pz || ny_pz || px_ny_pz) ? 0.6f : 0.3f,
+                        -0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, (nx_pz || ny_pz || nx_ny_pz) ? 0.6f : 0.3f,
+                        +0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, (px_pz || py_pz || px_py_pz) ? 0.6f : 0.3f,
+                        -0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, (nx_pz || py_pz || nx_py_pz) ? 0.6f : 0.3f,
+                        +0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, (px_pz || py_pz || px_py_pz) ? 0.6f : 0.3f,
+                        -0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, (nx_pz || ny_pz || nx_ny_pz) ? 0.6f : 0.3f,
+                }
          */
 
         std::vector<std::vector<float>> meshes = {
                 {
-                        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, (nx_ny || nx_nz || ny_nz || nx_ny_nz) ? 0.8f : 0.5f,
-                        -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, (nx_py || nx_nz || py_nz || nx_py_nz) ? 0.8f : 0.5f,
-                        -0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, (nx_ny || nx_pz || ny_pz || nx_ny_pz) ? 0.8f : 0.5f,
-                        -0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, (nx_py || nx_pz || py_pz || nx_py_pz) ? 0.8f : 0.5f,
-                        -0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, (nx_ny || nx_pz || ny_pz || nx_ny_pz) ? 0.8f : 0.5f,
-                        -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, (nx_py || nx_nz || py_nz || nx_py_nz) ? 0.8f : 0.5f,
+                        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, (nx_ny || nx_nz || nx_ny_nz) ? 0.8f : 0.5f,
+                        -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, (nx_py || nx_nz || nx_py_nz) ? 0.8f : 0.5f,
+                        -0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, (nx_ny || nx_pz || nx_ny_pz) ? 0.8f : 0.5f,
+                        -0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, (nx_py || nx_pz || nx_py_pz) ? 0.8f : 0.5f,
+                        -0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, (nx_ny || nx_pz || nx_ny_pz) ? 0.8f : 0.5f,
+                        -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, (nx_py || nx_nz || nx_py_nz) ? 0.8f : 0.5f,
                 },
                 {
-                        +0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, (px_py || px_nz || py_nz || px_py_nz) ? 0.8f : 0.5f,
-                        +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, (px_ny || px_nz || ny_nz || px_ny_nz) ? 0.8f : 0.5f,
-                        +0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, (px_py || px_pz || py_pz || px_py_pz) ? 0.8f : 0.5f,
-                        +0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, (px_ny || px_pz || ny_pz || px_ny_pz) ? 0.8f : 0.5f,
-                        +0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, (px_py || px_pz || py_pz || px_py_pz) ? 0.8f : 0.5f,
-                        +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, (px_ny || px_nz || ny_nz || px_ny_nz) ? 0.8f : 0.5f,
+                        +0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, (px_py || px_nz || px_py_nz) ? 0.8f : 0.5f,
+                        +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, (px_ny || px_nz || px_ny_nz) ? 0.8f : 0.5f,
+                        +0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, (px_py || px_pz || px_py_pz) ? 0.8f : 0.5f,
+                        +0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, (px_ny || px_pz || px_ny_pz) ? 0.8f : 0.5f,
+                        +0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, (px_py || px_pz || px_py_pz) ? 0.8f : 0.5f,
+                        +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, (px_ny || px_nz || px_ny_nz) ? 0.8f : 0.5f,
                 },
                 {
-                        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 2.0f, (nx_ny || nx_nz || ny_nz || nx_ny_nz) ? 0.4f : 0.1f,
-                        -0.5f, -0.5f, +0.5f, 0.0f, 1.0f, 2.0f, (nx_ny || nx_pz || ny_pz || nx_ny_pz) ? 0.4f : 0.1f,
-                        +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 2.0f, (px_ny || px_nz || ny_nz || px_ny_nz) ? 0.4f : 0.1f,
-                        +0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 2.0f, (px_ny || px_pz || ny_pz || px_ny_pz) ? 0.4f : 0.1f,
-                        +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 2.0f, (px_ny || px_nz || ny_nz || px_ny_nz) ? 0.4f : 0.1f,
-                        -0.5f, -0.5f, +0.5f, 0.0f, 1.0f, 2.0f, (nx_ny || nx_pz || ny_pz || nx_ny_pz) ? 0.4f : 0.1f,
+                        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 2.0f, (nx_ny || ny_nz || nx_ny_nz) ? 0.4f : 0.1f,
+                        -0.5f, -0.5f, +0.5f, 0.0f, 1.0f, 2.0f, (nx_ny || ny_pz || nx_ny_pz) ? 0.4f : 0.1f,
+                        +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 2.0f, (px_ny || ny_nz || px_ny_nz) ? 0.4f : 0.1f,
+                        +0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 2.0f, (px_ny || ny_pz || px_ny_pz) ? 0.4f : 0.1f,
+                        +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 2.0f, (px_ny || ny_nz || px_ny_nz) ? 0.4f : 0.1f,
+                        -0.5f, -0.5f, +0.5f, 0.0f, 1.0f, 2.0f, (nx_ny || ny_pz || nx_ny_pz) ? 0.4f : 0.1f,
                 },
                 {
-                        -0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 1.0f, (nx_py || nx_pz || py_pz || nx_py_pz) ? 1.0f : 0.7f,
-                        -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 1.0f, (nx_py || nx_nz || py_nz || nx_py_nz) ? 1.0f : 0.7f,
-                        +0.5f, +0.5f, +0.5f, 1.0f, 0.0f, 1.0f, (px_py || px_pz || py_pz || px_py_pz) ? 1.0f : 0.7f,
-                        +0.5f, +0.5f, -0.5f, 0.0f, 0.0f, 1.0f, (px_py || px_nz || py_nz || px_py_nz) ? 1.0f : 0.7f,
-                        +0.5f, +0.5f, +0.5f, 1.0f, 0.0f, 1.0f, (px_py || px_pz || py_pz || px_py_pz) ? 1.0f : 0.7f,
-                        -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 1.0f, (nx_py || nx_nz || py_nz || nx_py_nz) ? 1.0f : 0.7f,
+                        -0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 1.0f, (nx_py || py_pz || nx_py_pz) ? 1.0f : 0.7f,
+                        -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 1.0f, (nx_py || py_nz || nx_py_nz) ? 1.0f : 0.7f,
+                        +0.5f, +0.5f, +0.5f, 1.0f, 0.0f, 1.0f, (px_py || py_pz || px_py_pz) ? 1.0f : 0.7f,
+                        +0.5f, +0.5f, -0.5f, 0.0f, 0.0f, 1.0f, (px_py || py_nz || px_py_nz) ? 1.0f : 0.7f,
+                        +0.5f, +0.5f, +0.5f, 1.0f, 0.0f, 1.0f, (px_py || py_pz || px_py_pz) ? 1.0f : 0.7f,
+                        -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 1.0f, (nx_py || py_nz || nx_py_nz) ? 1.0f : 0.7f,
                 },
                 {
-                        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, (nx_ny || nx_nz || ny_nz || nx_ny_nz) ? 0.6f : 0.3f,
-                        +0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, (px_ny || px_nz || ny_nz || px_ny_nz) ? 0.6f : 0.3f,
-                        -0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, (nx_py || nx_nz || py_nz || nx_py_nz) ? 0.6f : 0.3f,
-                        +0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, (px_py || px_nz || py_nz || px_py_nz) ? 0.6f : 0.3f,
-                        -0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, (nx_py || nx_nz || py_nz || nx_py_nz) ? 0.6f : 0.3f,
-                        +0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, (px_ny || px_nz || ny_nz || px_ny_nz) ? 0.6f : 0.3f,
+                        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, (nx_nz || ny_nz || nx_ny_nz) ? 0.6f : 0.3f,
+                        +0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, (px_nz || ny_nz || px_ny_nz) ? 0.6f : 0.3f,
+                        -0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, (nx_nz || py_nz || nx_py_nz) ? 0.6f : 0.3f,
+                        +0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, (px_nz || py_nz || px_py_nz) ? 0.6f : 0.3f,
+                        -0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, (nx_nz || py_nz || nx_py_nz) ? 0.6f : 0.3f,
+                        +0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, (px_nz || ny_nz || px_ny_nz) ? 0.6f : 0.3f,
                 },
                 {
-                        +0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, (px_ny || px_pz || ny_pz || px_ny_pz) ? 0.6f : 0.3f,
-                        -0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, (nx_ny || nx_pz || ny_pz || nx_ny_pz) ? 0.6f : 0.3f,
-                        +0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, (px_py || px_pz || py_pz || px_py_pz) ? 0.6f : 0.3f,
-                        -0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, (nx_py || nx_pz || py_pz || nx_py_pz) ? 0.6f : 0.3f,
-                        +0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, (px_py || px_pz || py_pz || px_py_pz) ? 0.6f : 0.3f,
-                        -0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, (nx_ny || nx_pz || ny_pz || nx_ny_pz) ? 0.6f : 0.3f,
+                        +0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, (px_pz || ny_pz || px_ny_pz) ? 0.6f : 0.3f,
+                        -0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, (nx_pz || ny_pz || nx_ny_pz) ? 0.6f : 0.3f,
+                        +0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, (px_pz || py_pz || px_py_pz) ? 0.6f : 0.3f,
+                        -0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, (nx_pz || py_pz || nx_py_pz) ? 0.6f : 0.3f,
+                        +0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, (px_pz || py_pz || px_py_pz) ? 0.6f : 0.3f,
+                        -0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, (nx_pz || ny_pz || nx_ny_pz) ? 0.6f : 0.3f,
                 }
         };
 
