@@ -97,6 +97,9 @@ namespace window {
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_MAXIMIZED, input_state::maximized ? GL_TRUE : GLFW_FALSE);
 
+        // Enable MSAA
+        glfwWindowHint(GLFW_SAMPLES, 4);
+
         input_state::glfw_window = glfwCreateWindow(input_state::window_width, input_state::window_height,
                                                     user_state::title.c_str(), nullptr, nullptr);
 
@@ -146,10 +149,12 @@ namespace window {
 
         // Textures
         int texture_size = 16;
-//        std::vector<std::string> texture_paths = {"../res/textures/grass_block_side_forest.png",
-//                                                  "../res/textures/grass_block_top_forest.png", "../res/textures/dirt.png"};
-        std::vector<std::string> texture_paths = {"../res/textures/grass_block_side.png",
-                                                  "../res/textures/grass_block_top.png", "../res/textures/dirt.png"};
+        std::vector<std::string> texture_paths = {
+                "../res/textures/grass_block_side.png",
+                "../res/textures/grass_block_top.png",
+                "../res/textures/dirt.png",
+                "../res/textures/stone.png",
+        };
 
         stbi_set_flip_vertically_on_load(1);
 
