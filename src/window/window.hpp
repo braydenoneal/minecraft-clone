@@ -26,10 +26,9 @@
 #include "../render/models/cube.hpp"
 
 namespace window {
-    int cube_count = 1;
-    int x_region = 1;
+    int cube_count = 0;
+    int x_region = 0;
     int z_region = 0;
-
     std::map<std::array<int, 2>, std::vector<float>> chunk_locations_to_buffer_data;
     std::vector<float> vertex_buffer_data;
     std::queue<std::array<int, 2>> chunks_to_load;
@@ -248,38 +247,44 @@ namespace window {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(127.0f / 255.0f, 204.0f / 255.0f, 1.0f, 1.0f);
 
-        // Dynamic test
-        int next_x_region = std::floor(game_state::camera_position.x / (float) cube::chunk_size);
-        int next_z_region = std::ceil(-game_state::camera_position.z / (float) cube::chunk_size);
+        // Chunk loading
+        {
+            int next_x_region = std::floor(game_state::camera_position.x / (float) cube::chunk_size);
+            int next_z_region = std::ceil(-game_state::camera_position.z / (float) cube::chunk_size);
 
-        if (!user_state::pause_chunk_loading && next_x_region != x_region || next_z_region != z_region) {
-            chunks_to_load = {};
-            rerender();
+            if (!user_state::pause_chunk_loading && next_x_region != x_region || next_z_region != z_region) {
+                chunks_to_load = {};
+                rerender();
+            }
+
+            if (!user_state::pause_chunk_loading && !chunks_to_load.empty()) {
+                render_queue();
+            }
+
+            x_region = next_x_region;
+            z_region = next_z_region;
         }
-
-        if (!user_state::pause_chunk_loading && !chunks_to_load.empty()) {
-            render_queue();
-        }
-
-        x_region = next_x_region;
-        z_region = next_z_region;
 
         // Setup camera uniform
-        glm::mat4 perspective = glm::perspective(glm::radians(user_state::field_of_view),
-                                                 (float) input_state::window_width / (float) input_state::window_height,
-                                                 0.05f, 2048.0f);
-        auto camera_rotate = glm::mat4(1.0f);
-        camera_rotate = glm::rotate(camera_rotate, game_state::camera_angle.x, glm::vec3(1.0f, 0.0f, 0.0f));
-        camera_rotate = glm::rotate(camera_rotate, game_state::camera_angle.y, glm::vec3(0.0f, 1.0f, 0.0f));
-        camera_rotate = glm::rotate(camera_rotate, game_state::camera_angle.z, glm::vec3(0.0f, 0.0f, 1.0f));
-        glm::mat4 camera_translate = glm::translate(
-                glm::mat4(1.0f),
-                glm::vec3(-game_state::camera_position.x, -game_state::camera_position.y, game_state::camera_position.z)
-        );
-        glm::mat4 camera_matrix = perspective * camera_rotate * camera_translate;
+        {
+            glm::mat4 perspective = glm::perspective(glm::radians(user_state::field_of_view),
+                                                     (float) input_state::window_width /
+                                                     (float) input_state::window_height,
+                                                     0.05f, 2048.0f);
+            auto camera_rotate = glm::mat4(1.0f);
+            camera_rotate = glm::rotate(camera_rotate, game_state::camera_angle.x, glm::vec3(1.0f, 0.0f, 0.0f));
+            camera_rotate = glm::rotate(camera_rotate, game_state::camera_angle.y, glm::vec3(0.0f, 1.0f, 0.0f));
+            camera_rotate = glm::rotate(camera_rotate, game_state::camera_angle.z, glm::vec3(0.0f, 0.0f, 1.0f));
+            glm::mat4 camera_translate = glm::translate(
+                    glm::mat4(1.0f),
+                    glm::vec3(-game_state::camera_position.x, -game_state::camera_position.y,
+                              game_state::camera_position.z)
+            );
+            glm::mat4 camera_matrix = perspective * camera_rotate * camera_translate;
 
-        int location = glGetUniformLocation(render_state::program, "u_camera");
-        glUniformMatrix4fv(location, 1, GL_FALSE, &camera_matrix[0][0]);
+            int location = glGetUniformLocation(render_state::program, "u_camera");
+            glUniformMatrix4fv(location, 1, GL_FALSE, &camera_matrix[0][0]);
+        }
 
         // Draw geometry
         glDrawArrays(GL_TRIANGLES, 0, cube_count);
@@ -289,17 +294,33 @@ namespace window {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::Begin("Debug");
-        ImGui::Text("%.0f FPS", ImGui::GetIO().Framerate);
-        ImGui::Text("X: %.2f Y: %.2f Z: %.2f", game_state::camera_position.x, game_state::camera_position.y,
-                    game_state::camera_position.z);
-        ImGui::Text("P: %.2f° Y: %.2f°", -game_state::camera_angle.x / (float) M_PI * 180,
-                    game_state::camera_angle.y / (float) M_PI * 180);
-        ImGui::End();
+        // Debug screen
+        {
+            ImGui::Begin("Debug");
+            ImGui::Text("%.0f FPS", ImGui::GetIO().Framerate);
+            ImGui::Text("X: %.2f Y: %.2f Z: %.2f", game_state::camera_position.x, game_state::camera_position.y,
+                        game_state::camera_position.z);
+            ImGui::Text("P: %.2f° Y: %.2f°", -game_state::camera_angle.x / (float) M_PI * 180,
+                        game_state::camera_angle.y / (float) M_PI * 180);
+            std::string facing_text = "Facing: ";
+            float direction = game_state::camera_angle.y / (float) M_PI;
+            if (direction > -0.25f && direction <= 0.25f) {
+                facing_text += "+Z North";
+            } else if (direction > 0.25f && direction <= 0.75f) {
+                facing_text += "+X East";
+            } else if (direction > 0.75f || direction < -0.75f) {
+                facing_text += "-Z South";
+            } else if (direction > -0.75f && direction <= -0.25f) {
+                facing_text += "-X West";
+            }
+            ImGui::Text(facing_text.c_str());
+            ImGui::End();
+        }
 
         int previous_chunk_radius = user_state::chunk_radius;
         int previous_vsync_enabled = user_state::vsync_enabled;
 
+        // Pause screen
         if (input_state::paused) {
             ImGui::Begin("Pause");
             if (ImGui::Button("Resume")) {

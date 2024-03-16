@@ -30,7 +30,12 @@ namespace input {
 
             game_state::camera_angle.x = std::clamp(game_state::camera_angle.x, -(float) M_PI / 2.0f,
                                                     (float) M_PI / 2.0f);
-            game_state::camera_angle.y = (float) fmod(game_state::camera_angle.y, M_PI * 2);
+            if (game_state::camera_angle.y < -(float) M_PI) {
+                game_state::camera_angle.y += (float) M_PI * 2;
+            } else if (game_state::camera_angle.y >= (float) M_PI) {
+                game_state::camera_angle.y -= (float) M_PI * 2;
+            }
+//            game_state::camera_angle.y = (float) fmod(game_state::camera_angle.y, M_PI);
 
             for (std::pair<const int, int> key: input_state::keys) {
                 if (key.second) {
