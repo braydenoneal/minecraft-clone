@@ -4,6 +4,8 @@
 #include <vector>
 #include <map>
 
+#include "../../world/chunk/chunk.hpp"
+
 namespace cube {
     static int chunk_size = 16;
     static int chunk_height = 128;
@@ -111,163 +113,77 @@ namespace cube {
         return new_mesh;
     }
 
-    std::vector<std::vector<std::vector<float>>> chunk_location_to_block_types(int chunk_x, int chunk_z) {
-        std::vector<std::vector<std::vector<float>>> block_types(chunk_size + 2, std::vector<std::vector<float>>(chunk_height, std::vector<float>(chunk_size + 2)));
+    // Chunk location to block data
+    chunk::chunk chunk_location_to_block_data(int chunk_x, int chunk_z) {
+        chunk::chunk chunk_data = {chunk_x, chunk_z};
 
         for (int x = 0; x < chunk_size + 2; x++) {
             for (int z = 0; z < chunk_size + 2; z++) {
                 auto x_position = (float) (x - 1 + chunk_x * chunk_size);
                 auto z_position = (float) (z - 1 + chunk_z * chunk_size);
 
-                float vertical_scale = 32;
-                float horizontal_scale = 24;
+                float vertical_scale = 6;
+                float horizontal_scale = 16;
                 float y = (float) sea_level + vertical_scale * glm::perlin(glm::vec2(x_position / horizontal_scale, z_position / horizontal_scale));
 
                 int grass_height = (int) roundf(y);
                 int stone_top_height = grass_height - 2;
 
-                block_types[x][grass_height][z] = 1.0f;
-
-                for (int by = grass_height - 1; by > stone_top_height; by--) {
-                    block_types[x][by][z] = 2.0f;
-                }
-
-                for (int by = stone_top_height; by >= 0; by--) {
-//                    if (std::abs(glm::perlin(glm::vec3(x_position / 16, (float) by / 16, z_position / 16))) < 0.35f)
-                    block_types[x][by][z] = 3.0f;
-                }
+                chunk_data.blocks[chunk::pos(x, grass_height, z)] = {1};
             }
         }
 
-        return block_types;
+        return chunk_data;
     }
 
-    std::vector<float>
-    block_types_to_mesh(const std::vector<std::vector<std::vector<float>>> &block_types, int chunk_x, int chunk_z) {
-        std::vector<float> all_mesh = {};
+    // Chunk locations to block data
+    std::vector<chunk::chunk> chunk_locations_to_chunk_data(const std::vector<std::array<int, 2>> &chunk_locations) {
+        std::vector<chunk::chunk> block_datas = {};
 
-        for (int x = 0; x < chunk_size; x++) {
-            for (int y = 0; y < chunk_height; y++) {
-                for (int z = 0; z < chunk_size; z++) {
-                    float block = block_types[x + 1][y][z + 1];
+        block_datas.reserve(chunk_locations.size());
 
-                    if (block > 0.0f) {
-                        bool nx = block_types[x + 0][y][z + 1] == 0.0f;
-                        bool px = block_types[x + 2][y][z + 1] == 0.0f;
-                        bool ny = true;
-                        bool py = true;
-                        if (y > 0) {
-                            ny = block_types[x + 1][y - 1][z + 1] == 0.0f;
-                        }
-                        if (y < chunk_height - 1) {
-                            py = block_types[x + 1][y + 1][z + 1] == 0.0f;
-                        }
-                        bool nz = block_types[x + 1][y][z + 0] == 0.0f;
-                        bool pz = block_types[x + 1][y][z + 2] == 0.0f;
+        for (std::array<int, 2> chunk_location: chunk_locations) {
+            block_datas.emplace_back(chunk_location_to_block_data(chunk_location[0], chunk_location[1]));
+        }
 
-                        int rx = x + 1;
-                        int rz = z + 1;
+        return block_datas;
+    }
 
-                        bool nx_ny = false;
-                        bool nx_py = false;
-                        bool px_ny = false;
-                        bool px_py = false;
-                        bool nx_nz = false;
-                        bool nx_pz = false;
-                        bool px_nz = false;
-                        bool px_pz = false;
-                        bool ny_nz = false;
-                        bool ny_pz = false;
-                        bool py_nz = false;
-                        bool py_pz = false;
-                        bool nx_ny_nz = false;
-                        bool nx_ny_pz = false;
-                        bool nx_py_nz = false;
-                        bool nx_py_pz = false;
-                        bool px_ny_nz = false;
-                        bool px_ny_pz = false;
-                        bool px_py_nz = false;
-                        bool px_py_pz = false;
+    // Chunk data to mesh
+    std::vector<float> chunk_data_to_mesh(chunk::chunk chunk_data) {
+        std::vector<float> mesh = {};
 
-                        if (y > 0 && y < chunk_height - 1) {
-                            // XY
-                            nx_ny = block_types[rx - 1][y - 1][rz] != 0.0f;
-                            nx_py = block_types[rx - 1][y + 1][rz] != 0.0f;
-                            px_ny = block_types[rx + 1][y - 1][rz] != 0.0f;
-                            px_py = block_types[rx + 1][y + 1][rz] != 0.0f;
+        for (int x = 0; x < 16; x++) {
+            for (int y = 0; y < 128; y++) {
+                for (int z = 0; z < 16; z++) {
+                    auto block = (float) chunk_data.blocks[chunk::pos(x, y, z)].id;
 
-                            // XZ
-                            nx_nz = block_types[rx - 1][y][rz - 1] != 0.0f;
-                            nx_pz = block_types[rx - 1][y][rz + 1] != 0.0f;
-                            px_nz = block_types[rx + 1][y][rz - 1] != 0.0f;
-                            px_pz = block_types[rx + 1][y][rz + 1] != 0.0f;
+                    std::vector<float> block_mesh = get_block(block, false, false, false, false, false, false, false, false,
+                                                              false, false, false, false, false, false, false, false, false,
+                                                              false, false, false, false, false, false, false, false, false);
 
-                            // YZ
-                            ny_nz = block_types[rx][y - 1][rz - 1] != 0.0f;
-                            ny_pz = block_types[rx][y - 1][rz + 1] != 0.0f;
-                            py_nz = block_types[rx][y + 1][rz - 1] != 0.0f;
-                            py_pz = block_types[rx][y + 1][rz + 1] != 0.0f;
+                    block_mesh = position_mesh(block_mesh, (float) (x + 1 + chunk_data.x * chunk_size), (float) (y),
+                                               (float) (z + 1 + chunk_data.z * chunk_size));
 
-                            // XYZ
-                            nx_ny_nz = block_types[rx - 1][y - 1][rz - 1] != 0.0f;
-                            nx_ny_pz = block_types[rx - 1][y - 1][rz + 1] != 0.0f;
-                            nx_py_nz = block_types[rx - 1][y + 1][rz - 1] != 0.0f;
-                            nx_py_pz = block_types[rx - 1][y + 1][rz + 1] != 0.0f;
-                            px_ny_nz = block_types[rx + 1][y - 1][rz - 1] != 0.0f;
-                            px_ny_pz = block_types[rx + 1][y - 1][rz + 1] != 0.0f;
-                            px_py_nz = block_types[rx + 1][y + 1][rz - 1] != 0.0f;
-                            px_py_pz = block_types[rx + 1][y + 1][rz + 1] != 0.0f;
-                        }
-
-                        std::vector<float> block_mesh = get_block(block, nx, px, ny, py, nz, pz, nx_ny, nx_py, px_ny, px_py,
-                                                                  nx_nz, nx_pz, px_nz, px_pz, ny_nz, ny_pz, py_nz,
-                                                                  py_pz, nx_ny_nz, nx_ny_pz, nx_py_nz, nx_py_pz,
-                                                                  px_ny_nz, px_ny_pz, px_py_nz, px_py_pz);
-
-                        block_mesh = position_mesh(block_mesh, (float) (x + 1 + chunk_x * chunk_size), (float) (y),
-                                                   (float) (z + 1 + chunk_z * chunk_size));
-
-                        for (float value: block_mesh) {
-                            all_mesh.emplace_back(value);
-                        }
+                    for (float value: block_mesh) {
+                        mesh.emplace_back(value);
                     }
                 }
             }
         }
 
-        return all_mesh;
+        return mesh;
     }
 
-    std::map<std::array<int, 2>, std::vector<float>>
-    chunk_locations_to_buffer_data(const std::vector<std::array<int, 2>> &chunk_locations) {
-        std::map<std::array<int, 2>, std::vector<float>> chunk_locations_to_buffer_data = {};
+    // Chunk datas to mesh
+    std::vector<float> chunk_datas_to_mesh(const std::vector<chunk::chunk> &chunk_datas) {
+        std::vector<float> mesh = {};
 
-        for (std::array<int, 2> chunk_location: chunk_locations) {
-            auto block_types = chunk_location_to_block_types(chunk_location[0], chunk_location[1]);
-
-            chunk_locations_to_buffer_data[chunk_location] = block_types_to_mesh(block_types, chunk_location[0],
-                                                                                 chunk_location[1]);
+        for (chunk::chunk chunk_data: chunk_datas) {
+            std::vector<float> chunk_mesh = chunk_data_to_mesh(chunk_data);
+            mesh.insert(mesh.end(), chunk_mesh.begin(), chunk_mesh.end());
         }
 
-        return chunk_locations_to_buffer_data;
-    }
-
-    std::vector<float>
-    combine_chunks(const std::map<std::array<int, 2>, std::vector<float>> &chunk_locations_to_buffer_data) {
-        std::vector<float> buffer_data = {};
-
-        int reserve_space = 0;
-
-        for (const auto &[key, value]: chunk_locations_to_buffer_data) {
-            reserve_space += (int) value.size();
-        }
-
-        buffer_data.reserve(reserve_space);
-
-        for (const auto &[key, value]: chunk_locations_to_buffer_data) {
-            buffer_data.insert(buffer_data.end(), value.begin(), value.end());
-        }
-
-        return buffer_data;
+        return mesh;
     }
 }

@@ -24,6 +24,7 @@
 #include "../storage/user_state.hpp"
 #include "../storage/render_state.hpp"
 #include "../render/models/cube.hpp"
+#include "../world/chunk/chunk.hpp"
 
 namespace window {
     int cube_count = 0;
@@ -33,8 +34,11 @@ namespace window {
     std::vector<float> vertex_buffer_data;
     std::queue<std::array<int, 2>> chunks_to_load;
 
+    std::vector<std::array<int, 2>> chunk_locations;
+    std::vector<chunk::chunk> chunk_datas;
+
     void rerender() {
-        std::vector<std::array<int, 2>> chunk_locations = {};
+        chunk_locations = {};
 
         for (int x = x_region - user_state::chunk_radius; x <= x_region + user_state::chunk_radius; x++) {
             for (int z = z_region - user_state::chunk_radius; z <= z_region + user_state::chunk_radius; z++) {
@@ -45,30 +49,42 @@ namespace window {
         }
 
         // Unload chunks
-        std::vector<std::array<int, 2>> unload_chunks = {};
+        std::vector<int> unload_chunks = {};
 
-        for (const auto &[key, value]: chunk_locations_to_buffer_data) {
+        int del_index = 0;
+        for (const auto &chunk_data: chunk_datas) {
             bool del = true;
 
             for (std::array<int, 2> chunk_location: chunk_locations) {
-                if (key == chunk_location) {
+                if (chunk_data.x == chunk_location[0] && chunk_data.z == chunk_location[1]) {
                     del = false;
                 }
             }
 
             if (del) {
-                unload_chunks.push_back(key);
+                unload_chunks.push_back(del_index);
             }
+            del_index++;
         }
 
-        for (std::array<int, 2> chunk_location: unload_chunks) {
-            chunk_locations_to_buffer_data.erase(chunk_location);
+        for (int i: unload_chunks) {
+            chunk_datas.erase(chunk_datas.begin() + i);
         }
 
         // Load new chunks
         for (std::array<int, 2> chunk_location: chunk_locations) {
-            if (!chunk_locations_to_buffer_data.count(chunk_location)) {
+            bool add = true;
+
+            for (const auto &chunk_data: chunk_datas) {
+                if (chunk_data.x == chunk_location[0] && chunk_data.z == chunk_location[1]) {
+                    add = false;
+                }
+            }
+
+            if (add) {
                 chunks_to_load.push(chunk_location);
+
+                chunk_datas.emplace_back(cube::chunk_location_to_block_data(chunk_location[0], chunk_location[1]));
             }
         }
     }
@@ -76,11 +92,13 @@ namespace window {
     void render_queue() {
         std::vector<std::array<int, 2>> next_chunk = {chunks_to_load.front()};
 
-        std::map<std::array<int, 2>, std::vector<float>> new_data = cube::chunk_locations_to_buffer_data(next_chunk);
+//        for (const auto &chunk_data: chunk_datas) {
+//
+//        }
+//
+//        chunk_datas.emplace_back(cube::chunk_location_to_block_data(next_chunk[0][0], next_chunk[0][1]));
 
-        chunk_locations_to_buffer_data.merge(new_data);
-
-        vertex_buffer_data = cube::combine_chunks(chunk_locations_to_buffer_data);
+        vertex_buffer_data = cube::chunk_datas_to_mesh(chunk_datas);
 
         cube_count = std::ceil((float) vertex_buffer_data.size() / 7.0f);
 
