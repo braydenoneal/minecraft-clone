@@ -117,10 +117,10 @@ namespace cube {
     chunk::chunk chunk_location_to_block_data(int chunk_x, int chunk_z) {
         chunk::chunk chunk_data = {chunk_x, chunk_z};
 
-        for (int x = 0; x < chunk_size + 2; x++) {
-            for (int z = 0; z < chunk_size + 2; z++) {
-                auto x_position = (float) (x - 1 + chunk_x * chunk_size);
-                auto z_position = (float) (z - 1 + chunk_z * chunk_size);
+        for (int x = 0; x < chunk_size; x++) {
+            for (int z = 0; z < chunk_size; z++) {
+                auto x_position = (float) (x + chunk_x * chunk_size);
+                auto z_position = (float) (z + chunk_z * chunk_size);
 
                 float vertical_scale = 6;
                 float horizontal_scale = 16;
@@ -130,58 +130,53 @@ namespace cube {
                 int stone_top_height = grass_height - 2;
 
                 chunk_data.blocks[chunk::pos(x, grass_height, z)] = {1};
+//
+//                for (int by = grass_height - 1; by >= 0; by--) {
+//                    chunk_data.blocks[chunk::pos(x, by, z)] = {3};
+//                }
             }
         }
 
         return chunk_data;
     }
 
-    // Chunk locations to block data
-    std::vector<chunk::chunk> chunk_locations_to_chunk_data(const std::vector<std::array<int, 2>> &chunk_locations) {
-        std::vector<chunk::chunk> block_datas = {};
-
-        block_datas.reserve(chunk_locations.size());
-
-        for (std::array<int, 2> chunk_location: chunk_locations) {
-            block_datas.emplace_back(chunk_location_to_block_data(chunk_location[0], chunk_location[1]));
-        }
-
-        return block_datas;
-    }
-
     // Chunk data to mesh
-    std::vector<float> chunk_data_to_mesh(chunk::chunk chunk_data) {
+    chunk::chunk_mesh chunk_data_to_mesh(chunk::chunk chunk_data) {
         std::vector<float> mesh = {};
 
-        for (int x = 0; x < 16; x++) {
-            for (int y = 0; y < 128; y++) {
-                for (int z = 0; z < 16; z++) {
+        for (int x = 0; x < chunk_size; x++) {
+            for (int y = 0; y < chunk_height; y++) {
+                for (int z = 0; z < chunk_size; z++) {
                     auto block = (float) chunk_data.blocks[chunk::pos(x, y, z)].id;
 
-                    std::vector<float> block_mesh = get_block(block, false, false, false, false, false, false, false, false,
-                                                              false, false, false, false, false, false, false, false, false,
-                                                              false, false, false, false, false, false, false, false, false);
+                    if (block != 0) {
+                        std::vector<float> block_mesh = get_block(block, true, true, true, true, true, true, false,
+                                                                  false,
+                                                                  false, false, false, false, false, false, false,
+                                                                  false, false,
+                                                                  false, false, false, false, false, false, false,
+                                                                  false, false);
 
-                    block_mesh = position_mesh(block_mesh, (float) (x + 1 + chunk_data.x * chunk_size), (float) (y),
-                                               (float) (z + 1 + chunk_data.z * chunk_size));
+                        block_mesh = position_mesh(block_mesh, (float) (x + 1 + chunk_data.x * chunk_size), (float) (y),
+                                                   (float) (z + 1 + chunk_data.z * chunk_size));
 
-                    for (float value: block_mesh) {
-                        mesh.emplace_back(value);
+                        for (float value: block_mesh) {
+                            mesh.emplace_back(value);
+                        }
                     }
                 }
             }
         }
 
-        return mesh;
+        return {chunk_data.x, chunk_data.z, mesh};
     }
 
     // Chunk datas to mesh
-    std::vector<float> chunk_datas_to_mesh(const std::vector<chunk::chunk> &chunk_datas) {
+    std::vector<float> chunk_meshes_to_total_mesh(const std::vector<chunk::chunk_mesh> &chunk_meshes) {
         std::vector<float> mesh = {};
 
-        for (chunk::chunk chunk_data: chunk_datas) {
-            std::vector<float> chunk_mesh = chunk_data_to_mesh(chunk_data);
-            mesh.insert(mesh.end(), chunk_mesh.begin(), chunk_mesh.end());
+        for (chunk::chunk_mesh chunk_mesh: chunk_meshes) {
+            mesh.insert(mesh.end(), chunk_mesh.mesh.begin(), chunk_mesh.mesh.end());
         }
 
         return mesh;

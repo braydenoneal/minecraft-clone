@@ -30,81 +30,52 @@ namespace window {
     int cube_count = 0;
     int x_region = 0;
     int z_region = 0;
-    std::map<std::array<int, 2>, std::vector<float>> chunk_locations_to_buffer_data;
-    std::vector<float> vertex_buffer_data;
-    std::queue<std::array<int, 2>> chunks_to_load;
+//    std::map<std::array<int, 2>, std::vector<float>> chunk_locations_to_buffer_data;
+//    std::vector<float> vertex_buffer_data;
+//    std::queue<std::array<int, 2>> chunks_to_load;
+//
+//    std::vector<std::array<int, 2>> chunk_locations;
+//    std::vector<chunk::chunk> chunk_datas;
 
-    std::vector<std::array<int, 2>> chunk_locations;
-    std::vector<chunk::chunk> chunk_datas;
+    std::vector<chunk::chunk> chunks;
+    std::vector<chunk::chunk_mesh> chunk_meshes;
+    std::vector<float> total_mesh;
+    std::queue<chunk::chunk_location> chunk_queue;
 
     void rerender() {
-        chunk_locations = {};
-
         for (int x = x_region - user_state::chunk_radius; x <= x_region + user_state::chunk_radius; x++) {
             for (int z = z_region - user_state::chunk_radius; z <= z_region + user_state::chunk_radius; z++) {
                 if (pow((float) x + 0.5f - (float) x_region + 0.5f, 2) + pow((float) z + 0.5f - (float) z_region + 0.5f, 2) < user_state::chunk_radius * user_state::chunk_radius) {
-                    chunk_locations.push_back({x, z});
+                    chunk_queue.push({x, z});
                 }
             }
         }
 
-        // Unload chunks
-        std::vector<int> unload_chunks = {};
-
-        int del_index = 0;
-        for (const auto &chunk_data: chunk_datas) {
-            bool del = true;
-
-            for (std::array<int, 2> chunk_location: chunk_locations) {
-                if (chunk_data.x == chunk_location[0] && chunk_data.z == chunk_location[1]) {
-                    del = false;
-                }
-            }
-
-            if (del) {
-                unload_chunks.push_back(del_index);
-            }
-            del_index++;
-        }
-
-        for (int i: unload_chunks) {
-            chunk_datas.erase(chunk_datas.begin() + i);
-        }
-
-        // Load new chunks
-        for (std::array<int, 2> chunk_location: chunk_locations) {
-            bool add = true;
-
-            for (const auto &chunk_data: chunk_datas) {
-                if (chunk_data.x == chunk_location[0] && chunk_data.z == chunk_location[1]) {
-                    add = false;
-                }
-            }
-
-            if (add) {
-                chunks_to_load.push(chunk_location);
-
-                chunk_datas.emplace_back(cube::chunk_location_to_block_data(chunk_location[0], chunk_location[1]));
-            }
-        }
+//        vertex_buffer_data = cube::chunk_datas_to_mesh(chunk_datas);
+//
+//        cube_count = std::ceil((float) vertex_buffer_data.size() / 7.0f);
+//
+//        glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr) vertex_buffer_data.size() * 4, &vertex_buffer_data[0], GL_STATIC_DRAW);
     }
 
     void render_queue() {
-        std::vector<std::array<int, 2>> next_chunk = {chunks_to_load.front()};
+        chunk::chunk_location chunk_location = chunk_queue.front();
 
-//        for (const auto &chunk_data: chunk_datas) {
-//
-//        }
-//
-//        chunk_datas.emplace_back(cube::chunk_location_to_block_data(next_chunk[0][0], next_chunk[0][1]));
+        chunk_queue.pop();
 
-        vertex_buffer_data = cube::chunk_datas_to_mesh(chunk_datas);
+        chunk::chunk chunk_data = cube::chunk_location_to_block_data(chunk_location.x, chunk_location.z);
 
-        cube_count = std::ceil((float) vertex_buffer_data.size() / 7.0f);
+        chunks.push_back(chunk_data);
 
-        glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr) vertex_buffer_data.size() * 4, &vertex_buffer_data[0], GL_STATIC_DRAW);
+        chunk::chunk_mesh chunk_mesh = cube::chunk_data_to_mesh(chunk_data);
 
-        chunks_to_load.pop();
+        chunk_meshes.push_back(chunk_mesh);
+
+        total_mesh = cube::chunk_meshes_to_total_mesh(chunk_meshes);
+
+        cube_count = std::ceil((float) total_mesh.size() / 7.0f);
+
+        glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr) total_mesh.size() * 4, &total_mesh[0], GL_STATIC_DRAW);
     }
 
     void create_context() {
@@ -278,12 +249,14 @@ namespace window {
             int next_x_region = std::floor(game_state::camera_position.x / (float) cube::chunk_size);
             int next_z_region = std::ceil(-game_state::camera_position.z / (float) cube::chunk_size);
 
+            // Region changed
             if (!user_state::pause_chunk_loading && next_x_region != x_region || next_z_region != z_region) {
-                chunks_to_load = {};
+                chunk_queue = {};
                 rerender();
             }
 
-            if (!user_state::pause_chunk_loading && !chunks_to_load.empty()) {
+            // Queue not empty
+            if (!user_state::pause_chunk_loading && !chunk_queue.empty()) {
                 render_queue();
             }
 
@@ -364,7 +337,7 @@ namespace window {
         }
 
         if (!user_state::pause_chunk_loading && previous_chunk_radius != user_state::chunk_radius) {
-            chunks_to_load = {};
+            chunk_queue = {};
             rerender();
         }
 
