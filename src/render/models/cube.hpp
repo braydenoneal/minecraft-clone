@@ -9,57 +9,105 @@ namespace cube {
     static int chunk_height = 128;
     static int sea_level = 64;
 
-    std::vector<float> get_block(bool nx, bool px, bool ny, bool py, bool nz, bool pz) {
+    std::vector<float>
+    get_block(bool nx, bool px, bool ny, bool py, bool nz, bool pz, bool nx_ny, bool nx_py, bool px_ny, bool px_py,
+              bool nx_nz, bool nx_pz, bool px_nz, bool px_pz, bool ny_nz, bool ny_pz, bool py_nz, bool py_pz,
+              bool nx_ny_nz, bool nx_ny_pz, bool nx_py_nz, bool nx_py_pz, bool px_ny_nz, bool px_ny_pz, bool px_py_nz,
+              bool px_py_pz) {
         std::vector<float> block_mesh = {};
+
+        /*
+         nx
+             ny_nz : nx
+             ny_pz : nx
+             py_nz : nx
+             py_pz : nx
+         px
+             ny_nz : px
+             ny_pz : px
+             py_nz : px
+             py_pz : px
+         ny
+             nx_nz : ny
+             nx_pz : ny
+             px_nz : ny
+             px_pz : ny
+         py
+             nx_nz : py
+             nx_pz : py
+             px_nz : py
+             px_pz : py
+         nz
+             nx_ny : nz
+             nx_py : nz
+             px_ny : nz
+             px_py : nz
+         pz
+             nx_ny : pz
+             nx_py : pz
+             px_ny : pz
+             px_py : pz
+         */
+
+        /*
+         -0.5f, -0.5f, -0.5f : (nx_ny || nx_nz || ny_nz || nx_ny_nz) ? 0.f :
+         -0.5f, -0.5f, +0.5f : (nx_ny || nx_pz || ny_pz || nx_ny_pz) ? 0.f :
+         -0.5f, +0.5f, -0.5f : (nx_py || nx_nz || py_nz || nx_py_nz) ? 0.f :
+         -0.5f, +0.5f, +0.5f : (nx_py || nx_pz || py_pz || nx_py_pz) ? 0.f :
+         +0.5f, -0.5f, -0.5f : (px_ny || px_nz || ny_nz || px_ny_nz) ? 0.f :
+         +0.5f, -0.5f, +0.5f : (px_ny || px_pz || ny_pz || px_ny_pz) ? 0.f :
+         +0.5f, +0.5f, -0.5f : (px_py || px_nz || py_nz || px_py_nz) ? 0.f :
+         +0.5f, +0.5f, +0.5f : (px_py || px_pz || py_pz || px_py_pz) ? 0.f :
+         */
 
         std::vector<std::vector<float>> meshes = {
                 {
-                    -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.8f,
-                    -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.8f,
-                    -0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, 0.8f,
-                    -0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, 0.8f,
-                    -0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, 0.8f,
-                    -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.8f,
+                        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, (nx_ny || nx_nz || ny_nz || nx_ny_nz) ? 0.8f : 0.5f,
+                        -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, (nx_py || nx_nz || py_nz || nx_py_nz) ? 0.8f : 0.5f,
+                        -0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, (nx_ny || nx_pz || ny_pz || nx_ny_pz) ? 0.8f : 0.5f,
+                        -0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, (nx_py || nx_pz || py_pz || nx_py_pz) ? 0.8f : 0.5f,
+                        -0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, (nx_ny || nx_pz || ny_pz || nx_ny_pz) ? 0.8f : 0.5f,
+                        -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, (nx_py || nx_nz || py_nz || nx_py_nz) ? 0.8f : 0.5f,
                 },
                 {
-                    +0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.8f,
-                    +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.8f,
-                    +0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, 0.8f,
-                    +0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, 0.8f,
-                    +0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, 0.8f,
-                    +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.8f,
+                        +0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, (px_py || px_nz || py_nz || px_py_nz) ? 0.8f : 0.5f,
+                        +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, (px_ny || px_nz || ny_nz || px_ny_nz) ? 0.8f : 0.5f,
+                        +0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, (px_py || px_pz || py_pz || px_py_pz) ? 0.8f : 0.5f,
+                        +0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, (px_ny || px_pz || ny_pz || px_ny_pz) ? 0.8f : 0.5f,
+                        +0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, (px_py || px_pz || py_pz || px_py_pz) ? 0.8f : 0.5f,
+                        +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, (px_ny || px_nz || ny_nz || px_ny_nz) ? 0.8f : 0.5f,
                 },
                 {
-                    -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 2.0f, 0.4f,
-                    -0.5f, -0.5f, +0.5f, 0.0f, 1.0f, 2.0f, 0.4f,
-                    +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 2.0f, 0.4f,
-                    +0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 2.0f, 0.4f,
-                    +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 2.0f, 0.4f,
-                    -0.5f, -0.5f, +0.5f, 0.0f, 1.0f, 2.0f, 0.4f,
+                        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 2.0f, (nx_ny || nx_nz || ny_nz || nx_ny_nz) ? 0.4f : 0.1f,
+                        -0.5f, -0.5f, +0.5f, 0.0f, 1.0f, 2.0f, (nx_ny || nx_pz || ny_pz || nx_ny_pz) ? 0.4f : 0.1f,
+                        +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 2.0f, (px_ny || px_nz || ny_nz || px_ny_nz) ? 0.4f : 0.1f,
+                        +0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 2.0f, (px_ny || px_pz || ny_pz || px_ny_pz) ? 0.4f : 0.1f,
+                        +0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 2.0f, (px_ny || px_nz || ny_nz || px_ny_nz) ? 0.4f : 0.1f,
+                        -0.5f, -0.5f, +0.5f, 0.0f, 1.0f, 2.0f, (nx_ny || nx_pz || ny_pz || nx_ny_pz) ? 0.4f : 0.1f,
                 },
                 {
-                    -0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 1.0f, 1.0f,
-                    -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f,
-                    +0.5f, +0.5f, +0.5f, 1.0f, 0.0f, 1.0f, 1.0f,
-                    +0.5f, +0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
-                    +0.5f, +0.5f, +0.5f, 1.0f, 0.0f, 1.0f, 1.0f,
-                    -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f,
+                        -0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 1.0f, (nx_py || nx_pz || py_pz || nx_py_pz) ? 1.0f : 0.7f,
+                        -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 1.0f, (nx_py || nx_nz || py_nz || nx_py_nz) ? 1.0f : 0.7f,
+                        +0.5f, +0.5f, +0.5f, 1.0f, 0.0f, 1.0f, (px_py || px_pz || py_pz || px_py_pz) ? 1.0f : 0.7f,
+                        +0.5f, +0.5f, -0.5f, 0.0f, 0.0f, 1.0f, (px_py || px_nz || py_nz || px_py_nz) ? 1.0f : 0.7f,
+                        +0.5f, +0.5f, +0.5f, 1.0f, 0.0f, 1.0f, (px_py || px_pz || py_pz || px_py_pz) ? 1.0f : 0.7f,
+                        -0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 1.0f, (nx_py || nx_nz || py_nz || nx_py_nz) ? 1.0f : 0.7f,
                 },
                 {
-                    -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.6f,
-                    +0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.6f,
-                    -0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.6f,
-                    +0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.6f,
-                    -0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.6f,
-                    +0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.6f,
+                        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, (nx_ny || nx_nz || ny_nz || nx_ny_nz) ? 0.6f : 0.3f,
+                        +0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, (px_ny || px_nz || ny_nz || px_ny_nz) ? 0.6f : 0.3f,
+                        -0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, (nx_py || nx_nz || py_nz || nx_py_nz) ? 0.6f : 0.3f,
+                        +0.5f, +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, (px_py || px_nz || py_nz || px_py_nz) ? 0.6f : 0.3f,
+                        -0.5f, +0.5f, -0.5f, 1.0f, 1.0f, 0.0f, (nx_py || nx_nz || py_nz || nx_py_nz) ? 0.6f : 0.3f,
+                        +0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, (px_ny || px_nz || ny_nz || px_ny_nz) ? 0.6f : 0.3f,
                 },
                 {
-                    +0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, 0.6f,
-                    -0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, 0.6f,
-                    +0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, 0.6f,
-                    -0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, 0.6f,
-                    +0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, 0.6f,
-                    -0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, 0.6f,
+                        +0.5f, -0.5f, +0.5f, 1.0f, 0.0f, 0.0f, (px_ny || px_pz || ny_pz || px_ny_pz) ? 0.6f : 0.3f,
+                        -0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, (nx_ny || nx_pz || ny_pz || nx_ny_pz) ? 0.6f : 0.3f,
+                        +0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, (px_py || px_pz || py_pz || px_py_pz) ? 0.6f : 0.3f,
+                        -0.5f, +0.5f, +0.5f, 0.0f, 1.0f, 0.0f, (nx_py || nx_pz || py_pz || nx_py_pz) ? 0.6f : 0.3f,
+                        +0.5f, +0.5f, +0.5f, 1.0f, 1.0f, 0.0f, (px_py || px_pz || py_pz || px_py_pz) ? 0.6f : 0.3f,
+                        -0.5f, -0.5f, +0.5f, 0.0f, 0.0f, 0.0f, (nx_ny || nx_pz || ny_pz || nx_ny_pz) ? 0.6f : 0.3f,
                 }
         };
 
@@ -98,7 +146,11 @@ namespace cube {
     }
 
     std::vector<std::vector<std::vector<float>>> chunk_location_to_block_types(int chunk_x, int chunk_z) {
-        std::vector<std::vector<std::vector<float>>> block_types(chunk_size + 2, std::vector<std::vector<float>>(chunk_height, std::vector<float>(chunk_size + 2)));
+        std::vector<std::vector<std::vector<float>>> block_types(chunk_size + 2,
+                                                                 std::vector<std::vector<float>>(chunk_height,
+                                                                                                 std::vector<float>(
+                                                                                                         chunk_size +
+                                                                                                         2)));
 
         for (int x = 0; x < chunk_size + 2; x++) {
             for (int z = 0; z < chunk_size + 2; z++) {
@@ -116,7 +168,8 @@ namespace cube {
         return block_types;
     }
 
-    std::vector<float> block_types_to_mesh(const std::vector<std::vector<std::vector<float>>> &block_types, int chunk_x, int chunk_z) {
+    std::vector<float>
+    block_types_to_mesh(const std::vector<std::vector<std::vector<float>>> &block_types, int chunk_x, int chunk_z) {
         std::vector<float> all_mesh = {};
 
         for (int x = 0; x < chunk_size; x++) {
@@ -135,10 +188,68 @@ namespace cube {
                     bool nz = block_types[x + 1][y][z + 0] == 0.0f;
                     bool pz = block_types[x + 1][y][z + 2] == 0.0f;
 
-                    if (block_types[x + 1][y][z + 1] > 0.0f) {
-                        std::vector<float> block_mesh = get_block(nx, px, ny, py, nz, pz);
+                    int rx = x + 1;
+                    int rz = z + 1;
 
-                        block_mesh = position_mesh(block_mesh, (float) (x + 1 + chunk_x * chunk_size), (float) (y), (float) (z + 1 + chunk_z * chunk_size));
+                    bool nx_ny = true;
+                    bool nx_py = true;
+                    bool px_ny = true;
+                    bool px_py = true;
+                    bool nx_nz = true;
+                    bool nx_pz = true;
+                    bool px_nz = true;
+                    bool px_pz = true;
+                    bool ny_nz = true;
+                    bool ny_pz = true;
+                    bool py_nz = true;
+                    bool py_pz = true;
+                    bool nx_ny_nz = true;
+                    bool nx_ny_pz = true;
+                    bool nx_py_nz = true;
+                    bool nx_py_pz = true;
+                    bool px_ny_nz = true;
+                    bool px_ny_pz = true;
+                    bool px_py_nz = true;
+                    bool px_py_pz = true;
+
+                    if (y > 0 && y < chunk_height - 1) {
+                        // XY
+                        nx_ny = block_types[rx - 1][y - 1][rz] == 0.0f;
+                        nx_py = block_types[rx - 1][y + 1][rz] == 0.0f;
+                        px_ny = block_types[rx + 1][y - 1][rz] == 0.0f;
+                        px_py = block_types[rx + 1][y + 1][rz] == 0.0f;
+
+                        // XZ
+                        nx_nz = block_types[rx + 1][y][rz - 1] == 0.0f;
+                        nx_pz = block_types[rx + 1][y][rz + 1] == 0.0f;
+                        px_nz = block_types[rx + 1][y][rz - 1] == 0.0f;
+                        px_pz = block_types[rx + 1][y][rz + 1] == 0.0f;
+
+                        // YZ
+                        ny_nz = block_types[rx][y - 1][rz - 1] == 0.0f;
+                        ny_pz = block_types[rx][y - 1][rz + 1] == 0.0f;
+                        py_nz = block_types[rx][y + 1][rz - 1] == 0.0f;
+                        py_pz = block_types[rx][y + 1][rz + 1] == 0.0f;
+
+                        // XYZ
+                        nx_ny_nz = block_types[rz - 1][y - 1][rz - 1] == 0.0f;
+                        nx_ny_pz = block_types[rz - 1][y - 1][rz + 1] == 0.0f;
+                        nx_py_nz = block_types[rz - 1][y + 1][rz - 1] == 0.0f;
+                        nx_py_pz = block_types[rz - 1][y + 1][rz + 1] == 0.0f;
+                        px_ny_nz = block_types[rz + 1][y - 1][rz - 1] == 0.0f;
+                        px_ny_pz = block_types[rz + 1][y - 1][rz + 1] == 0.0f;
+                        px_py_nz = block_types[rz + 1][y + 1][rz - 1] == 0.0f;
+                        px_py_pz = block_types[rz + 1][y + 1][rz + 1] == 0.0f;
+                    }
+
+                    if (block_types[x + 1][y][z + 1] > 0.0f) {
+                        std::vector<float> block_mesh = get_block(nx, px, ny, py, nz, pz, nx_ny, nx_py, px_ny, px_py,
+                                                                  nx_nz, nx_pz, px_nz, px_pz, ny_nz, ny_pz, py_nz,
+                                                                  py_pz, nx_ny_nz, nx_ny_pz, nx_py_nz, nx_py_pz,
+                                                                  px_ny_nz, px_ny_pz, px_py_nz, px_py_pz);
+
+                        block_mesh = position_mesh(block_mesh, (float) (x + 1 + chunk_x * chunk_size), (float) (y),
+                                                   (float) (z + 1 + chunk_z * chunk_size));
 
                         for (float value: block_mesh) {
                             all_mesh.emplace_back(value);
@@ -158,7 +269,8 @@ namespace cube {
         for (std::array<int, 2> chunk_location: chunk_locations) {
             auto block_types = chunk_location_to_block_types(chunk_location[0], chunk_location[1]);
 
-            chunk_locations_to_buffer_data[chunk_location] = block_types_to_mesh(block_types, chunk_location[0], chunk_location[1]);
+            chunk_locations_to_buffer_data[chunk_location] = block_types_to_mesh(block_types, chunk_location[0],
+                                                                                 chunk_location[1]);
         }
 
         return chunk_locations_to_buffer_data;
