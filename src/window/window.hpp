@@ -348,9 +348,6 @@ namespace window {
                         z_block_pos += 16;
                     }
 
-                    std::cout << std::floor(std::fmod(-1, 16)) << std::endl;
-                    std::cout << -1 % 16 << std::endl;
-
                     for (int y = cube::chunk_height - 1; y >= 0; y--) {
                         if (chunk_data.blocks[chunk::pos(x_block_pos, y, z_block_pos)].id != 0) {
                             game_state::camera_position.y = y + 2.6;
@@ -366,8 +363,8 @@ namespace window {
             int next_x_region = std::floor(game_state::camera_position.x / (float) cube::chunk_size);
             int next_z_region = std::floor(game_state::camera_position.z / (float) cube::chunk_size);
 
-            // Region changed
-            if (!user_state::pause_chunk_loading && next_x_region != x_region || next_z_region != z_region) {
+            // Chunk location changed
+            if (!user_state::pause_chunk_loading && (next_x_region != x_region || next_z_region != z_region)) {
                 chunk_queue = {};
                 x_region = next_x_region;
                 z_region = next_z_region;

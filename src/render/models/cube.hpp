@@ -144,13 +144,13 @@ namespace cube {
     }
 
     int pos(int x, int y, int z) {
-        return (x + 1) * (chunk_size + 2) * chunk_height + y * (chunk_size + 2) + z + 1;
+        return (x + 1) * (chunk_size + 2) * (chunk_height + 2) + y * (chunk_size + 2) + z + 1;
     }
 
     chunk::chunk_mesh chunk_data_to_mesh(chunk::chunk chunk_data, const std::vector<chunk::chunk> &chunk_datas) {
         std::vector<float> mesh = {};
 
-        chunk::block block_data[(chunk_size + 2) * chunk_height * (chunk_size + 2)];
+        chunk::block block_data[(chunk_size + 2) * (chunk_height + 2) * (chunk_size + 2)];
 
         for (int x = 0; x < chunk_size; x++) {
             for (int y = 0; y < chunk_height; y++) {
@@ -212,7 +212,7 @@ namespace cube {
         }
 
         for (int x = 0; x < chunk_size; x++) {
-            for (int y = 1; y < chunk_height - 1; y++) {
+            for (int y = 0; y < chunk_height; y++) {
                 for (int z = 0; z < chunk_size; z++) {
                     auto block = (float) chunk_data.blocks[chunk::pos(x, y, z)].id;
 
@@ -263,9 +263,7 @@ namespace cube {
 
                         block_mesh = position_mesh(block_mesh, x_position, (float) (y),z_position);
 
-                        for (float value: block_mesh) {
-                            mesh.emplace_back(value);
-                        }
+                        mesh.insert(mesh.end(), block_mesh.begin(), block_mesh.end());
                     }
                 }
             }
