@@ -331,7 +331,6 @@ namespace window {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(127.0f / 255.0f, 204.0f / 255.0f, 1.0f, 1.0f);
 
-        int block = -1;
         int chunk_x = std::floor(game_state::camera_position.x / (float) cube::chunk_size);
         int chunk_z = std::floor(game_state::camera_position.z / (float) cube::chunk_size);
 
@@ -339,19 +338,24 @@ namespace window {
         {
             for (const auto &chunk_data: chunks) {
                 if (chunk_data.x == chunk_x && chunk_data.z == chunk_z) {
-                    float next_y = game_state::camera_position.y - 0.1f - 1.6f;
+                    int x_block_pos = (int) std::floor(game_state::camera_position.x) % cube::chunk_size;
+                    int z_block_pos = (int) std::floor(game_state::camera_position.z) % cube::chunk_size;
 
-                    int x_block_pos = std::floor(std::fmod(game_state::camera_position.x, (float) cube::chunk_size));
-                    int z_block_pos = std::floor(std::fmod(game_state::camera_position.z, (float) cube::chunk_size));
+                    if (x_block_pos < 0) {
+                        x_block_pos += 16;
+                    }
+                    if (z_block_pos < 0) {
+                        z_block_pos += 16;
+                    }
 
-                    int below_block_pos = std::floor(next_y);
+                    std::cout << std::floor(std::fmod(-1, 16)) << std::endl;
+                    std::cout << -1 % 16 << std::endl;
 
-                    int below_block = chunk_data.blocks[chunk::pos(x_block_pos, below_block_pos, z_block_pos)].id;
-
-                    block = below_block;
-
-                    if (below_block == 0) {
-//                        game_state::camera_position.y -= 0.1f;
+                    for (int y = cube::chunk_height - 1; y >= 0; y--) {
+                        if (chunk_data.blocks[chunk::pos(x_block_pos, y, z_block_pos)].id != 0) {
+                            game_state::camera_position.y = y + 2.6;
+                            y = 0;
+                        }
                     }
                 }
             }
@@ -413,9 +417,6 @@ namespace window {
         {
             ImGui::Begin("Debug");
             ImGui::Text("%.0f FPS", ImGui::GetIO().Framerate);
-            ImGui::Text("%d block", block);
-            ImGui::Text("%d x", chunk_x);
-            ImGui::Text("%d z", chunk_z);
             ImGui::Text("X: %.2f Y: %.2f Z: %.2f", game_state::camera_position.x, game_state::camera_position.y,
                         game_state::camera_position.z);
             ImGui::Text("P: %.2f° Y: %.2f°", -game_state::camera_angle.x / (float) M_PI * 180,
@@ -432,6 +433,7 @@ namespace window {
                 facing_text += "+X East";
             }
             ImGui::Text(facing_text.c_str());
+            ImGui::Text("Chunk: X: %d Z: %d", x_region, z_region);
             ImGui::End();
         }
 
