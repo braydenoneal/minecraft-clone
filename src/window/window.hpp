@@ -30,6 +30,7 @@ namespace window {
     int cube_count = 0;
     int x_region = 0;
     int z_region = 0;
+    int air_time = 0;
 
     std::vector<chunk::chunk> chunks;
     std::vector<chunk::chunk_mesh> chunk_meshes;
@@ -326,6 +327,65 @@ namespace window {
         glfwSwapInterval(user_state::vsync_enabled);
     }
 
+    int get_block_of_position(glm::vec3 position, const std::vector<chunk::chunk> &chunk_datas) {
+        int chunk_x = std::floor(position.x / (float) game_state::chunk_size);
+        int chunk_z = std::floor(position.z / (float) game_state::chunk_size);
+
+        for (const auto &chunk_data: chunk_datas) {
+            if (chunk_data.x == chunk_x && chunk_data.z == chunk_z) {
+                int x = (int) std::floor(position.x) % game_state::chunk_size;
+                int z = (int) std::floor(position.z) % game_state::chunk_size;
+
+                if (x < 0) {
+                    x += game_state::chunk_size;
+                }
+                if (z < 0) {
+                    z += game_state::chunk_size;
+                }
+
+                int y = (int) std::floor(position.y);
+
+                if (y >= game_state::chunk_height) {
+                    return 0;
+                }
+
+                return chunk_data.blocks[chunk::pos(x, y, z)].id;
+            }
+        }
+
+        return -1;
+    }
+
+    bool move_camera(glm::vec3 position) {
+        bool move = true;
+
+        auto nx_ny_nz = glm::vec3(position.x - 0.3, position.y - 1.6, position.z - 0.3);
+        auto nx_ny_pz = glm::vec3(position.x - 0.3, position.y - 1.6, position.z + 0.3);
+        auto nx_py_nz = glm::vec3(position.x - 0.3, position.y + 0.0, position.z - 0.3);
+        auto nx_py_pz = glm::vec3(position.x - 0.3, position.y + 0.0, position.z + 0.3);
+        auto px_ny_nz = glm::vec3(position.x + 0.3, position.y - 1.6, position.z - 0.3);
+        auto px_ny_pz = glm::vec3(position.x + 0.3, position.y - 1.6, position.z + 0.3);
+        auto px_py_nz = glm::vec3(position.x + 0.3, position.y + 0.0, position.z - 0.3);
+        auto px_py_pz = glm::vec3(position.x + 0.3, position.y + 0.0, position.z + 0.3);
+
+        if (get_block_of_position(nx_ny_nz, chunks) != 0 ||
+            get_block_of_position(nx_ny_pz, chunks) != 0 ||
+            get_block_of_position(nx_py_nz, chunks) != 0 ||
+            get_block_of_position(nx_py_pz, chunks) != 0 ||
+            get_block_of_position(px_ny_nz, chunks) != 0 ||
+            get_block_of_position(px_ny_pz, chunks) != 0 ||
+            get_block_of_position(px_py_nz, chunks) != 0 ||
+            get_block_of_position(px_py_pz, chunks) != 0) {
+            move = false;
+        }
+
+        if (move) {
+            game_state::camera_position = position;
+        }
+
+        return move;
+    }
+
     void render() {
         // Clear screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -336,6 +396,14 @@ namespace window {
 
         // Basic collision
         {
+            bool in_air = move_camera(glm::vec3(game_state::camera_position.x, game_state::camera_position.y - 0.025f * std::sqrt(air_time), game_state::camera_position.z));
+
+            if (in_air) {
+                air_time++;
+            } else {
+                air_time = 0;
+            }
+
             for (const auto &chunk_data: chunks) {
                 if (chunk_data.x == chunk_x && chunk_data.z == chunk_z) {
                     int x_block_pos = (int) std::floor(game_state::camera_position.x) % game_state::chunk_size;
@@ -348,10 +416,12 @@ namespace window {
                         z_block_pos += game_state::chunk_size;
                     }
 
+                    int y_block_pos = (int) std::floor(game_state::camera_position.y);
+
                     for (int y = game_state::chunk_height - 1; y >= 0; y--) {
                         if (chunk_data.blocks[chunk::pos(x_block_pos, y, z_block_pos)].id != 0) {
-                            game_state::camera_position.y = y + 2.6;
-                            y = 0;
+//                            game_state::camera_position.y = y + 2.6;
+//                            y = 0;
                         }
                     }
                 }
