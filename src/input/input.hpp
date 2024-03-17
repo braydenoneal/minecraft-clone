@@ -60,16 +60,15 @@ namespace input {
                                     glm::vec3(game_state::camera_speed, 0.0f, 0.0f)));
                             break;
                         case GLFW_KEY_SPACE:
-                            window::move_camera(glm::vec3(
-                                    game_state::camera_position.x,
-                                    game_state::camera_position.y + game_state::camera_speed,
-                                    game_state::camera_position.z));
+                            if (window::air_time == 0) {
+                                window::jumping = true;
+                            }
                             break;
-                        case GLFW_KEY_LEFT_SHIFT:
-                            window::move_camera(glm::vec3(
-                                    game_state::camera_position.x,
-                                    game_state::camera_position.y - game_state::camera_speed,
-                                    game_state::camera_position.z));
+//                        case GLFW_KEY_LEFT_SHIFT:
+//                            window::move_camera(glm::vec3(
+//                                    game_state::camera_position.x,
+//                                    game_state::camera_position.y - game_state::camera_speed,
+//                                    game_state::camera_position.z));
                             break;
                         default:
                             break;

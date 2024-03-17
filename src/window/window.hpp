@@ -31,6 +31,7 @@ namespace window {
     int x_region = 0;
     int z_region = 0;
     int air_time = 0;
+    bool jumping = false;
 
     std::vector<chunk::chunk> chunks;
     std::vector<chunk::chunk_mesh> chunk_meshes;
@@ -391,39 +392,39 @@ namespace window {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(127.0f / 255.0f, 204.0f / 255.0f, 1.0f, 1.0f);
 
-        int chunk_x = std::floor(game_state::camera_position.x / (float) game_state::chunk_size);
-        int chunk_z = std::floor(game_state::camera_position.z / (float) game_state::chunk_size);
-
         // Basic collision
         {
-            bool in_air = move_camera(glm::vec3(game_state::camera_position.x, game_state::camera_position.y - 0.025f * std::sqrt(air_time), game_state::camera_position.z));
+            if (jumping) {
+                float next_step_amount = 0.1f - (float) std::sqrt(air_time) / 64.0f;
 
-            if (in_air) {
-                air_time++;
+                if (next_step_amount > 0) {
+                    bool can_step = move_camera(glm::vec3(
+                            game_state::camera_position.x,
+                            game_state::camera_position.y + next_step_amount,
+                            game_state::camera_position.z)
+                    );
+
+                    if (can_step) {
+                        air_time++;
+                    } else {
+                        jumping = false;
+                        air_time = 1;
+                    }
+                } else {
+                    jumping = false;
+                    air_time = 1;
+                }
             } else {
-                air_time = 0;
-            }
+                bool in_air = move_camera(glm::vec3(
+                        game_state::camera_position.x,
+                        game_state::camera_position.y - 0.025f * (std::sqrt(air_time + 1) / 2.0f),
+                        game_state::camera_position.z)
+                );
 
-            for (const auto &chunk_data: chunks) {
-                if (chunk_data.x == chunk_x && chunk_data.z == chunk_z) {
-                    int x_block_pos = (int) std::floor(game_state::camera_position.x) % game_state::chunk_size;
-                    int z_block_pos = (int) std::floor(game_state::camera_position.z) % game_state::chunk_size;
-
-                    if (x_block_pos < 0) {
-                        x_block_pos += game_state::chunk_size;
-                    }
-                    if (z_block_pos < 0) {
-                        z_block_pos += game_state::chunk_size;
-                    }
-
-                    int y_block_pos = (int) std::floor(game_state::camera_position.y);
-
-                    for (int y = game_state::chunk_height - 1; y >= 0; y--) {
-                        if (chunk_data.blocks[chunk::pos(x_block_pos, y, z_block_pos)].id != 0) {
-//                            game_state::camera_position.y = y + 2.6;
-//                            y = 0;
-                        }
-                    }
+                if (in_air) {
+                    air_time++;
+                } else {
+                    air_time = 0;
                 }
             }
         }
