@@ -64,12 +64,6 @@ namespace input {
                                 window::jumping = true;
                             }
                             break;
-//                        case GLFW_KEY_LEFT_SHIFT:
-//                            window::move_camera(glm::vec3(
-//                                    game_state::camera_position.x,
-//                                    game_state::camera_position.y - game_state::camera_speed,
-//                                    game_state::camera_position.z));
-                            break;
                         default:
                             break;
                     }
@@ -127,10 +121,12 @@ namespace input {
     }
 
     void mouse_button_callback(GLFWwindow *glfw_window, int button, int action, int mods) {
-        if (action == GLFW_PRESS) {
+        ImGui_ImplGlfw_MouseButtonCallback(glfw_window, button, action, mods);
+
+        if (!input_state::paused && action == GLFW_PRESS) {
             switch (button) {
                 case (GLFW_MOUSE_BUTTON_RIGHT):
-                    window::place_block(3);
+                    window::place_block(window::selected_block);
                     break;
                 case (GLFW_MOUSE_BUTTON_LEFT):
                     window::place_block(0);
@@ -141,9 +137,18 @@ namespace input {
         }
     }
 
+    void scroll_callback(GLFWwindow* glfw_window, double x_offset, double y_offset) {
+        if (y_offset > 0) {
+            window::selected_block = std::clamp(window::selected_block - 1, 1, 3);
+        } else {
+            window::selected_block = std::clamp(window::selected_block + 1, 1, 3);
+        }
+    }
+
     void create_context() {
         glfwSetKeyCallback(input_state::glfw_window, key_callback);
         glfwSetFramebufferSizeCallback(input_state::glfw_window, resize_callback);
         glfwSetMouseButtonCallback(input_state::glfw_window, mouse_button_callback);
+        glfwSetScrollCallback(input_state::glfw_window, scroll_callback);
     }
 }

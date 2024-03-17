@@ -33,6 +33,7 @@ namespace window {
     int z_region = 0;
     int air_time = 0;
     bool jumping = false;
+    int selected_block = 1;
 
     std::vector<chunk::chunk> chunks;
     std::vector<chunk::chunk_mesh> chunk_meshes;
@@ -454,6 +455,33 @@ namespace window {
         return move;
     }
 
+    GLuint load_hotbar_texture(const char *path) {
+        // Load from file
+        stbi_set_flip_vertically_on_load(0);
+        int image_width = 0;
+        int image_height = 0;
+        unsigned char* image_data = stbi_load(path, &image_width, &image_height, NULL, 4);
+
+        // Create a OpenGL texture identifier
+        GLuint image_texture;
+        glGenTextures(1, &image_texture);
+        glBindTexture(GL_TEXTURE_2D, image_texture);
+
+        // Setup filtering parameters for display
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        // Upload pixels into texture
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+        stbi_image_free(image_data);
+
+        return image_texture;
+    }
+
     void render() {
         // Clear screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -569,6 +597,20 @@ namespace window {
             }
             ImGui::Text(facing_text.c_str());
             ImGui::Text("Chunk: X: %d Z: %d", x_region, z_region);
+            ImGui::End();
+        }
+
+        // Hotbar screen
+        {
+            ImGui::Begin("Hotbar");
+            GLuint grass = load_hotbar_texture(selected_block == 1 ? "../res/textures/hotbar/selected/grass.png" : "../res/textures/hotbar/unselected/grass.png");
+            ImGui::Image((void*) (intptr_t) grass, ImVec2(64, 64));
+            ImGui::SameLine();
+            GLuint dirt = load_hotbar_texture(selected_block == 2 ? "../res/textures/hotbar/selected/dirt.png" : "../res/textures/hotbar/unselected/dirt.png");
+            ImGui::Image((void*) (intptr_t) dirt, ImVec2(64, 64));
+            ImGui::SameLine();
+            GLuint stone = load_hotbar_texture(selected_block == 3 ? "../res/textures/hotbar/selected/stone.png" : "../res/textures/hotbar/unselected/stone.png");
+            ImGui::Image((void*) (intptr_t) stone, ImVec2(64, 64));
             ImGui::End();
         }
 
