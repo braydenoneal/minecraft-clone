@@ -331,24 +331,24 @@ namespace window {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(127.0f / 255.0f, 204.0f / 255.0f, 1.0f, 1.0f);
 
-        int chunk_x = std::floor(game_state::camera_position.x / (float) cube::chunk_size);
-        int chunk_z = std::floor(game_state::camera_position.z / (float) cube::chunk_size);
+        int chunk_x = std::floor(game_state::camera_position.x / (float) game_state::chunk_size);
+        int chunk_z = std::floor(game_state::camera_position.z / (float) game_state::chunk_size);
 
         // Basic collision
         {
             for (const auto &chunk_data: chunks) {
                 if (chunk_data.x == chunk_x && chunk_data.z == chunk_z) {
-                    int x_block_pos = (int) std::floor(game_state::camera_position.x) % cube::chunk_size;
-                    int z_block_pos = (int) std::floor(game_state::camera_position.z) % cube::chunk_size;
+                    int x_block_pos = (int) std::floor(game_state::camera_position.x) % game_state::chunk_size;
+                    int z_block_pos = (int) std::floor(game_state::camera_position.z) % game_state::chunk_size;
 
                     if (x_block_pos < 0) {
-                        x_block_pos += 16;
+                        x_block_pos += game_state::chunk_size;
                     }
                     if (z_block_pos < 0) {
-                        z_block_pos += 16;
+                        z_block_pos += game_state::chunk_size;
                     }
 
-                    for (int y = cube::chunk_height - 1; y >= 0; y--) {
+                    for (int y = game_state::chunk_height - 1; y >= 0; y--) {
                         if (chunk_data.blocks[chunk::pos(x_block_pos, y, z_block_pos)].id != 0) {
                             game_state::camera_position.y = y + 2.6;
                             y = 0;
@@ -360,8 +360,8 @@ namespace window {
 
         // Chunk loading
         {
-            int next_x_region = std::floor(game_state::camera_position.x / (float) cube::chunk_size);
-            int next_z_region = std::floor(game_state::camera_position.z / (float) cube::chunk_size);
+            int next_x_region = std::floor(game_state::camera_position.x / (float) game_state::chunk_size);
+            int next_z_region = std::floor(game_state::camera_position.z / (float) game_state::chunk_size);
 
             // Chunk location changed
             if (!user_state::pause_chunk_loading && (next_x_region != x_region || next_z_region != z_region)) {

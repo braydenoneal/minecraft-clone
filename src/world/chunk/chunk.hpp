@@ -10,11 +10,11 @@ namespace chunk {
     struct chunk {
         int x;
         int z;
-        block blocks[16 * 128 * 16];
+        block blocks[game_state::chunk_size * game_state::chunk_height * game_state::chunk_size];
     };
 
     int pos(int x, int y, int z) {
-        return x * 16 * 128 + y * 16 + z;
+        return x * game_state::chunk_size * game_state::chunk_height + y * game_state::chunk_size + z;
     }
 
     struct chunk_location {

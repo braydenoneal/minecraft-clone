@@ -7,10 +7,6 @@
 #include "../../world/chunk/chunk.hpp"
 
 namespace cube {
-    static int chunk_size = 16;
-    static int chunk_height = 128;
-    static int sea_level = 64;
-
     std::vector<float>
     get_block(float block, bool nx, bool px, bool ny, bool py, bool nz, bool pz, bool nx_ny, bool nx_py, bool px_ny, bool px_py,
               bool nx_nz, bool nx_pz, bool px_nz, bool px_pz, bool ny_nz, bool ny_pz, bool py_nz, bool py_pz,
@@ -79,22 +75,22 @@ namespace cube {
                 }
         };
 
-        if (nx) {
+        if (!nx) {
             block_mesh.insert(block_mesh.end(), meshes[0].begin(), meshes[0].end());
         }
-        if (px) {
+        if (!px) {
             block_mesh.insert(block_mesh.end(), meshes[1].begin(), meshes[1].end());
         }
-        if (ny) {
+        if (!ny) {
             block_mesh.insert(block_mesh.end(), meshes[2].begin(), meshes[2].end());
         }
-        if (py) {
+        if (!py) {
             block_mesh.insert(block_mesh.end(), meshes[3].begin(), meshes[3].end());
         }
-        if (nz) {
+        if (!nz) {
             block_mesh.insert(block_mesh.end(), meshes[4].begin(), meshes[4].end());
         }
-        if (pz) {
+        if (!pz) {
             block_mesh.insert(block_mesh.end(), meshes[5].begin(), meshes[5].end());
         }
 
@@ -116,14 +112,14 @@ namespace cube {
     chunk::chunk chunk_location_to_block_data(int chunk_x, int chunk_z) {
         chunk::chunk chunk_data = {chunk_x, chunk_z};
 
-        for (int x = 0; x < chunk_size; x++) {
-            for (int z = 0; z < chunk_size; z++) {
-                auto x_position = (float) (x + chunk_x * chunk_size);
-                auto z_position = (float) (z + chunk_z * chunk_size);
+        for (int x = 0; x < game_state::chunk_size; x++) {
+            for (int z = 0; z < game_state::chunk_size; z++) {
+                auto x_position = (float) (x + chunk_x * game_state::chunk_size);
+                auto z_position = (float) (z + chunk_z * game_state::chunk_size);
 
                 float vertical_scale = 6;
                 float horizontal_scale = 16;
-                float y = (float) sea_level + vertical_scale * glm::perlin(glm::vec2(x_position / horizontal_scale, z_position / horizontal_scale));
+                float y = (float) game_state::sea_level + vertical_scale * glm::perlin(glm::vec2(x_position / horizontal_scale, z_position / horizontal_scale));
 
                 int grass_height = (int) roundf(y);
                 int stone_top_height = grass_height - 2;
@@ -144,17 +140,17 @@ namespace cube {
     }
 
     int pos(int x, int y, int z) {
-        return (x + 1) * (chunk_size + 2) * (chunk_height + 2) + y * (chunk_size + 2) + z + 1;
+        return (x + 1) * (game_state::chunk_size + 2) * (game_state::chunk_height + 2) + (y + 1) * (game_state::chunk_size + 2) + z + 1;
     }
 
     chunk::chunk_mesh chunk_data_to_mesh(chunk::chunk chunk_data, const std::vector<chunk::chunk> &chunk_datas) {
         std::vector<float> mesh = {};
 
-        chunk::block block_data[(chunk_size + 2) * (chunk_height + 2) * (chunk_size + 2)];
+        chunk::block block_data[(game_state::chunk_size + 2) * (game_state::chunk_height + 2) * (game_state::chunk_size + 2)];
 
-        for (int x = 0; x < chunk_size; x++) {
-            for (int y = 0; y < chunk_height; y++) {
-                for (int z = 0; z < chunk_size; z++) {
+        for (int x = 0; x < game_state::chunk_size; x++) {
+            for (int y = 0; y < game_state::chunk_height; y++) {
+                for (int z = 0; z < game_state::chunk_size; z++) {
                     block_data[pos(x, y, z)] = chunk_data.blocks[chunk::pos(x, y, z)];
                 }
             }
@@ -162,67 +158,67 @@ namespace cube {
 
         for (const auto &adjacent_chunk: chunk_datas) {
             if (chunk_data.x - 1 == adjacent_chunk.x && chunk_data.z == adjacent_chunk.z) {
-                for (int y = 0; y < chunk_height; y++) {
-                    for (int z = 0; z < chunk_size; z++) {
-                        block_data[pos(-1, y, z)] = adjacent_chunk.blocks[chunk::pos(chunk_size - 1, y, z)];
+                for (int y = 0; y < game_state::chunk_height; y++) {
+                    for (int z = 0; z < game_state::chunk_size; z++) {
+                        block_data[pos(-1, y, z)] = adjacent_chunk.blocks[chunk::pos(game_state::chunk_size - 1, y, z)];
                     }
                 }
             }
             else if (chunk_data.x + 1 == adjacent_chunk.x && chunk_data.z == adjacent_chunk.z) {
-                for (int y = 0; y < chunk_height; y++) {
-                    for (int z = 0; z < chunk_size; z++) {
-                        block_data[pos(chunk_size, y, z)] = adjacent_chunk.blocks[chunk::pos(0, y, z)];
+                for (int y = 0; y < game_state::chunk_height; y++) {
+                    for (int z = 0; z < game_state::chunk_size; z++) {
+                        block_data[pos(game_state::chunk_size, y, z)] = adjacent_chunk.blocks[chunk::pos(0, y, z)];
                     }
                 }
             }
             else if (chunk_data.x == adjacent_chunk.x && chunk_data.z - 1 == adjacent_chunk.z) {
-                for (int x = 0; x < chunk_size; x++) {
-                    for (int y = 0; y < chunk_height; y++) {
-                        block_data[pos(x, y, -1)] = adjacent_chunk.blocks[chunk::pos(x, y, chunk_size - 1)];
+                for (int x = 0; x < game_state::chunk_size; x++) {
+                    for (int y = 0; y < game_state::chunk_height; y++) {
+                        block_data[pos(x, y, -1)] = adjacent_chunk.blocks[chunk::pos(x, y, game_state::chunk_size - 1)];
                     }
                 }
             }
             else if (chunk_data.x == adjacent_chunk.x && chunk_data.z + 1 == adjacent_chunk.z) {
-                for (int x = 0; x < chunk_size; x++) {
-                    for (int y = 0; y < chunk_height; y++) {
-                        block_data[pos(x, y, chunk_size)] = adjacent_chunk.blocks[chunk::pos(x, y, 0)];
+                for (int x = 0; x < game_state::chunk_size; x++) {
+                    for (int y = 0; y < game_state::chunk_height; y++) {
+                        block_data[pos(x, y, game_state::chunk_size)] = adjacent_chunk.blocks[chunk::pos(x, y, 0)];
                     }
                 }
             }
             else if (chunk_data.x - 1 == adjacent_chunk.x && chunk_data.z - 1 == adjacent_chunk.z) {
-                for (int y = 0; y < chunk_height; y++) {
-                    block_data[pos(-1, y, -1)] = adjacent_chunk.blocks[chunk::pos(chunk_size - 1, y, chunk_size - 1)];
+                for (int y = 0; y < game_state::chunk_height; y++) {
+                    block_data[pos(-1, y, -1)] = adjacent_chunk.blocks[chunk::pos(game_state::chunk_size - 1, y, game_state::chunk_size - 1)];
                 }
             }
             else if (chunk_data.x + 1 == adjacent_chunk.x && chunk_data.z - 1 == adjacent_chunk.z) {
-                for (int y = 0; y < chunk_height; y++) {
-                    block_data[pos(chunk_size, y, -1)] = adjacent_chunk.blocks[chunk::pos(0, y, chunk_size - 1)];
+                for (int y = 0; y < game_state::chunk_height; y++) {
+                    block_data[pos(game_state::chunk_size, y, -1)] = adjacent_chunk.blocks[chunk::pos(0, y, game_state::chunk_size - 1)];
                 }
             }
             else if (chunk_data.x - 1 == adjacent_chunk.x && chunk_data.z + 1 == adjacent_chunk.z) {
-                for (int y = 0; y < chunk_height; y++) {
-                    block_data[pos(-1, y, chunk_size)] = adjacent_chunk.blocks[chunk::pos(chunk_size - 1, y, 0)];
+                for (int y = 0; y < game_state::chunk_height; y++) {
+                    block_data[pos(-1, y, game_state::chunk_size)] = adjacent_chunk.blocks[chunk::pos(game_state::chunk_size - 1, y, 0)];
                 }
             }
             else if (chunk_data.x + 1 == adjacent_chunk.x && chunk_data.z + 1 == adjacent_chunk.z) {
-                for (int y = 0; y < chunk_height; y++) {
-                    block_data[pos(chunk_size, y, chunk_size)] = adjacent_chunk.blocks[chunk::pos(0, y, 0)];
+                for (int y = 0; y < game_state::chunk_height; y++) {
+                    block_data[pos(game_state::chunk_size, y, game_state::chunk_size)] = adjacent_chunk.blocks[chunk::pos(0, y, 0)];
                 }
             }
         }
 
-        for (int x = 0; x < chunk_size; x++) {
-            for (int y = 0; y < chunk_height; y++) {
-                for (int z = 0; z < chunk_size; z++) {
+        for (int x = 0; x < game_state::chunk_size; x++) {
+            for (int y = 0; y < game_state::chunk_height; y++) {
+                for (int z = 0; z < game_state::chunk_size; z++) {
                     auto block = (float) chunk_data.blocks[chunk::pos(x, y, z)].id;
 
                     if (block != 0) {
-                        bool nx = block_data[pos(x - 1, y, z)].id == 0;
-                        bool px = block_data[pos(x + 1, y, z)].id == 0;
-                        bool ny = block_data[pos(x, y - 1, z)].id == 0;
-                        bool py = block_data[pos(x, y + 1, z)].id == 0;
-                        bool nz = block_data[pos(x, y, z - 1)].id == 0;
-                        bool pz = block_data[pos(x, y, z + 1)].id == 0;
+                        bool nx = block_data[pos(x - 1, y, z)].id != 0;
+                        bool px = block_data[pos(x + 1, y, z)].id != 0;
+                        bool ny = block_data[pos(x, y - 1, z)].id != 0;
+                        bool py = block_data[pos(x, y + 1, z)].id != 0;
+                        bool nz = block_data[pos(x, y, z - 1)].id != 0;
+                        bool pz = block_data[pos(x, y, z + 1)].id != 0;
 
                         // XY
                         bool nx_ny = block_data[pos(x - 1, y - 1, z)].id != 0;
@@ -258,8 +254,8 @@ namespace cube {
                             px_py_nz, px_py_pz
                         );
 
-                        auto x_position = (float) (x + chunk_data.x * chunk_size);
-                        auto z_position = (float) (z + chunk_data.z * chunk_size);
+                        auto x_position = (float) (x + chunk_data.x * game_state::chunk_size);
+                        auto z_position = (float) (z + chunk_data.z * game_state::chunk_size);
 
                         block_mesh = position_mesh(block_mesh, x_position, (float) (y),z_position);
 
