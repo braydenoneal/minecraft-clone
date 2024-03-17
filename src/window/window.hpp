@@ -25,6 +25,7 @@
 #include "../storage/render_state.hpp"
 #include "../render/models/cube.hpp"
 #include "../world/chunk/chunk.hpp"
+#include "../math/math.hpp"
 
 namespace window {
     int cube_count = 0;
@@ -376,26 +377,51 @@ namespace window {
                 int y = (int) std::floor(position.y);
 
                 if (y < game_state::chunk_height && y > 0) {
-                    if (chunk.blocks[chunk::pos(x, y, z)].id != 0 && chunk.blocks[chunk::pos(x, y, z)].id != block_id) {
+                    if (chunk.blocks[chunk::pos(x, y, z)].id != block_id) {
                         chunk.blocks[chunk::pos(x, y, z)].id = block_id;
                         chunk_queue.push({chunk.x, chunk.z});
 
                         // Remove mesh
-                        int delete_index = -1;
-
                         for (int i = 0; i < chunk_meshes.size(); i++) {
                             if (chunk.x == chunk_meshes[i].x && chunk.z == chunk_meshes[i].z) {
-                                delete_index = i;
+                                chunk_meshes.erase(chunk_meshes.begin() + i);
                             }
-                        }
-
-                        if (delete_index != -1) {
-                            chunk_meshes.erase(chunk_meshes.begin() + delete_index);
                         }
                     }
                 }
             }
         }
+    }
+
+    int cast_ray(glm::vec3 start_position, glm::vec3 angle, float distance_cap, int block_id, const std::vector<chunk::chunk> &chunk_datas) {
+        glm::vec3 current_position = start_position;
+        glm::vec3 previous_position = start_position;
+        float step_amount = 0.01f;
+        float distance = 0.0f;
+        int block = -1;
+
+        while (distance < distance_cap) {
+            block = get_block_of_position(current_position, chunk_datas);
+
+            if (block > 0) {
+                if (block_id > 0) {
+                    change_block_at_position(previous_position, block_id);
+                } else {
+                    change_block_at_position(current_position, block_id);
+                }
+                return block;
+            }
+
+            previous_position = current_position;
+            current_position = math::translate_in_angle_by_amount(current_position, angle, glm::vec3(0.0f, 0.0f, -step_amount));
+            distance += step_amount;
+        }
+
+        return -1;
+    }
+
+    void place_block(int block_id) {
+        cast_ray(game_state::camera_position, game_state::camera_angle, 4.0f, block_id, chunks);
     }
 
     bool move_camera(glm::vec3 position) {
@@ -432,16 +458,6 @@ namespace window {
         // Clear screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(127.0f / 255.0f, 204.0f / 255.0f, 1.0f, 1.0f);
-
-        // Block destruction
-        {
-//            if (air_time == 0)
-                change_block_at_position(glm::vec3(
-                        game_state::camera_position.x,
-                        game_state::camera_position.y - 1.6f - 1.0f,
-                        game_state::camera_position.z
-                        ), 3);
-        }
 
         // Basic collision
         {

@@ -118,7 +118,7 @@ namespace input {
         }
     }
 
-    void resize_callback(GLFWwindow *window, int width, int height) {
+    void resize_callback(GLFWwindow *glfw_window, int width, int height) {
         if (width > 0 && height > 0) {
             glViewport(0, 0, width, height);
             input_state::window_width = width;
@@ -126,8 +126,24 @@ namespace input {
         }
     }
 
+    void mouse_button_callback(GLFWwindow *glfw_window, int button, int action, int mods) {
+        if (action == GLFW_PRESS) {
+            switch (button) {
+                case (GLFW_MOUSE_BUTTON_RIGHT):
+                    window::place_block(3);
+                    break;
+                case (GLFW_MOUSE_BUTTON_LEFT):
+                    window::place_block(0);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
     void create_context() {
         glfwSetKeyCallback(input_state::glfw_window, key_callback);
         glfwSetFramebufferSizeCallback(input_state::glfw_window, resize_callback);
+        glfwSetMouseButtonCallback(input_state::glfw_window, mouse_button_callback);
     }
 }
