@@ -329,13 +329,38 @@ namespace window {
     void render() {
         // Clear screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//        glClearColor(138.0f / 255.0f, 163.0f / 255.0f, 1.0f, 1.0f);
         glClearColor(127.0f / 255.0f, 204.0f / 255.0f, 1.0f, 1.0f);
+
+        int block = -1;
+        int chunk_x = (int) game_state::camera_position.x / cube::chunk_size;
+        int chunk_z = (int) game_state::camera_position.z / cube::chunk_size;
+
+        // Basic collision
+        {
+            for (const auto &chunk_data: chunks) {
+                if (chunk_data.x == chunk_x && chunk_data.z == chunk_z) {
+                    float next_y = game_state::camera_position.y - 0.1f - 1.6f;
+
+                    int x_block_pos = (int) game_state::camera_position.x % cube::chunk_size;
+                    int z_block_pos = (int) game_state::camera_position.z % cube::chunk_size;
+
+                    int below_block_pos = std::floor(next_y);
+
+                    int below_block = chunk_data.blocks[chunk::pos(x_block_pos, below_block_pos, z_block_pos)].id;
+
+                    block = below_block;
+
+                    if (below_block == 0) {
+//                        game_state::camera_position.y -= 0.1f;
+                    }
+                }
+            }
+        }
 
         // Chunk loading
         {
-            int next_x_region = std::floor(game_state::camera_position.x / (float) cube::chunk_size);
-            int next_z_region = std::ceil(-game_state::camera_position.z / (float) cube::chunk_size);
+            int next_x_region = (int) game_state::camera_position.x / cube::chunk_size;
+            int next_z_region = (int) game_state::camera_position.z / cube::chunk_size;
 
             // Region changed
             if (!user_state::pause_chunk_loading && next_x_region != x_region || next_z_region != z_region) {
@@ -354,19 +379,20 @@ namespace window {
 
         // Setup camera uniform
         {
-            glm::mat4 perspective = glm::perspective(glm::radians(user_state::field_of_view),
-                                                     (float) input_state::window_width /
-                                                     (float) input_state::window_height,
-                                                     0.05f, 2048.0f);
-            auto camera_rotate = glm::mat4(1.0f);
-            camera_rotate = glm::rotate(camera_rotate, game_state::camera_angle.x, glm::vec3(1.0f, 0.0f, 0.0f));
-            camera_rotate = glm::rotate(camera_rotate, game_state::camera_angle.y, glm::vec3(0.0f, 1.0f, 0.0f));
-            camera_rotate = glm::rotate(camera_rotate, game_state::camera_angle.z, glm::vec3(0.0f, 0.0f, 1.0f));
-            glm::mat4 camera_translate = glm::translate(
-                    glm::mat4(1.0f),
-                    glm::vec3(-game_state::camera_position.x, -game_state::camera_position.y,
-                              game_state::camera_position.z)
+            glm::mat4 perspective = glm::perspective(
+                glm::radians(user_state::field_of_view),
+                (float) input_state::window_width / (float) input_state::window_height,
+                0.05f, 2048.0f
             );
+
+            auto camera_rotate = glm::mat4(1.0f);
+
+            camera_rotate = glm::rotate(camera_rotate, -game_state::camera_angle.x, glm::vec3(1.0f, 0.0f, 0.0f));
+            camera_rotate = glm::rotate(camera_rotate, -game_state::camera_angle.y, glm::vec3(0.0f, 1.0f, 0.0f));
+            camera_rotate = glm::rotate(camera_rotate, -game_state::camera_angle.z, glm::vec3(0.0f, 0.0f, 1.0f));
+
+            glm::mat4 camera_translate = glm::translate(glm::mat4(1.0f),-game_state::camera_position);
+
             glm::mat4 camera_matrix = perspective * camera_rotate * camera_translate;
 
             int location = glGetUniformLocation(render_state::program, "u_camera");
@@ -385,6 +411,9 @@ namespace window {
         {
             ImGui::Begin("Debug");
             ImGui::Text("%.0f FPS", ImGui::GetIO().Framerate);
+            ImGui::Text("%d block", block);
+            ImGui::Text("%d x", chunk_x);
+            ImGui::Text("%d z", chunk_z);
             ImGui::Text("X: %.2f Y: %.2f Z: %.2f", game_state::camera_position.x, game_state::camera_position.y,
                         game_state::camera_position.z);
             ImGui::Text("P: %.2f° Y: %.2f°", -game_state::camera_angle.x / (float) M_PI * 180,

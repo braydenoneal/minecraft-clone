@@ -25,8 +25,8 @@ namespace input {
             // TODO: This is from Minecraft
             float mouse_scale = std::pow(user_state::mouse_sensitivity * 0.6f + 0.2f, 3.0f) * 0.008f;
 
-            game_state::camera_angle.x += (float) input_state::cursor_difference_y * mouse_scale;
-            game_state::camera_angle.y += (float) input_state::cursor_difference_x * mouse_scale;
+            game_state::camera_angle.x -= (float) input_state::cursor_difference_y * mouse_scale;
+            game_state::camera_angle.y -= (float) input_state::cursor_difference_x * mouse_scale;
 
             game_state::camera_angle.x = std::clamp(game_state::camera_angle.x, -(float) M_PI / 2.0f,
                                                     (float) M_PI / 2.0f);
@@ -35,7 +35,6 @@ namespace input {
             } else if (game_state::camera_angle.y >= (float) M_PI) {
                 game_state::camera_angle.y -= (float) M_PI * 2;
             }
-//            game_state::camera_angle.y = (float) fmod(game_state::camera_angle.y, M_PI);
 
             for (std::pair<const int, int> key: input_state::keys) {
                 if (key.second) {
@@ -43,7 +42,7 @@ namespace input {
                         case GLFW_KEY_W:
                             game_state::camera_position = math::translate_in_direction_by_amount(
                                     game_state::camera_position, game_state::camera_angle.y,
-                                    glm::vec3(0.0f, 0.0f, game_state::camera_speed));
+                                    glm::vec3(0.0f, 0.0f, -game_state::camera_speed));
                             break;
                         case GLFW_KEY_A:
                             game_state::camera_position = math::translate_in_direction_by_amount(
@@ -53,7 +52,7 @@ namespace input {
                         case GLFW_KEY_S:
                             game_state::camera_position = math::translate_in_direction_by_amount(
                                     game_state::camera_position, game_state::camera_angle.y,
-                                    glm::vec3(0.0f, 0.0f, -game_state::camera_speed));
+                                    glm::vec3(0.0f, 0.0f, game_state::camera_speed));
                             break;
                         case GLFW_KEY_D:
                             game_state::camera_position = math::translate_in_direction_by_amount(
