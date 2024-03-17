@@ -41,7 +41,7 @@ namespace window {
 
         for (int x = x_region - user_state::chunk_radius; x <= x_region + user_state::chunk_radius; x++) {
             for (int z = z_region - user_state::chunk_radius; z <= z_region + user_state::chunk_radius; z++) {
-                if (pow((float) x + 0.5f - (float) x_region + 0.5f, 2) + pow((float) z + 0.5f - (float) z_region + 0.5f, 2) < user_state::chunk_radius * user_state::chunk_radius) {
+                if (pow(x - x_region, 2) + pow(z - z_region, 2) < pow(user_state::chunk_radius + 1, 2)) {
                     chunk_locations.push_back({x, z});
                 }
             }
@@ -49,9 +49,9 @@ namespace window {
 
         std::vector<chunk::chunk_location> chunk_data_locations = {};
 
-        for (int x = x_region - (user_state::chunk_radius + 1); x <= x_region + (user_state::chunk_radius + 1); x++) {
-            for (int z = z_region - (user_state::chunk_radius + 1); z <= z_region + (user_state::chunk_radius + 1); z++) {
-                if (pow((float) x + 0.5f - (float) x_region + 0.5f, 2) + pow((float) z + 0.5f - (float) z_region + 0.5f, 2) < (user_state::chunk_radius + 1) * (user_state::chunk_radius + 1)) {
+        for (int x = x_region - user_state::chunk_radius - 1; x <= x_region + user_state::chunk_radius + 1; x++) {
+            for (int z = z_region - user_state::chunk_radius - 1; z <= z_region + user_state::chunk_radius + 1; z++) {
+                if (pow(x - x_region, 2) + pow(z - z_region, 2) < pow(user_state::chunk_radius + 2, 2)) {
                     chunk_data_locations.push_back({x, z});
                 }
             }
@@ -209,8 +209,6 @@ namespace window {
         glGenBuffers(1, &render_state::vertex_buffer);
         glBindBuffer(GL_ARRAY_BUFFER, render_state::vertex_buffer);
 
-        rerender();
-
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * 7, (GLvoid *) nullptr);
 
@@ -276,6 +274,8 @@ namespace window {
 
         int texture_uniform = glGetUniformLocation(render_state::program, "u_textures");
         glUniform1i(texture_uniform, 0);
+
+        rerender();
     }
 
     int should_close() {
@@ -332,8 +332,8 @@ namespace window {
         glClearColor(127.0f / 255.0f, 204.0f / 255.0f, 1.0f, 1.0f);
 
         int block = -1;
-        int chunk_x = (int) game_state::camera_position.x / cube::chunk_size;
-        int chunk_z = (int) game_state::camera_position.z / cube::chunk_size;
+        int chunk_x = std::floor(game_state::camera_position.x / (float) cube::chunk_size);
+        int chunk_z = std::floor(game_state::camera_position.z / (float) cube::chunk_size);
 
         // Basic collision
         {
@@ -341,8 +341,8 @@ namespace window {
                 if (chunk_data.x == chunk_x && chunk_data.z == chunk_z) {
                     float next_y = game_state::camera_position.y - 0.1f - 1.6f;
 
-                    int x_block_pos = (int) game_state::camera_position.x % cube::chunk_size;
-                    int z_block_pos = (int) game_state::camera_position.z % cube::chunk_size;
+                    int x_block_pos = std::floor(std::fmod(game_state::camera_position.x, (float) cube::chunk_size));
+                    int z_block_pos = std::floor(std::fmod(game_state::camera_position.z, (float) cube::chunk_size));
 
                     int below_block_pos = std::floor(next_y);
 
@@ -359,12 +359,14 @@ namespace window {
 
         // Chunk loading
         {
-            int next_x_region = (int) game_state::camera_position.x / cube::chunk_size;
-            int next_z_region = (int) game_state::camera_position.z / cube::chunk_size;
+            int next_x_region = std::floor(game_state::camera_position.x / (float) cube::chunk_size);
+            int next_z_region = std::floor(game_state::camera_position.z / (float) cube::chunk_size);
 
             // Region changed
             if (!user_state::pause_chunk_loading && next_x_region != x_region || next_z_region != z_region) {
                 chunk_queue = {};
+                x_region = next_x_region;
+                z_region = next_z_region;
                 rerender();
             }
 
@@ -421,13 +423,13 @@ namespace window {
             std::string facing_text = "Facing: ";
             float direction = game_state::camera_angle.y / (float) M_PI;
             if (direction > -0.25f && direction <= 0.25f) {
-                facing_text += "+Z North";
+                facing_text += "-Z North";
             } else if (direction > 0.25f && direction <= 0.75f) {
-                facing_text += "+X East";
-            } else if (direction > 0.75f || direction < -0.75f) {
-                facing_text += "-Z South";
-            } else if (direction > -0.75f && direction <= -0.25f) {
                 facing_text += "-X West";
+            } else if (direction > 0.75f || direction < -0.75f) {
+                facing_text += "+Z South";
+            } else if (direction > -0.75f && direction <= -0.25f) {
+                facing_text += "+X East";
             }
             ImGui::Text(facing_text.c_str());
             ImGui::End();

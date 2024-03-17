@@ -116,8 +116,8 @@ namespace cube {
     chunk::chunk chunk_location_to_block_data(int chunk_x, int chunk_z) {
         chunk::chunk chunk_data = {chunk_x, chunk_z};
 
-        for (int x = 0; x < chunk_size; x++) {
-            for (int z = 0; z < chunk_size; z++) {
+        for (int x = 1; x < chunk_size - 1; x++) {
+            for (int z = 1; z < chunk_size - 1; z++) {
                 auto x_position = (float) (x + chunk_x * chunk_size);
                 auto z_position = (float) (z + chunk_z * chunk_size);
 
