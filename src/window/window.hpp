@@ -47,13 +47,23 @@ namespace window {
             }
         }
 
+        std::vector<chunk::chunk_location> chunk_data_locations = {};
+
+        for (int x = x_region - (user_state::chunk_radius + 1); x <= x_region + (user_state::chunk_radius + 1); x++) {
+            for (int z = z_region - (user_state::chunk_radius + 1); z <= z_region + (user_state::chunk_radius + 1); z++) {
+                if (pow((float) x + 0.5f - (float) x_region + 0.5f, 2) + pow((float) z + 0.5f - (float) z_region + 0.5f, 2) < (user_state::chunk_radius + 1) * (user_state::chunk_radius + 1)) {
+                    chunk_data_locations.push_back({x, z});
+                }
+            }
+        }
+
         // Unload chunk datas
         std::vector<chunk::chunk_location> chunk_data_delete_chunk_locations = {};
 
         for (auto &chunk : chunks) {
             bool delete_chunk = true;
 
-            for (auto chunk_location: chunk_locations) {
+            for (auto chunk_location: chunk_data_locations) {
                 if (chunk_location.x == chunk.x && chunk_location.z == chunk.z) {
                     delete_chunk = false;
                 }
@@ -105,18 +115,33 @@ namespace window {
             chunk_meshes.erase(chunk_meshes.begin() + delete_index);
         }
 
-        // Load chunks
+        // Add chunk mesh to queue
         for (auto chunk_location: chunk_locations) {
             bool add_mesh = true;
 
-            for (const auto &chunk_data: chunks) {
-                if (chunk_location.x == chunk_data.x && chunk_location.z == chunk_data.z) {
+            for (const auto &chunk_mesh: chunk_meshes) {
+                if (chunk_location.x == chunk_mesh.x && chunk_location.z == chunk_mesh.z) {
                     add_mesh = false;
                 }
             }
 
             if (add_mesh) {
                 chunk_queue.push({chunk_location.x, chunk_location.z});
+            }
+        }
+
+        // Load chunk data
+        for (auto chunk_location: chunk_data_locations) {
+            bool add_chunk_data = true;
+
+            for (const auto &chunk_data: chunks) {
+                if (chunk_location.x == chunk_data.x && chunk_location.z == chunk_data.z) {
+                    add_chunk_data = false;
+                }
+            }
+
+            if (add_chunk_data) {
+                chunks.push_back(cube::chunk_location_to_block_data(chunk_location.x, chunk_location.z));
             }
         }
     }
@@ -126,19 +151,19 @@ namespace window {
 
         chunk_queue.pop();
 
-        chunk::chunk chunk_data = cube::chunk_location_to_block_data(chunk_location.x, chunk_location.z);
+        for (const auto &chunk_data: chunks) {
+            if (chunk_location.x == chunk_data.x && chunk_location.z == chunk_data.z) {
+                chunk::chunk_mesh chunk_mesh = cube::chunk_data_to_mesh(chunk_data, chunks);
 
-        chunks.push_back(chunk_data);
+                chunk_meshes.push_back(chunk_mesh);
 
-        chunk::chunk_mesh chunk_mesh = cube::chunk_data_to_mesh(chunk_data, chunks);
+                total_mesh = cube::chunk_meshes_to_total_mesh(chunk_meshes);
 
-        chunk_meshes.push_back(chunk_mesh);
+                cube_count = std::ceil((float) total_mesh.size() / 7.0f);
 
-        total_mesh = cube::chunk_meshes_to_total_mesh(chunk_meshes);
-
-        cube_count = std::ceil((float) total_mesh.size() / 7.0f);
-
-        glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr) total_mesh.size() * 4, &total_mesh[0], GL_STATIC_DRAW);
+                glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr) total_mesh.size() * 4, &total_mesh[0], GL_STATIC_DRAW);
+            }
+        }
     }
 
     void create_context() {

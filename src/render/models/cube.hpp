@@ -140,16 +140,16 @@ namespace cube {
     }
 
     int pos(int x, int y, int z) {
-        return (x + 1) * (chunk_size + 1) * chunk_height + y * (chunk_size + 1) + z + 1;
+        return (x + 1) * (chunk_size + 2) * chunk_height + y * (chunk_size + 2) + z + 1;
     }
 
     chunk::chunk_mesh chunk_data_to_mesh(chunk::chunk chunk_data, const std::vector<chunk::chunk> &chunk_datas) {
         std::vector<float> mesh = {};
 
-        chunk::block block_data[(chunk_size + 1) * chunk_height * (chunk_size + 1)];
+        chunk::block block_data[(chunk_size + 2) * chunk_height * (chunk_size + 2)];
 
         for (int x = 0; x < chunk_size; x++) {
-            for (int y = 0; y < chunk_size; y++) {
+            for (int y = 0; y < chunk_height; y++) {
                 for (int z = 0; z < chunk_size; z++) {
                     block_data[pos(x, y, z)] = chunk_data.blocks[chunk::pos(x, y, z)];
                 }
@@ -157,73 +157,76 @@ namespace cube {
         }
 
         for (const auto &adjacent_chunk: chunk_datas) {
-            if (chunk_data.x == adjacent_chunk.x - 1 && chunk_data.z == adjacent_chunk.z) {
-                for (int y = 0; y < chunk_size; y++) {
+            if (chunk_data.x - 1 == adjacent_chunk.x && chunk_data.z == adjacent_chunk.z) {
+                for (int y = 0; y < chunk_height; y++) {
                     for (int z = 0; z < chunk_size; z++) {
-                        block_data[pos(0, y, z)] = adjacent_chunk.blocks[chunk::pos(chunk_size - 1, y, z)];
+                        block_data[pos(-1, y, z)] = adjacent_chunk.blocks[chunk::pos(chunk_size - 1, y, z)];
                     }
                 }
-            } else if (chunk_data.x == adjacent_chunk.x + 1 && chunk_data.z == adjacent_chunk.z) {
-                for (int y = 0; y < chunk_size; y++) {
+            }
+            else if (chunk_data.x + 1 == adjacent_chunk.x && chunk_data.z == adjacent_chunk.z) {
+                for (int y = 0; y < chunk_height; y++) {
                     for (int z = 0; z < chunk_size; z++) {
-                        block_data[pos(chunk_size - 1, y, z)] = adjacent_chunk.blocks[chunk::pos(0, y, z)];
+                        block_data[pos(chunk_size, y, z)] = adjacent_chunk.blocks[chunk::pos(0, y, z)];
                     }
                 }
-            } else if (chunk_data.x == adjacent_chunk.x && chunk_data.z == adjacent_chunk.z - 1) {
+            }
+            else if (chunk_data.x == adjacent_chunk.x && chunk_data.z - 1 == adjacent_chunk.z) {
                 for (int x = 0; x < chunk_size; x++) {
-                    for (int y = 0; y < chunk_size; y++) {
-                        block_data[pos(x, y, chunk_size - 1)] = adjacent_chunk.blocks[chunk::pos(x, y, 0)];
+                    for (int y = 0; y < chunk_height; y++) {
+                        block_data[pos(x, y, -1)] = adjacent_chunk.blocks[chunk::pos(x, y, chunk_size - 1)];
                     }
                 }
-            } else if (chunk_data.x == adjacent_chunk.x && chunk_data.z == adjacent_chunk.z + 1) {
+            }
+            else if (chunk_data.x == adjacent_chunk.x && chunk_data.z + 1 == adjacent_chunk.z) {
                 for (int x = 0; x < chunk_size; x++) {
-                    for (int y = 0; y < chunk_size; y++) {
-                        block_data[pos(x, y, 0)] = adjacent_chunk.blocks[chunk::pos(x, y, chunk_size - 1)];
+                    for (int y = 0; y < chunk_height; y++) {
+                        block_data[pos(x, y, chunk_size)] = adjacent_chunk.blocks[chunk::pos(x, y, 0)];
                     }
                 }
             }
         }
 
-        for (int x = 1; x < chunk_size - 1; x++) {
+        for (int x = 0; x < chunk_size; x++) {
             for (int y = 1; y < chunk_height - 1; y++) {
-                for (int z = 1; z < chunk_size - 1; z++) {
+                for (int z = 0; z < chunk_size; z++) {
                     auto block = (float) chunk_data.blocks[chunk::pos(x, y, z)].id;
 
                     if (block != 0) {
-                        bool nx = chunk_data.blocks[chunk::pos(x - 1, y, z)].id == 0;
-                        bool px = chunk_data.blocks[chunk::pos(x + 1, y, z)].id == 0;
-                        bool ny = chunk_data.blocks[chunk::pos(x, y - 1, z)].id == 0;
-                        bool py = chunk_data.blocks[chunk::pos(x, y + 1, z)].id == 0;
-                        bool nz = chunk_data.blocks[chunk::pos(x, y, z - 1)].id == 0;
-                        bool pz = chunk_data.blocks[chunk::pos(x, y, z + 1)].id == 0;
+                        bool nx = block_data[pos(x - 1, y, z)].id == 0;
+                        bool px = block_data[pos(x + 1, y, z)].id == 0;
+                        bool ny = block_data[pos(x, y - 1, z)].id == 0;
+                        bool py = block_data[pos(x, y + 1, z)].id == 0;
+                        bool nz = block_data[pos(x, y, z - 1)].id == 0;
+                        bool pz = block_data[pos(x, y, z + 1)].id == 0;
 
                         // XY
-                        bool nx_ny = chunk_data.blocks[chunk::pos(x - 1, y - 1, z)].id != 0;
-                        bool nx_py = chunk_data.blocks[chunk::pos(x - 1, y + 1, z)].id != 0;
-                        bool px_ny = chunk_data.blocks[chunk::pos(x + 1, y - 1, z)].id != 0;
-                        bool px_py = chunk_data.blocks[chunk::pos(x + 1, y + 1, z)].id != 0;
+                        bool nx_ny = block_data[pos(x - 1, y - 1, z)].id != 0;
+                        bool nx_py = block_data[pos(x - 1, y + 1, z)].id != 0;
+                        bool px_ny = block_data[pos(x + 1, y - 1, z)].id != 0;
+                        bool px_py = block_data[pos(x + 1, y + 1, z)].id != 0;
 
                         // XZ
-                        bool nx_nz = chunk_data.blocks[chunk::pos(x - 1, y, z - 1)].id != 0;
-                        bool nx_pz = chunk_data.blocks[chunk::pos(x - 1, y, z + 1)].id != 0;
-                        bool px_nz = chunk_data.blocks[chunk::pos(x + 1, y, z - 1)].id != 0;
-                        bool px_pz = chunk_data.blocks[chunk::pos(x + 1, y, z + 1)].id != 0;
+                        bool nx_nz = block_data[pos(x - 1, y, z - 1)].id != 0;
+                        bool nx_pz = block_data[pos(x - 1, y, z + 1)].id != 0;
+                        bool px_nz = block_data[pos(x + 1, y, z - 1)].id != 0;
+                        bool px_pz = block_data[pos(x + 1, y, z + 1)].id != 0;
 
                         // YZ
-                        bool ny_nz = chunk_data.blocks[chunk::pos(x, y - 1, z - 1)].id != 0;
-                        bool ny_pz = chunk_data.blocks[chunk::pos(x, y - 1, z + 1)].id != 0;
-                        bool py_nz = chunk_data.blocks[chunk::pos(x, y + 1, z - 1)].id != 0;
-                        bool py_pz = chunk_data.blocks[chunk::pos(x, y + 1, z + 1)].id != 0;
+                        bool ny_nz = block_data[pos(x, y - 1, z - 1)].id != 0;
+                        bool ny_pz = block_data[pos(x, y - 1, z + 1)].id != 0;
+                        bool py_nz = block_data[pos(x, y + 1, z - 1)].id != 0;
+                        bool py_pz = block_data[pos(x, y + 1, z + 1)].id != 0;
 
                         // XYZ
-                        bool nx_ny_nz = chunk_data.blocks[chunk::pos(x - 1, y - 1, z - 1)].id != 0;
-                        bool nx_ny_pz = chunk_data.blocks[chunk::pos(x - 1, y - 1, z + 1)].id != 0;
-                        bool nx_py_nz = chunk_data.blocks[chunk::pos(x - 1, y + 1, z - 1)].id != 0;
-                        bool nx_py_pz = chunk_data.blocks[chunk::pos(x - 1, y + 1, z + 1)].id != 0;
-                        bool px_ny_nz = chunk_data.blocks[chunk::pos(x + 1, y - 1, z - 1)].id != 0;
-                        bool px_ny_pz = chunk_data.blocks[chunk::pos(x + 1, y - 1, z + 1)].id != 0;
-                        bool px_py_nz = chunk_data.blocks[chunk::pos(x + 1, y + 1, z - 1)].id != 0;
-                        bool px_py_pz = chunk_data.blocks[chunk::pos(x + 1, y + 1, z + 1)].id != 0;
+                        bool nx_ny_nz = block_data[pos(x - 1, y - 1, z - 1)].id != 0;
+                        bool nx_ny_pz = block_data[pos(x - 1, y - 1, z + 1)].id != 0;
+                        bool nx_py_nz = block_data[pos(x - 1, y + 1, z - 1)].id != 0;
+                        bool nx_py_pz = block_data[pos(x - 1, y + 1, z + 1)].id != 0;
+                        bool px_ny_nz = block_data[pos(x + 1, y - 1, z - 1)].id != 0;
+                        bool px_ny_pz = block_data[pos(x + 1, y - 1, z + 1)].id != 0;
+                        bool px_py_nz = block_data[pos(x + 1, y + 1, z - 1)].id != 0;
+                        bool px_py_pz = block_data[pos(x + 1, y + 1, z + 1)].id != 0;
 
                         std::vector<float> block_mesh = get_block(
                             block, nx, px, ny, py, nz, pz, nx_ny, nx_py, px_ny, px_py, nx_nz, nx_pz, px_nz, px_pz,
