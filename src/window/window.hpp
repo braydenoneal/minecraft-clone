@@ -357,17 +357,58 @@ namespace window {
         return -1;
     }
 
+    void change_block_at_position(glm::vec3 position, int block_id) {
+        int chunk_x = std::floor(position.x / (float) game_state::chunk_size);
+        int chunk_z = std::floor(position.z / (float) game_state::chunk_size);
+
+        for (auto & chunk : chunks) {
+            if (chunk.x == chunk_x && chunk.z == chunk_z) {
+                int x = (int) std::floor(position.x) % game_state::chunk_size;
+                int z = (int) std::floor(position.z) % game_state::chunk_size;
+
+                if (x < 0) {
+                    x += game_state::chunk_size;
+                }
+                if (z < 0) {
+                    z += game_state::chunk_size;
+                }
+
+                int y = (int) std::floor(position.y);
+
+                if (y < game_state::chunk_height && y > 0) {
+                    if (chunk.blocks[chunk::pos(x, y, z)].id != 0 && chunk.blocks[chunk::pos(x, y, z)].id != block_id) {
+                        chunk.blocks[chunk::pos(x, y, z)].id = block_id;
+                        chunk_queue.push({chunk.x, chunk.z});
+
+                        // Remove mesh
+                        int delete_index = -1;
+
+                        for (int i = 0; i < chunk_meshes.size(); i++) {
+                            if (chunk.x == chunk_meshes[i].x && chunk.z == chunk_meshes[i].z) {
+                                delete_index = i;
+                            }
+                        }
+
+                        if (delete_index != -1) {
+                            chunk_meshes.erase(chunk_meshes.begin() + delete_index);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     bool move_camera(glm::vec3 position) {
         bool move = true;
 
         auto nx_ny_nz = glm::vec3(position.x - 0.3, position.y - 1.6, position.z - 0.3);
         auto nx_ny_pz = glm::vec3(position.x - 0.3, position.y - 1.6, position.z + 0.3);
-        auto nx_py_nz = glm::vec3(position.x - 0.3, position.y + 0.0, position.z - 0.3);
-        auto nx_py_pz = glm::vec3(position.x - 0.3, position.y + 0.0, position.z + 0.3);
+        auto nx_py_nz = glm::vec3(position.x - 0.3, position.y + 0.2, position.z - 0.3);
+        auto nx_py_pz = glm::vec3(position.x - 0.3, position.y + 0.2, position.z + 0.3);
         auto px_ny_nz = glm::vec3(position.x + 0.3, position.y - 1.6, position.z - 0.3);
         auto px_ny_pz = glm::vec3(position.x + 0.3, position.y - 1.6, position.z + 0.3);
-        auto px_py_nz = glm::vec3(position.x + 0.3, position.y + 0.0, position.z - 0.3);
-        auto px_py_pz = glm::vec3(position.x + 0.3, position.y + 0.0, position.z + 0.3);
+        auto px_py_nz = glm::vec3(position.x + 0.3, position.y + 0.2, position.z - 0.3);
+        auto px_py_pz = glm::vec3(position.x + 0.3, position.y + 0.2, position.z + 0.3);
 
         if (get_block_of_position(nx_ny_nz, chunks) != 0 ||
             get_block_of_position(nx_ny_pz, chunks) != 0 ||
@@ -391,6 +432,16 @@ namespace window {
         // Clear screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(127.0f / 255.0f, 204.0f / 255.0f, 1.0f, 1.0f);
+
+        // Block destruction
+        {
+//            if (air_time == 0)
+                change_block_at_position(glm::vec3(
+                        game_state::camera_position.x,
+                        game_state::camera_position.y - 1.6f - 1.0f,
+                        game_state::camera_position.z
+                        ), 3);
+        }
 
         // Basic collision
         {
