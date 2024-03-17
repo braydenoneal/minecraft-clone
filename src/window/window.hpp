@@ -233,6 +233,7 @@ namespace window {
                 "../res/textures/grass_block_top.png",
                 "../res/textures/dirt.png",
                 "../res/textures/stone.png",
+                "../res/textures/wood.png",
         };
 
         stbi_set_flip_vertically_on_load(1);
@@ -611,6 +612,9 @@ namespace window {
             ImGui::SameLine();
             GLuint stone = load_hotbar_texture(selected_block == 3 ? "../res/textures/hotbar/selected/stone.png" : "../res/textures/hotbar/unselected/stone.png");
             ImGui::Image((void*) (intptr_t) stone, ImVec2(64, 64));
+            ImGui::SameLine();
+            GLuint wood = load_hotbar_texture(selected_block == 4 ? "../res/textures/hotbar/selected/wood.png" : "../res/textures/hotbar/unselected/wood.png");
+            ImGui::Image((void*) (intptr_t) wood, ImVec2(64, 64));
             ImGui::End();
         }
 

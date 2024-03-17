@@ -20,6 +20,8 @@ namespace cube {
             face_textures = {2.0f, 2.0f, 2.0f, 2.0f, 2.0f, 2.0f};
         } else if (block == 3.0f) {
             face_textures = {3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f};
+        } else if (block == 4.0f) {
+            face_textures = {4.0f, 4.0f, 4.0f, 4.0f, 4.0f, 4.0f};
         }
 
         std::vector<float> block_mesh = {};
