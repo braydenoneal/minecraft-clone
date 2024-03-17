@@ -129,10 +129,14 @@ namespace cube {
                 int stone_top_height = grass_height - 2;
 
                 chunk_data.blocks[chunk::pos(x, grass_height, z)] = {1};
-//
-//                for (int by = grass_height - 1; by >= 0; by--) {
-//                    chunk_data.blocks[chunk::pos(x, by, z)] = {3};
-//                }
+
+                for (int by = grass_height - 1; by >= stone_top_height; by--) {
+                    chunk_data.blocks[chunk::pos(x, by, z)] = {2};
+                }
+
+                for (int by = stone_top_height; by >= 0; by--) {
+                    chunk_data.blocks[chunk::pos(x, by, z)] = {3};
+                }
             }
         }
 
@@ -183,6 +187,26 @@ namespace cube {
                     for (int y = 0; y < chunk_height; y++) {
                         block_data[pos(x, y, chunk_size)] = adjacent_chunk.blocks[chunk::pos(x, y, 0)];
                     }
+                }
+            }
+            else if (chunk_data.x - 1 == adjacent_chunk.x && chunk_data.z - 1 == adjacent_chunk.z) {
+                for (int y = 0; y < chunk_height; y++) {
+                    block_data[pos(-1, y, -1)] = adjacent_chunk.blocks[chunk::pos(chunk_size - 1, y, chunk_size - 1)];
+                }
+            }
+            else if (chunk_data.x + 1 == adjacent_chunk.x && chunk_data.z - 1 == adjacent_chunk.z) {
+                for (int y = 0; y < chunk_height; y++) {
+                    block_data[pos(chunk_size, y, -1)] = adjacent_chunk.blocks[chunk::pos(0, y, chunk_size - 1)];
+                }
+            }
+            else if (chunk_data.x - 1 == adjacent_chunk.x && chunk_data.z + 1 == adjacent_chunk.z) {
+                for (int y = 0; y < chunk_height; y++) {
+                    block_data[pos(-1, y, chunk_size)] = adjacent_chunk.blocks[chunk::pos(chunk_size - 1, y, 0)];
+                }
+            }
+            else if (chunk_data.x + 1 == adjacent_chunk.x && chunk_data.z + 1 == adjacent_chunk.z) {
+                for (int y = 0; y < chunk_height; y++) {
+                    block_data[pos(chunk_size, y, chunk_size)] = adjacent_chunk.blocks[chunk::pos(0, y, 0)];
                 }
             }
         }
