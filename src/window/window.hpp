@@ -40,6 +40,18 @@ namespace window {
     std::vector<float> total_mesh;
     std::queue<chunk::chunk_location> chunk_queue;
 
+    std::vector<std::array<GLuint, 2>> hotbar_textures;
+
+    std::chrono::steady_clock::time_point start(const char *name) {
+        std::cout << name << std::endl;
+        return std::chrono::steady_clock::now();
+    }
+
+    void end(std::chrono::steady_clock::time_point start) {
+        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+        std::cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << std::endl;
+    }
+
     void rerender() {
         std::vector<chunk::chunk_location> chunk_locations = {};
 
@@ -170,6 +182,49 @@ namespace window {
         }
     }
 
+    GLuint load_hotbar_texture(const char *path) {
+        // Load from file
+        stbi_set_flip_vertically_on_load(0);
+        int image_width = 0;
+        int image_height = 0;
+        unsigned char* image_data = stbi_load(path, &image_width, &image_height, nullptr, 4);
+
+        // Create a OpenGL texture identifier
+        GLuint image_texture;
+        glGenTextures(1, &image_texture);
+        glBindTexture(GL_TEXTURE_2D, image_texture);
+
+        // Setup filtering parameters for display
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        // Upload pixels into texture
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+        stbi_image_free(image_data);
+
+        return image_texture;
+    }
+
+    void setup_hotbar() {
+        std::vector<std::array<std::string, 2>> paths = {
+                {"../res/textures/hotbar/selected/grass.png", "../res/textures/hotbar/unselected/grass.png"},
+                {"../res/textures/hotbar/selected/dirt.png", "../res/textures/hotbar/unselected/dirt.png"},
+                {"../res/textures/hotbar/selected/stone.png", "../res/textures/hotbar/unselected/stone.png"},
+                {"../res/textures/hotbar/selected/wood.png", "../res/textures/hotbar/unselected/wood.png"},
+        };
+
+        for (const auto &path_pair: paths) {
+            GLuint selected_texture = load_hotbar_texture(path_pair[0].c_str());
+            GLuint unselected_texture = load_hotbar_texture(path_pair[1].c_str());
+
+            hotbar_textures.push_back({selected_texture, unselected_texture});
+        }
+    }
+
     void create_context() {
         glfwInit();
 
@@ -279,6 +334,8 @@ namespace window {
 
         int texture_uniform = glGetUniformLocation(render_state::program, "u_textures");
         glUniform1i(texture_uniform, 0);
+
+        setup_hotbar();
 
         rerender();
     }
@@ -457,38 +514,14 @@ namespace window {
         return move;
     }
 
-    GLuint load_hotbar_texture(const char *path) {
-        // Load from file
-        stbi_set_flip_vertically_on_load(0);
-        int image_width = 0;
-        int image_height = 0;
-        unsigned char* image_data = stbi_load(path, &image_width, &image_height, nullptr, 4);
-
-        // Create a OpenGL texture identifier
-        GLuint image_texture;
-        glGenTextures(1, &image_texture);
-        glBindTexture(GL_TEXTURE_2D, image_texture);
-
-        // Setup filtering parameters for display
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-        // Upload pixels into texture
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
-        stbi_image_free(image_data);
-
-        return image_texture;
-    }
-
     void render() {
         // Clear screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(127.0f / 255.0f, 204.0f / 255.0f, 1.0f, 1.0f);
 
+        auto tframe = start("frame");
+
+        auto tcol = start("collision");
         // Basic collision
         {
             if (jumping) {
@@ -525,7 +558,9 @@ namespace window {
                 }
             }
         }
+        end(tcol);
 
+        auto tchunk = start("chunk");
         // Chunk loading
         {
             int next_x_region = std::floor(game_state::camera_position.x / (float) game_state::chunk_size);
@@ -547,7 +582,9 @@ namespace window {
             x_region = next_x_region;
             z_region = next_z_region;
         }
+        end(tchunk);
 
+        auto trest = start("remaining");
         // Setup camera uniform
         {
             glm::mat4 perspective = glm::perspective(
@@ -605,17 +642,13 @@ namespace window {
         // Hotbar screen
         {
             ImGui::Begin("##Hotbar");
-            GLuint grass = load_hotbar_texture(selected_block == 1 ? "../res/textures/hotbar/selected/grass.png" : "../res/textures/hotbar/unselected/grass.png");
-            ImGui::Image((void*) (intptr_t) grass, ImVec2(64, 64));
-            ImGui::SameLine();
-            GLuint dirt = load_hotbar_texture(selected_block == 2 ? "../res/textures/hotbar/selected/dirt.png" : "../res/textures/hotbar/unselected/dirt.png");
-            ImGui::Image((void*) (intptr_t) dirt, ImVec2(64, 64));
-            ImGui::SameLine();
-            GLuint stone = load_hotbar_texture(selected_block == 3 ? "../res/textures/hotbar/selected/stone.png" : "../res/textures/hotbar/unselected/stone.png");
-            ImGui::Image((void*) (intptr_t) stone, ImVec2(64, 64));
-            ImGui::SameLine();
-            GLuint wood = load_hotbar_texture(selected_block == 4 ? "../res/textures/hotbar/selected/wood.png" : "../res/textures/hotbar/unselected/wood.png");
-            ImGui::Image((void*) (intptr_t) wood, ImVec2(64, 64));
+
+            for (int i = 0; i < hotbar_textures.size(); i++) {
+                GLuint texture = selected_block == i + 1 ? hotbar_textures[i][0] : hotbar_textures[i][1];
+                ImGui::Image((void*) (intptr_t) texture, ImVec2(64, 64));
+                ImGui::SameLine();
+            }
+
             ImGui::End();
         }
 
@@ -650,6 +683,9 @@ namespace window {
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        end(trest);
+        end(tframe);
 
         // Next frame
         glfwSwapBuffers(input_state::glfw_window);
