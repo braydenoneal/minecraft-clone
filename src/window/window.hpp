@@ -383,6 +383,7 @@ namespace window {
                         chunk.blocks[chunk::pos(x, y, z)].id = block_id;
                         chunk_queue.push({chunk.x, chunk.z});
 
+                        // TODO: Remove neighbor meshes
                         // Remove mesh
                         for (int i = 0; i < chunk_meshes.size(); i++) {
                             if (chunk.x == chunk_meshes[i].x && chunk.z == chunk_meshes[i].z) {
@@ -461,7 +462,7 @@ namespace window {
         stbi_set_flip_vertically_on_load(0);
         int image_width = 0;
         int image_height = 0;
-        unsigned char* image_data = stbi_load(path, &image_width, &image_height, NULL, 4);
+        unsigned char* image_data = stbi_load(path, &image_width, &image_height, nullptr, 4);
 
         // Create a OpenGL texture identifier
         GLuint image_texture;
@@ -603,7 +604,7 @@ namespace window {
 
         // Hotbar screen
         {
-            ImGui::Begin("Hotbar");
+            ImGui::Begin("##Hotbar");
             GLuint grass = load_hotbar_texture(selected_block == 1 ? "../res/textures/hotbar/selected/grass.png" : "../res/textures/hotbar/unselected/grass.png");
             ImGui::Image((void*) (intptr_t) grass, ImVec2(64, 64));
             ImGui::SameLine();

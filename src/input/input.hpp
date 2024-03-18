@@ -139,9 +139,15 @@ namespace input {
 
     void scroll_callback(GLFWwindow* glfw_window, double x_offset, double y_offset) {
         if (y_offset > 0) {
-            window::selected_block = std::clamp(window::selected_block - 1, 1, 4);
+            window::selected_block -= 1;
+            if (window::selected_block < 1) {
+                window::selected_block = 4;
+            }
         } else {
-            window::selected_block = std::clamp(window::selected_block + 1, 1, 4);
+            window::selected_block += 1;
+            if (window::selected_block > 4) {
+                window::selected_block = 1;
+            }
         }
     }
 
