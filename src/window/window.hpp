@@ -5,7 +5,6 @@
 #include <vector>
 #include <iostream>
 #include <queue>
-#include <chrono>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -26,6 +25,7 @@
 #include "../render/models/cube.hpp"
 #include "../world/chunk/chunk.hpp"
 #include "../math/math.hpp"
+#include "../math/timer.hpp"
 
 namespace window {
     int cube_count = 0;
@@ -41,16 +41,6 @@ namespace window {
     std::queue<chunk::chunk_location> chunk_queue;
 
     std::vector<std::array<GLuint, 2>> hotbar_textures;
-
-    std::chrono::steady_clock::time_point start(const char *name) {
-        std::cout << name << std::endl;
-        return std::chrono::steady_clock::now();
-    }
-
-    void end(std::chrono::steady_clock::time_point start) {
-        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-        std::cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << std::endl;
-    }
 
     void rerender() {
         std::vector<chunk::chunk_location> chunk_locations = {};
@@ -519,9 +509,6 @@ namespace window {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(127.0f / 255.0f, 204.0f / 255.0f, 1.0f, 1.0f);
 
-        auto tframe = start("frame");
-
-        auto tcol = start("collision");
         // Basic collision
         {
             if (jumping) {
@@ -558,9 +545,7 @@ namespace window {
                 }
             }
         }
-        end(tcol);
 
-        auto tchunk = start("chunk");
         // Chunk loading
         {
             int next_x_region = std::floor(game_state::camera_position.x / (float) game_state::chunk_size);
@@ -582,9 +567,7 @@ namespace window {
             x_region = next_x_region;
             z_region = next_z_region;
         }
-        end(tchunk);
 
-        auto trest = start("remaining");
         // Setup camera uniform
         {
             glm::mat4 perspective = glm::perspective(
@@ -683,9 +666,6 @@ namespace window {
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        end(trest);
-        end(tframe);
 
         // Next frame
         glfwSwapBuffers(input_state::glfw_window);

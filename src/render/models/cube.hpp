@@ -5,10 +5,11 @@
 #include <map>
 
 #include "../../world/chunk/chunk.hpp"
+#include "../../math/timer.hpp"
 
 namespace cube {
-    std::vector<float>
-    get_block(float block, bool nx, bool px, bool ny, bool py, bool nz, bool pz, bool nx_ny, bool nx_py, bool px_ny, bool px_py,
+    void
+    get_block(std::vector<float> &block_mesh, float block, bool nx, bool px, bool ny, bool py, bool nz, bool pz, bool nx_ny, bool nx_py, bool px_ny, bool px_py,
               bool nx_nz, bool nx_pz, bool px_nz, bool px_pz, bool ny_nz, bool ny_pz, bool py_nz, bool py_pz,
               bool nx_ny_nz, bool nx_ny_pz, bool nx_py_nz, bool nx_py_pz, bool px_ny_nz, bool px_ny_pz, bool px_py_nz,
               bool px_py_pz) {
@@ -24,79 +25,72 @@ namespace cube {
             face_textures = {4.0f, 4.0f, 4.0f, 4.0f, 4.0f, 4.0f};
         }
 
-        std::vector<float> block_mesh = {};
-
-        std::vector<std::vector<float>> meshes = {
-                {
-                        -0.0f, -0.0f, -0.0f, 0.0f, 0.0f, face_textures[0], 0.8f - (float) ((nx_ny ? 1 : 0) + (nx_nz ? 1 : 0) + (nx_ny_nz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
-                        -0.0f, +1.0f, -0.0f, 0.0f, 1.0f, face_textures[0], 0.8f - (float) ((nx_py ? 1 : 0) + (nx_nz ? 1 : 0) + (nx_py_nz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
-                        -0.0f, -0.0f, +1.0f, 1.0f, 0.0f, face_textures[0], 0.8f - (float) ((nx_ny ? 1 : 0) + (nx_pz ? 1 : 0) + (nx_ny_pz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
-                        -0.0f, +1.0f, +1.0f, 1.0f, 1.0f, face_textures[0], 0.8f - (float) ((nx_py ? 1 : 0) + (nx_pz ? 1 : 0) + (nx_py_pz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
-                        -0.0f, -0.0f, +1.0f, 1.0f, 0.0f, face_textures[0], 0.8f - (float) ((nx_ny ? 1 : 0) + (nx_pz ? 1 : 0) + (nx_ny_pz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
-                        -0.0f, +1.0f, -0.0f, 0.0f, 1.0f, face_textures[0], 0.8f - (float) ((nx_py ? 1 : 0) + (nx_nz ? 1 : 0) + (nx_py_nz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
-                },
-                {
-                        +1.0f, +1.0f, -0.0f, 1.0f, 1.0f, face_textures[1], 0.8f - (float) ((px_py ? 1 : 0) + (px_nz ? 1 : 0) + (px_py_nz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
-                        +1.0f, -0.0f, -0.0f, 1.0f, 0.0f, face_textures[1], 0.8f - (float) ((px_ny ? 1 : 0) + (px_nz ? 1 : 0) + (px_ny_nz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
-                        +1.0f, +1.0f, +1.0f, 0.0f, 1.0f, face_textures[1], 0.8f - (float) ((px_py ? 1 : 0) + (px_pz ? 1 : 0) + (px_py_pz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
-                        +1.0f, -0.0f, +1.0f, 0.0f, 0.0f, face_textures[1], 0.8f - (float) ((px_ny ? 1 : 0) + (px_pz ? 1 : 0) + (px_ny_pz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
-                        +1.0f, +1.0f, +1.0f, 0.0f, 1.0f, face_textures[1], 0.8f - (float) ((px_py ? 1 : 0) + (px_pz ? 1 : 0) + (px_py_pz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
-                        +1.0f, -0.0f, -0.0f, 1.0f, 0.0f, face_textures[1], 0.8f - (float) ((px_ny ? 1 : 0) + (px_nz ? 1 : 0) + (px_ny_nz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
-                },
-                {
-                        -0.0f, -0.0f, -0.0f, 1.0f, 1.0f, face_textures[2], 0.4f - (float) ((nx_ny ? 1 : 0) + (ny_nz ? 1 : 0) + (nx_ny_nz ? 1 : 0)) * (0.4f * 0.5f / 3.0f),
-                        -0.0f, -0.0f, +1.0f, 0.0f, 1.0f, face_textures[2], 0.4f - (float) ((nx_ny ? 1 : 0) + (ny_pz ? 1 : 0) + (nx_ny_pz ? 1 : 0)) * (0.4f * 0.5f / 3.0f),
-                        +1.0f, -0.0f, -0.0f, 1.0f, 0.0f, face_textures[2], 0.4f - (float) ((px_ny ? 1 : 0) + (ny_nz ? 1 : 0) + (px_ny_nz ? 1 : 0)) * (0.4f * 0.5f / 3.0f),
-                        +1.0f, -0.0f, +1.0f, 0.0f, 0.0f, face_textures[2], 0.4f - (float) ((px_ny ? 1 : 0) + (ny_pz ? 1 : 0) + (px_ny_pz ? 1 : 0)) * (0.4f * 0.5f / 3.0f),
-                        +1.0f, -0.0f, -0.0f, 1.0f, 0.0f, face_textures[2], 0.4f - (float) ((px_ny ? 1 : 0) + (ny_nz ? 1 : 0) + (px_ny_nz ? 1 : 0)) * (0.4f * 0.5f / 3.0f),
-                        -0.0f, -0.0f, +1.0f, 0.0f, 1.0f, face_textures[2], 0.4f - (float) ((nx_ny ? 1 : 0) + (ny_pz ? 1 : 0) + (nx_ny_pz ? 1 : 0)) * (0.4f * 0.5f / 3.0f),
-                },
-                {
-                        -0.0f, +1.0f, +1.0f, 1.0f, 1.0f, face_textures[3], 1.0f - (float) ((nx_py ? 1 : 0) + (py_pz ? 1 : 0) + (nx_py_pz ? 1 : 0)) * (1.0f * 0.5f / 3.0f),
-                        -0.0f, +1.0f, -0.0f, 0.0f, 1.0f, face_textures[3], 1.0f - (float) ((nx_py ? 1 : 0) + (py_nz ? 1 : 0) + (nx_py_nz ? 1 : 0)) * (1.0f * 0.5f / 3.0f),
-                        +1.0f, +1.0f, +1.0f, 1.0f, 0.0f, face_textures[3], 1.0f - (float) ((px_py ? 1 : 0) + (py_pz ? 1 : 0) + (px_py_pz ? 1 : 0)) * (1.0f * 0.5f / 3.0f),
-                        +1.0f, +1.0f, -0.0f, 0.0f, 0.0f, face_textures[3], 1.0f - (float) ((px_py ? 1 : 0) + (py_nz ? 1 : 0) + (px_py_nz ? 1 : 0)) * (1.0f * 0.5f / 3.0f),
-                        +1.0f, +1.0f, +1.0f, 1.0f, 0.0f, face_textures[3], 1.0f - (float) ((px_py ? 1 : 0) + (py_pz ? 1 : 0) + (px_py_pz ? 1 : 0)) * (1.0f * 0.5f / 3.0f),
-                        -0.0f, +1.0f, -0.0f, 0.0f, 1.0f, face_textures[3], 1.0f - (float) ((nx_py ? 1 : 0) + (py_nz ? 1 : 0) + (nx_py_nz ? 1 : 0)) * (1.0f * 0.5f / 3.0f),
-                },
-                {
-                        -0.0f, -0.0f, -0.0f, 1.0f, 0.0f, face_textures[4], 0.6f - (float) ((nx_nz ? 1 : 0) + (ny_nz ? 1 : 0) + (nx_ny_nz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
-                        +1.0f, -0.0f, -0.0f, 0.0f, 0.0f, face_textures[4], 0.6f - (float) ((px_nz ? 1 : 0) + (ny_nz ? 1 : 0) + (px_ny_nz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
-                        -0.0f, +1.0f, -0.0f, 1.0f, 1.0f, face_textures[4], 0.6f - (float) ((nx_nz ? 1 : 0) + (py_nz ? 1 : 0) + (nx_py_nz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
-                        +1.0f, +1.0f, -0.0f, 0.0f, 1.0f, face_textures[4], 0.6f - (float) ((px_nz ? 1 : 0) + (py_nz ? 1 : 0) + (px_py_nz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
-                        -0.0f, +1.0f, -0.0f, 1.0f, 1.0f, face_textures[4], 0.6f - (float) ((nx_nz ? 1 : 0) + (py_nz ? 1 : 0) + (nx_py_nz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
-                        +1.0f, -0.0f, -0.0f, 0.0f, 0.0f, face_textures[4], 0.6f - (float) ((px_nz ? 1 : 0) + (ny_nz ? 1 : 0) + (px_ny_nz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
-                },
-                {
-                        +1.0f, -0.0f, +1.0f, 1.0f, 0.0f, face_textures[5], 0.6f - (float) ((px_pz ? 1 : 0) + (ny_pz ? 1 : 0) + (px_ny_pz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
-                        -0.0f, -0.0f, +1.0f, 0.0f, 0.0f, face_textures[5], 0.6f - (float) ((nx_pz ? 1 : 0) + (ny_pz ? 1 : 0) + (nx_ny_pz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
-                        +1.0f, +1.0f, +1.0f, 1.0f, 1.0f, face_textures[5], 0.6f - (float) ((px_pz ? 1 : 0) + (py_pz ? 1 : 0) + (px_py_pz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
-                        -0.0f, +1.0f, +1.0f, 0.0f, 1.0f, face_textures[5], 0.6f - (float) ((nx_pz ? 1 : 0) + (py_pz ? 1 : 0) + (nx_py_pz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
-                        +1.0f, +1.0f, +1.0f, 1.0f, 1.0f, face_textures[5], 0.6f - (float) ((px_pz ? 1 : 0) + (py_pz ? 1 : 0) + (px_py_pz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
-                        -0.0f, -0.0f, +1.0f, 0.0f, 0.0f, face_textures[5], 0.6f - (float) ((nx_pz ? 1 : 0) + (ny_pz ? 1 : 0) + (nx_ny_pz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
-                }
-        };
-
         if (!nx) {
-            block_mesh.insert(block_mesh.end(), meshes[0].begin(), meshes[0].end());
+            std::vector<float> face = {
+                -0.0f, -0.0f, -0.0f, 0.0f, 0.0f, face_textures[0], 0.8f - (float) ((nx_ny ? 1 : 0) + (nx_nz ? 1 : 0) + (nx_ny_nz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
+                -0.0f, +1.0f, -0.0f, 0.0f, 1.0f, face_textures[0], 0.8f - (float) ((nx_py ? 1 : 0) + (nx_nz ? 1 : 0) + (nx_py_nz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
+                -0.0f, -0.0f, +1.0f, 1.0f, 0.0f, face_textures[0], 0.8f - (float) ((nx_ny ? 1 : 0) + (nx_pz ? 1 : 0) + (nx_ny_pz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
+                -0.0f, +1.0f, +1.0f, 1.0f, 1.0f, face_textures[0], 0.8f - (float) ((nx_py ? 1 : 0) + (nx_pz ? 1 : 0) + (nx_py_pz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
+                -0.0f, -0.0f, +1.0f, 1.0f, 0.0f, face_textures[0], 0.8f - (float) ((nx_ny ? 1 : 0) + (nx_pz ? 1 : 0) + (nx_ny_pz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
+                -0.0f, +1.0f, -0.0f, 0.0f, 1.0f, face_textures[0], 0.8f - (float) ((nx_py ? 1 : 0) + (nx_nz ? 1 : 0) + (nx_py_nz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
+            };
+            block_mesh.insert(block_mesh.end(), face.begin(), face.end());
         }
         if (!px) {
-            block_mesh.insert(block_mesh.end(), meshes[1].begin(), meshes[1].end());
+            std::vector<float> face = {
+                +1.0f, +1.0f, -0.0f, 1.0f, 1.0f, face_textures[1], 0.8f - (float) ((px_py ? 1 : 0) + (px_nz ? 1 : 0) + (px_py_nz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
+                +1.0f, -0.0f, -0.0f, 1.0f, 0.0f, face_textures[1], 0.8f - (float) ((px_ny ? 1 : 0) + (px_nz ? 1 : 0) + (px_ny_nz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
+                +1.0f, +1.0f, +1.0f, 0.0f, 1.0f, face_textures[1], 0.8f - (float) ((px_py ? 1 : 0) + (px_pz ? 1 : 0) + (px_py_pz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
+                +1.0f, -0.0f, +1.0f, 0.0f, 0.0f, face_textures[1], 0.8f - (float) ((px_ny ? 1 : 0) + (px_pz ? 1 : 0) + (px_ny_pz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
+                +1.0f, +1.0f, +1.0f, 0.0f, 1.0f, face_textures[1], 0.8f - (float) ((px_py ? 1 : 0) + (px_pz ? 1 : 0) + (px_py_pz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
+                +1.0f, -0.0f, -0.0f, 1.0f, 0.0f, face_textures[1], 0.8f - (float) ((px_ny ? 1 : 0) + (px_nz ? 1 : 0) + (px_ny_nz ? 1 : 0)) * (0.8f * 0.5f / 3.0f),
+            };
+            block_mesh.insert(block_mesh.end(), face.begin(), face.end());
         }
         if (!ny) {
-            block_mesh.insert(block_mesh.end(), meshes[2].begin(), meshes[2].end());
+            std::vector<float> face = {
+                -0.0f, -0.0f, -0.0f, 1.0f, 1.0f, face_textures[2], 0.4f - (float) ((nx_ny ? 1 : 0) + (ny_nz ? 1 : 0) + (nx_ny_nz ? 1 : 0)) * (0.4f * 0.5f / 3.0f),
+                -0.0f, -0.0f, +1.0f, 0.0f, 1.0f, face_textures[2], 0.4f - (float) ((nx_ny ? 1 : 0) + (ny_pz ? 1 : 0) + (nx_ny_pz ? 1 : 0)) * (0.4f * 0.5f / 3.0f),
+                +1.0f, -0.0f, -0.0f, 1.0f, 0.0f, face_textures[2], 0.4f - (float) ((px_ny ? 1 : 0) + (ny_nz ? 1 : 0) + (px_ny_nz ? 1 : 0)) * (0.4f * 0.5f / 3.0f),
+                +1.0f, -0.0f, +1.0f, 0.0f, 0.0f, face_textures[2], 0.4f - (float) ((px_ny ? 1 : 0) + (ny_pz ? 1 : 0) + (px_ny_pz ? 1 : 0)) * (0.4f * 0.5f / 3.0f),
+                +1.0f, -0.0f, -0.0f, 1.0f, 0.0f, face_textures[2], 0.4f - (float) ((px_ny ? 1 : 0) + (ny_nz ? 1 : 0) + (px_ny_nz ? 1 : 0)) * (0.4f * 0.5f / 3.0f),
+                -0.0f, -0.0f, +1.0f, 0.0f, 1.0f, face_textures[2], 0.4f - (float) ((nx_ny ? 1 : 0) + (ny_pz ? 1 : 0) + (nx_ny_pz ? 1 : 0)) * (0.4f * 0.5f / 3.0f),
+            };
+            block_mesh.insert(block_mesh.end(), face.begin(), face.end());
         }
         if (!py) {
-            block_mesh.insert(block_mesh.end(), meshes[3].begin(), meshes[3].end());
+            std::vector<float> face = {
+                -0.0f, +1.0f, +1.0f, 1.0f, 1.0f, face_textures[3], 1.0f - (float) ((nx_py ? 1 : 0) + (py_pz ? 1 : 0) + (nx_py_pz ? 1 : 0)) * (1.0f * 0.5f / 3.0f),
+                -0.0f, +1.0f, -0.0f, 0.0f, 1.0f, face_textures[3], 1.0f - (float) ((nx_py ? 1 : 0) + (py_nz ? 1 : 0) + (nx_py_nz ? 1 : 0)) * (1.0f * 0.5f / 3.0f),
+                +1.0f, +1.0f, +1.0f, 1.0f, 0.0f, face_textures[3], 1.0f - (float) ((px_py ? 1 : 0) + (py_pz ? 1 : 0) + (px_py_pz ? 1 : 0)) * (1.0f * 0.5f / 3.0f),
+                +1.0f, +1.0f, -0.0f, 0.0f, 0.0f, face_textures[3], 1.0f - (float) ((px_py ? 1 : 0) + (py_nz ? 1 : 0) + (px_py_nz ? 1 : 0)) * (1.0f * 0.5f / 3.0f),
+                +1.0f, +1.0f, +1.0f, 1.0f, 0.0f, face_textures[3], 1.0f - (float) ((px_py ? 1 : 0) + (py_pz ? 1 : 0) + (px_py_pz ? 1 : 0)) * (1.0f * 0.5f / 3.0f),
+                -0.0f, +1.0f, -0.0f, 0.0f, 1.0f, face_textures[3], 1.0f - (float) ((nx_py ? 1 : 0) + (py_nz ? 1 : 0) + (nx_py_nz ? 1 : 0)) * (1.0f * 0.5f / 3.0f),
+            };
+            block_mesh.insert(block_mesh.end(), face.begin(), face.end());
         }
         if (!nz) {
-            block_mesh.insert(block_mesh.end(), meshes[4].begin(), meshes[4].end());
+            std::vector<float> face = {
+                -0.0f, -0.0f, -0.0f, 1.0f, 0.0f, face_textures[4], 0.6f - (float) ((nx_nz ? 1 : 0) + (ny_nz ? 1 : 0) + (nx_ny_nz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
+                +1.0f, -0.0f, -0.0f, 0.0f, 0.0f, face_textures[4], 0.6f - (float) ((px_nz ? 1 : 0) + (ny_nz ? 1 : 0) + (px_ny_nz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
+                -0.0f, +1.0f, -0.0f, 1.0f, 1.0f, face_textures[4], 0.6f - (float) ((nx_nz ? 1 : 0) + (py_nz ? 1 : 0) + (nx_py_nz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
+                +1.0f, +1.0f, -0.0f, 0.0f, 1.0f, face_textures[4], 0.6f - (float) ((px_nz ? 1 : 0) + (py_nz ? 1 : 0) + (px_py_nz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
+                -0.0f, +1.0f, -0.0f, 1.0f, 1.0f, face_textures[4], 0.6f - (float) ((nx_nz ? 1 : 0) + (py_nz ? 1 : 0) + (nx_py_nz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
+                +1.0f, -0.0f, -0.0f, 0.0f, 0.0f, face_textures[4], 0.6f - (float) ((px_nz ? 1 : 0) + (ny_nz ? 1 : 0) + (px_ny_nz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
+            };
+            block_mesh.insert(block_mesh.end(), face.begin(), face.end());
         }
         if (!pz) {
-            block_mesh.insert(block_mesh.end(), meshes[5].begin(), meshes[5].end());
+            std::vector<float> face = {
+                +1.0f, -0.0f, +1.0f, 1.0f, 0.0f, face_textures[5], 0.6f - (float) ((px_pz ? 1 : 0) + (ny_pz ? 1 : 0) + (px_ny_pz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
+                -0.0f, -0.0f, +1.0f, 0.0f, 0.0f, face_textures[5], 0.6f - (float) ((nx_pz ? 1 : 0) + (ny_pz ? 1 : 0) + (nx_ny_pz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
+                +1.0f, +1.0f, +1.0f, 1.0f, 1.0f, face_textures[5], 0.6f - (float) ((px_pz ? 1 : 0) + (py_pz ? 1 : 0) + (px_py_pz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
+                -0.0f, +1.0f, +1.0f, 0.0f, 1.0f, face_textures[5], 0.6f - (float) ((nx_pz ? 1 : 0) + (py_pz ? 1 : 0) + (nx_py_pz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
+                +1.0f, +1.0f, +1.0f, 1.0f, 1.0f, face_textures[5], 0.6f - (float) ((px_pz ? 1 : 0) + (py_pz ? 1 : 0) + (px_py_pz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
+                -0.0f, -0.0f, +1.0f, 0.0f, 0.0f, face_textures[5], 0.6f - (float) ((nx_pz ? 1 : 0) + (ny_pz ? 1 : 0) + (nx_ny_pz ? 1 : 0)) * (0.6f * 0.5f / 3.0f),
+            };
+            block_mesh.insert(block_mesh.end(), face.begin(), face.end());
         }
-
-        return block_mesh;
     }
 
     std::vector<float> position_mesh(const std::vector<float> &mesh, float x, float y, float z) {
@@ -250,7 +244,8 @@ namespace cube {
                         bool px_py_nz = block_data[pos(x + 1, y + 1, z - 1)].id != 0;
                         bool px_py_pz = block_data[pos(x + 1, y + 1, z + 1)].id != 0;
 
-                        std::vector<float> block_mesh = get_block(
+                        std::vector<float> block_mesh;
+                        get_block(block_mesh,
                             block, nx, px, ny, py, nz, pz, nx_ny, nx_py, px_ny, px_py, nx_nz, nx_pz, px_nz, px_pz,
                             ny_nz, ny_pz, py_nz, py_pz, nx_ny_nz, nx_ny_pz, nx_py_nz, nx_py_pz, px_ny_nz, px_ny_pz,
                             px_py_nz, px_py_pz
