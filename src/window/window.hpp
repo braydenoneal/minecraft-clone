@@ -3,8 +3,9 @@
 #include <cmath>
 #include <string>
 #include <vector>
-#include <iostream>
 #include <queue>
+#include <iostream>
+#include <fstream>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -41,6 +42,16 @@ namespace window {
     std::queue<chunk::chunk_location> chunk_queue;
 
     std::vector<std::array<GLuint, 2>> hotbar_textures;
+
+    void write_file_test() {
+        std::ofstream file("test.txt");
+
+        for (int i = 0; i < sizeof(chunk::chunk::blocks); i++) {
+            file << chunks[0].blocks[i].id;
+        }
+
+        file.close();
+    }
 
     void rerender() {
         std::vector<chunk::chunk_location> chunk_locations = {};
@@ -154,6 +165,8 @@ namespace window {
 
     void render_queue() {
         chunk::chunk_location chunk_location = chunk_queue.front();
+
+        write_file_test();
 
         chunk_queue.pop();
 
