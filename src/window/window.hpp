@@ -43,14 +43,75 @@ namespace window {
 
     std::vector<std::array<GLuint, 2>> hotbar_textures;
 
-    void write_file_test() {
-        std::ofstream file("test.txt");
+    /*
+     * Region File:
+     * Header:
+     *      File format
+     *      File version
+     *      Region x
+     *      Region z
+     *      Number of chunks?
+     * Data:
+     *      Chunk[]:
+     *          Chunk x
+     *          Chunk z
+     *              Block[]:
+     *                  Block id
+     */
 
-        for (int i = 0; i < sizeof(chunk::chunk::blocks); i++) {
-            file << chunks[0].blocks[i].id;
+    /*
+     * Get list of chunks around player
+     * For each chunk:
+     *      If chunk in file, load from there
+     *      Else, generate and store
+     *
+     * On edit blocks, store
+     */
+
+    void set_chunks_from_storage() {
+        std::ifstream rf("test.dat", std::ios::out | std::ios::binary);
+
+        u_long read_chunk_size;
+
+        rf.read((char *) &read_chunk_size, sizeof(read_chunk_size));
+
+        std::vector<chunk::chunk> read_chunks;
+
+        for (int i = 0; i < read_chunk_size; i++) {
+            chunk::chunk chunk_in = {0, 0};
+            rf.read((char *) &chunk_in, sizeof(chunk::chunk));
+            read_chunks.push_back(chunk_in);
         }
 
-        file.close();
+        chunks = read_chunks;
+    }
+
+    void write_file_test() {
+        std::ofstream wf("test.dat", std::ios::out | std::ios::binary);
+
+        u_long chunk_size = chunks.size();
+
+        wf.write((char *) &chunk_size, sizeof(chunk_size));
+
+        for (const auto &chunk: chunks) {
+            wf.write((char *) &chunk, sizeof(chunk::chunk));
+        }
+
+        wf.close();
+
+        std::ifstream rf("test.dat", std::ios::out | std::ios::binary);
+
+        u_long read_chunk_size;
+
+        rf.read((char *) &read_chunk_size, sizeof(read_chunk_size));
+
+        std::vector<chunk::chunk> read_chunks;
+
+        for (int i = 0; i < read_chunk_size; i++) {
+            chunk::chunk chunk_in = {0, 0};
+            rf.read((char *) &chunk_in, sizeof(chunk::chunk));
+            read_chunks.push_back(chunk_in);
+        }
     }
 
     void rerender() {
@@ -147,6 +208,21 @@ namespace window {
             }
         }
 
+        // Read chunks from storage
+        std::ifstream rf("test.dat", std::ios::out | std::ios::binary);
+
+        u_long read_chunk_size;
+
+        rf.read((char *) &read_chunk_size, sizeof(read_chunk_size));
+
+        std::vector<chunk::chunk> read_chunks;
+
+        for (int i = 0; i < read_chunk_size; i++) {
+            chunk::chunk chunk_in = {0, 0};
+            rf.read((char *) &chunk_in, sizeof(chunk::chunk));
+            read_chunks.push_back(chunk_in);
+        }
+
         // Load chunk data
         for (auto chunk_location: chunk_data_locations) {
             bool add_chunk_data = true;
@@ -158,7 +234,30 @@ namespace window {
             }
 
             if (add_chunk_data) {
-                chunks.push_back(cube::chunk_location_to_block_data(chunk_location.x, chunk_location.z));
+                bool generate = true;
+
+                for (const auto &read_chunk: read_chunks) {
+                    if (read_chunk.x == chunk_location.x && read_chunk.z == chunk_location.z) {
+                        generate = false;
+                        chunks.push_back(read_chunk);
+                    }
+                }
+
+                if (generate) {
+                    chunk::chunk new_chunk = cube::chunk_location_to_block_data(chunk_location.x, chunk_location.z);
+
+                    chunks.push_back(new_chunk);
+                    // TODO: Write chunk
+                    std::ofstream wf("test.dat", std::ios::out | std::ios::binary);
+
+                    u_long chunk_size = read_chunk_size + 1;
+
+                    wf.write((char *) &chunk_size, sizeof(chunk_size));
+
+                    wf.seekp(std::ios_base::end);
+
+                    wf.write((char *) &new_chunk, sizeof(chunk::chunk));
+                }
             }
         }
     }
@@ -166,7 +265,7 @@ namespace window {
     void render_queue() {
         chunk::chunk_location chunk_location = chunk_queue.front();
 
-        write_file_test();
+//        write_file_test();
 
         chunk_queue.pop();
 
@@ -340,6 +439,8 @@ namespace window {
 
         setup_hotbar();
 
+//        set_chunks_from_storage();
+
         rerender();
     }
 
@@ -441,6 +542,23 @@ namespace window {
                 if (y < game_state::chunk_height && y > 0) {
                     if (chunk.blocks[chunk::pos(x, y, z)].id != block_id) {
                         chunk.blocks[chunk::pos(x, y, z)].id = block_id;
+
+                        std::ifstream rf("test.dat", std::ios::out | std::ios::binary);
+
+                        u_long read_chunk_size;
+
+                        rf.read((char *) &read_chunk_size, sizeof(read_chunk_size));
+
+                        std::ofstream wf("test.dat", std::ios::out | std::ios::binary);
+
+                        u_long chunk_size = read_chunk_size + 1;
+
+                        wf.write((char *) &chunk_size, sizeof(chunk_size));
+
+                        wf.seekp(std::ios_base::end);
+
+                        wf.write((char *) &chunk, sizeof(chunk::chunk));
+
                         chunk_queue.push({chunk.x, chunk.z});
 
                         // TODO: Remove neighbor meshes
