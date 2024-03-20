@@ -43,6 +43,13 @@ namespace window {
 
     std::vector<std::array<GLuint, 2>> hotbar_textures;
 
+    int auto_save_counter = 0;
+
+    struct region {
+        unsigned long chunk_quantity;
+        chunk::chunk chunks[];
+    };
+
     /*
      * Region File:
      * Header:
@@ -68,10 +75,23 @@ namespace window {
      * On edit blocks, store
      */
 
+    /*
+     * Read file
+     *
+     * Load chunks:
+     *      If chunk in file
+     */
+
+    std::ofstream write_to_file(const char *file_path) {
+        std::ofstream write_file(file_path, std::ios::out | std::ios::binary);
+
+        return write_file;
+    }
+
     void set_chunks_from_storage() {
         std::ifstream rf("test.dat", std::ios::out | std::ios::binary);
 
-        u_long read_chunk_size;
+        unsigned long read_chunk_size;
 
         rf.read((char *) &read_chunk_size, sizeof(read_chunk_size));
 
@@ -87,31 +107,108 @@ namespace window {
     }
 
     void write_file_test() {
+        // Clear a file
+        // Start file
+        // Edit file
+
+        std::ofstream wf("test.dat", std::ofstream::trunc | std::ofstream::binary);
+
+//        region blank_region = {0};
+//
+//        wf.write((char *) &blank_region, sizeof(blank_region));
+
+        unsigned long blank_region = 0;
+
+        wf.write((char *) &blank_region, sizeof(blank_region));
+
+//        for (int i = 0; i < 4; i++) {
+//            wf.write((char *) &i, sizeof(int));
+//        }
+
+        wf.close();
+
+//        std::ifstream rf("test.dat", std::ios::out | std::ios::binary);
+//
+//        unsigned long read_chunk_size;
+//
+//        rf.read((char *) &read_chunk_size, sizeof(read_chunk_size));
+//
+//        std::cout << read_chunk_size << std::endl;
+//
+//        std::vector<int> read_chunks;
+//
+//        for (int i = 0; i < read_chunk_size; i++) {
+//            int chunk_in = -1;
+//            rf.read((char *) &chunk_in, sizeof(int));
+//            read_chunks.push_back(chunk_in);
+//            std::cout << chunk_in << std::endl;
+//        }
+//
+//        rf.close();
+    }
+
+//    void write_file_test() {
+//        std::ofstream wf("test.dat", std::ofstream::trunc | std::ofstream::binary);
+//
+//        unsigned long chunk_size = 0;
+//
+//        wf.write((char *) &chunk_size, sizeof(chunk_size));
+//
+////        for (int i = 0; i < 4; i++) {
+////            wf.write((char *) &i, sizeof(int));
+////        }
+//
+//        wf.close();
+//
+////        std::ifstream rf("test.dat", std::ios::out | std::ios::binary);
+////
+////        unsigned long read_chunk_size;
+////
+////        rf.read((char *) &read_chunk_size, sizeof(read_chunk_size));
+////
+////        std::cout << read_chunk_size << std::endl;
+////
+////        std::vector<int> read_chunks;
+////
+////        for (int i = 0; i < read_chunk_size; i++) {
+////            int chunk_in = -1;
+////            rf.read((char *) &chunk_in, sizeof(int));
+////            read_chunks.push_back(chunk_in);
+////            std::cout << chunk_in << std::endl;
+////        }
+////
+////        rf.close();
+//    }
+
+    void second_test() {
         std::ofstream wf("test.dat", std::ios::out | std::ios::binary);
 
-        u_long chunk_size = chunks.size();
+        unsigned long chunk_size = 5;
 
         wf.write((char *) &chunk_size, sizeof(chunk_size));
 
-        for (const auto &chunk: chunks) {
-            wf.write((char *) &chunk, sizeof(chunk::chunk));
-        }
+        wf.seekp(0, std::ios::end);
+
+        int e = 15;
+        wf.write((char *) &e, sizeof(int));
 
         wf.close();
 
         std::ifstream rf("test.dat", std::ios::out | std::ios::binary);
 
-        u_long read_chunk_size;
+        unsigned long read_chunk_size;
 
         rf.read((char *) &read_chunk_size, sizeof(read_chunk_size));
 
-        std::vector<chunk::chunk> read_chunks;
+        std::cout << read_chunk_size << std::endl;
 
         for (int i = 0; i < read_chunk_size; i++) {
-            chunk::chunk chunk_in = {0, 0};
-            rf.read((char *) &chunk_in, sizeof(chunk::chunk));
-            read_chunks.push_back(chunk_in);
+            int chunk_in;
+            rf.read((char *) &chunk_in, sizeof(int));
+            std::cout << chunk_in << std::endl;
         }
+
+        rf.close();
     }
 
     void rerender() {
@@ -209,11 +306,13 @@ namespace window {
         }
 
         // Read chunks from storage
-        std::ifstream rf("test.dat", std::ios::out | std::ios::binary);
+        std::ifstream rf("test.dat", std::ifstream::out | std::ifstream::binary);
 
-        u_long read_chunk_size;
+        unsigned long read_chunk_size;
 
         rf.read((char *) &read_chunk_size, sizeof(read_chunk_size));
+
+        std::cout << read_chunk_size << std::endl;
 
         std::vector<chunk::chunk> read_chunks;
 
@@ -221,7 +320,10 @@ namespace window {
             chunk::chunk chunk_in = {0, 0};
             rf.read((char *) &chunk_in, sizeof(chunk::chunk));
             read_chunks.push_back(chunk_in);
+            std::cout << chunk_in.x << ", " << chunk_in.z << std::endl;
         }
+
+        rf.close();
 
         // Load chunk data
         for (auto chunk_location: chunk_data_locations) {
@@ -247,25 +349,55 @@ namespace window {
                     chunk::chunk new_chunk = cube::chunk_location_to_block_data(chunk_location.x, chunk_location.z);
 
                     chunks.push_back(new_chunk);
-                    // TODO: Write chunk
-                    std::ofstream wf("test.dat", std::ios::out | std::ios::binary);
 
-                    u_long chunk_size = read_chunk_size + 1;
+                    std::ofstream wf("test.dat", std::ofstream::app | std::ofstream::binary);
 
-                    wf.write((char *) &chunk_size, sizeof(chunk_size));
+                    wf.write((char *) &new_chunk, sizeof(new_chunk));
 
-                    wf.seekp(std::ios_base::end);
+                    wf.close();
 
-                    wf.write((char *) &new_chunk, sizeof(chunk::chunk));
+                    std::ofstream wf2("test.dat", std::ofstream::binary | std::ofstream::in);
+
+                    wf.seekp(0, std::ofstream::beg);
+
+                    read_chunk_size++;
+                    unsigned long chunk_size = read_chunk_size;
+                    std::cout << read_chunk_size << std::endl;
+
+                    wf2.write((char *) &chunk_size, sizeof(chunk_size));
+
+                    wf2.close();
+//
+//                    exit(1);
                 }
             }
+        }
+
+        {
+
+            std::ifstream rf("test.dat", std::ifstream::out | std::ifstream::binary);
+
+            unsigned long read_chunk_size;
+
+            rf.read((char *) &read_chunk_size, sizeof(read_chunk_size));
+
+            std::cout << read_chunk_size << std::endl;
+
+            std::vector<chunk::chunk> read_chunks;
+
+            for (int i = 0; i < read_chunk_size; i++) {
+                chunk::chunk chunk_in = {0, 0};
+                rf.read((char *) &chunk_in, sizeof(chunk::chunk));
+                read_chunks.push_back(chunk_in);
+                std::cout << chunk_in.x << ", " << chunk_in.z << std::endl;
+            }
+
+            rf.close();
         }
     }
 
     void render_queue() {
         chunk::chunk_location chunk_location = chunk_queue.front();
-
-//        write_file_test();
 
         chunk_queue.pop();
 
@@ -441,6 +573,40 @@ namespace window {
 
 //        set_chunks_from_storage();
 
+//        write_file_test();
+//        second_test();
+
+//        {
+//            std::ofstream wf("world.dat", std::ofstream::trunc | std::ofstream::binary);
+//
+//            glm::vec3 position = game_state::camera_position;
+//
+//            wf.write((char *) &position, sizeof(position));
+//
+//            glm::vec3 angle = game_state::camera_angle;
+//
+//            wf.write((char *) &angle, sizeof(angle));
+//
+//            wf.close();
+//        }
+
+        {
+            std::ifstream rf("world.dat", std::ifstream::in | std::ifstream::binary);
+
+            glm::vec3 position;
+
+            rf.read((char *) &position, sizeof(position));
+
+            glm::vec3 angle;
+
+            rf.read((char *) &angle, sizeof(angle));
+
+            game_state::camera_position = position;
+            game_state::camera_angle = angle;
+
+            rf.close();
+        }
+
         rerender();
     }
 
@@ -543,21 +709,52 @@ namespace window {
                     if (chunk.blocks[chunk::pos(x, y, z)].id != block_id) {
                         chunk.blocks[chunk::pos(x, y, z)].id = block_id;
 
-                        std::ifstream rf("test.dat", std::ios::out | std::ios::binary);
+                        std::ifstream rf("test.dat", std::ifstream::in | std::ifstream::binary);
 
-                        u_long read_chunk_size;
+                        unsigned long read_chunk_size;
 
                         rf.read((char *) &read_chunk_size, sizeof(read_chunk_size));
 
-                        std::ofstream wf("test.dat", std::ios::out | std::ios::binary);
+                        for (unsigned long i = 0; i < read_chunk_size; i++) {
+                            int x_read;
+                            int z_read;
+                            rf.seekg(sizeof(unsigned long) + i * sizeof(chunk::chunk));
+                            rf.read((char *) &x_read, sizeof(int));
+                            rf.seekg(sizeof(unsigned long) + i * sizeof(chunk::chunk) + sizeof(int));
+                            rf.read((char *) &z_read, sizeof(int));
 
-                        u_long chunk_size = read_chunk_size + 1;
+                            if (x_read == chunk.x && z_read == chunk.z) {
+//                                std::ofstream wf("test.dat", std::ofstream::app | std::ofstream::binary);
+//
+//                                wf.seekp(sizeof(unsigned long) + i * sizeof(chunk::chunk));
+//
+//                                wf.write((char *) &chunk, sizeof(chunk::chunk));
+//
+//                                wf.close();
 
-                        wf.write((char *) &chunk_size, sizeof(chunk_size));
+                                std::ofstream wf("test.dat", std::ofstream::binary | std::ofstream::in);
+//
+                                wf.seekp(sizeof(unsigned long) + i * sizeof(chunk::chunk));
 
-                        wf.seekp(std::ios_base::end);
+                                wf.write((char *) &chunk, sizeof(chunk));
 
-                        wf.write((char *) &chunk, sizeof(chunk::chunk));
+                                wf.close();
+//
+//                                std::ofstream wf2("test.dat", std::ofstream::binary | std::ofstream::in);
+//
+//                                wf.seekp(0, std::ofstream::beg);
+//
+//                                read_chunk_size++;
+//                                unsigned long chunk_size = read_chunk_size;
+//                                std::cout << read_chunk_size << std::endl;
+//
+//                                wf2.write((char *) &chunk_size, sizeof(chunk_size));
+//
+//                                wf2.close();
+                            }
+                        }
+
+                        rf.close();
 
                         chunk_queue.push({chunk.x, chunk.z});
 
@@ -639,6 +836,29 @@ namespace window {
         // Clear screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(127.0f / 255.0f, 204.0f / 255.0f, 1.0f, 1.0f);
+
+        // Auto save
+        {
+            if (auto_save_counter > 600) {
+                auto_save_counter = 0;
+                std::cout << "Saving position..." << std::endl;
+
+                std::ofstream wf("world.dat", std::ofstream::trunc | std::ofstream::binary);
+
+                glm::vec3 position = game_state::camera_position;
+
+                wf.write((char *) &position, sizeof(position));
+
+                glm::vec3 angle = game_state::camera_angle;
+
+                wf.write((char *) &angle, sizeof(angle));
+
+                wf.close();
+                std::cout << "Done" << std::endl;
+            }
+
+            auto_save_counter++;
+        }
 
         // Basic collision
         {
