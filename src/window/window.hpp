@@ -336,6 +336,7 @@ namespace window {
                 "../res/textures/dirt.png",
                 "../res/textures/stone.png",
                 "../res/textures/wood.png",
+                "../res/textures/sky.png",
         };
 
         stbi_set_flip_vertically_on_load(1);
@@ -628,7 +629,7 @@ namespace window {
     void render() {
         // Clear screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(127.0f / 255.0f, 204.0f / 255.0f, 1.0f, 1.0f);
+        glClearColor(166.0f / 255.0f, 208.0f / 255.0f, 1.0f, 1.0f);
 
         // Auto save
         {

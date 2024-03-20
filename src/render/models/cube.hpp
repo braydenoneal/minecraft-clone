@@ -23,6 +23,8 @@ namespace cube {
             face_textures = {3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f};
         } else if (block == 4.0f) {
             face_textures = {4.0f, 4.0f, 4.0f, 4.0f, 4.0f, 4.0f};
+        } else if (block == 5.0f) {
+            face_textures = {5.0f, 5.0f, 5.0f, 5.0f, 5.0f, 5.0f};
         }
 
         if (!nx) {
@@ -271,6 +273,17 @@ namespace cube {
         for (chunk::chunk_mesh chunk_mesh: chunk_meshes) {
             mesh.insert(mesh.end(), chunk_mesh.mesh.begin(), chunk_mesh.mesh.end());
         }
+
+        std::vector<float> sky_box = {
+                -1000.0f, +100.0f, -1000.0f, 1.0f, 1.0f, 8.0f, 1.0f,
+                -1000.0f, +100.0f, +1000.0f, 0.0f, 1.0f, 8.0f, 1.0f,
+                +1000.0f, +100.0f, -1000.0f, 1.0f, 0.0f, 8.0f, 1.0f,
+                +1000.0f, +100.0f, +1000.0f, 0.0f, 0.0f, 8.0f, 1.0f,
+                +1000.0f, +100.0f, -1000.0f, 1.0f, 0.0f, 8.0f, 1.0f,
+                -1000.0f, +100.0f, +1000.0f, 0.0f, 1.0f, 8.0f, 1.0f,
+        };
+
+        mesh.insert(mesh.end(), sky_box.begin(), sky_box.end());
 
         return mesh;
     }

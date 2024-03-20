@@ -10,7 +10,8 @@ uniform sampler2DArray u_textures;
 void main() {
     vec4 texture_color = texture(u_textures, v_texture_coordinates);
     texture_color.rgb *= f_Brightness;
-//    float fog_distance = gl_FragCoord.z / gl_FragCoord.w;
-//    texture_color = mix(texture_color, vec4(138.0f / 255.0f, 163.0f / 255.0f, 1.0f, 1.0f), (1.0 - exp2(-0.0005 * fog_distance * fog_distance)));
+    float fog_distance = gl_FragCoord.z / gl_FragCoord.w;
+    //    texture_color = mix(texture_color, vec4(138.0f / 255.0f, 163.0f / 255.0f, 1.0f, 1.0f), (1.0 - exp2(-0.0005 * fog_distance * fog_distance)));
+    texture_color = mix(texture_color, vec4(166.0f / 255.0f, 208.0f / 255.0f, 1.0f, 1.0f), (1.0 - exp2(-0.00005 * fog_distance * fog_distance)));
     color = texture_color;
 }
