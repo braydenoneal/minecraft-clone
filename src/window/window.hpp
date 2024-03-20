@@ -45,170 +45,11 @@ namespace window {
 
     int auto_save_counter = 0;
 
-    struct region {
-        unsigned long chunk_quantity;
-        chunk::chunk chunks[];
-    };
-
-    /*
-     * Region File:
-     * Header:
-     *      File format
-     *      File version
-     *      Region x
-     *      Region z
-     *      Number of chunks?
-     * Data:
-     *      Chunk[]:
-     *          Chunk x
-     *          Chunk z
-     *              Block[]:
-     *                  Block id
-     */
-
-    /*
-     * Get list of chunks around player
-     * For each chunk:
-     *      If chunk in file, load from there
-     *      Else, generate and store
-     *
-     * On edit blocks, store
-     */
-
-    /*
-     * Read file
-     *
-     * Load chunks:
-     *      If chunk in file
-     */
-
-    std::ofstream write_to_file(const char *file_path) {
-        std::ofstream write_file(file_path, std::ios::out | std::ios::binary);
-
-        return write_file;
-    }
-
-    void set_chunks_from_storage() {
-        std::ifstream rf("test.dat", std::ios::out | std::ios::binary);
-
-        unsigned long read_chunk_size;
-
-        rf.read((char *) &read_chunk_size, sizeof(read_chunk_size));
-
-        std::vector<chunk::chunk> read_chunks;
-
-        for (int i = 0; i < read_chunk_size; i++) {
-            chunk::chunk chunk_in = {0, 0};
-            rf.read((char *) &chunk_in, sizeof(chunk::chunk));
-            read_chunks.push_back(chunk_in);
-        }
-
-        chunks = read_chunks;
-    }
-
     void write_file_test() {
-        // Clear a file
-        // Start file
-        // Edit file
-
         std::ofstream wf("test.dat", std::ofstream::trunc | std::ofstream::binary);
-
-//        region blank_region = {0};
-//
-//        wf.write((char *) &blank_region, sizeof(blank_region));
-
         unsigned long blank_region = 0;
-
         wf.write((char *) &blank_region, sizeof(blank_region));
-
-//        for (int i = 0; i < 4; i++) {
-//            wf.write((char *) &i, sizeof(int));
-//        }
-
         wf.close();
-
-//        std::ifstream rf("test.dat", std::ios::out | std::ios::binary);
-//
-//        unsigned long read_chunk_size;
-//
-//        rf.read((char *) &read_chunk_size, sizeof(read_chunk_size));
-//
-//        std::cout << read_chunk_size << std::endl;
-//
-//        std::vector<int> read_chunks;
-//
-//        for (int i = 0; i < read_chunk_size; i++) {
-//            int chunk_in = -1;
-//            rf.read((char *) &chunk_in, sizeof(int));
-//            read_chunks.push_back(chunk_in);
-//            std::cout << chunk_in << std::endl;
-//        }
-//
-//        rf.close();
-    }
-
-//    void write_file_test() {
-//        std::ofstream wf("test.dat", std::ofstream::trunc | std::ofstream::binary);
-//
-//        unsigned long chunk_size = 0;
-//
-//        wf.write((char *) &chunk_size, sizeof(chunk_size));
-//
-////        for (int i = 0; i < 4; i++) {
-////            wf.write((char *) &i, sizeof(int));
-////        }
-//
-//        wf.close();
-//
-////        std::ifstream rf("test.dat", std::ios::out | std::ios::binary);
-////
-////        unsigned long read_chunk_size;
-////
-////        rf.read((char *) &read_chunk_size, sizeof(read_chunk_size));
-////
-////        std::cout << read_chunk_size << std::endl;
-////
-////        std::vector<int> read_chunks;
-////
-////        for (int i = 0; i < read_chunk_size; i++) {
-////            int chunk_in = -1;
-////            rf.read((char *) &chunk_in, sizeof(int));
-////            read_chunks.push_back(chunk_in);
-////            std::cout << chunk_in << std::endl;
-////        }
-////
-////        rf.close();
-//    }
-
-    void second_test() {
-        std::ofstream wf("test.dat", std::ios::out | std::ios::binary);
-
-        unsigned long chunk_size = 5;
-
-        wf.write((char *) &chunk_size, sizeof(chunk_size));
-
-        wf.seekp(0, std::ios::end);
-
-        int e = 15;
-        wf.write((char *) &e, sizeof(int));
-
-        wf.close();
-
-        std::ifstream rf("test.dat", std::ios::out | std::ios::binary);
-
-        unsigned long read_chunk_size;
-
-        rf.read((char *) &read_chunk_size, sizeof(read_chunk_size));
-
-        std::cout << read_chunk_size << std::endl;
-
-        for (int i = 0; i < read_chunk_size; i++) {
-            int chunk_in;
-            rf.read((char *) &chunk_in, sizeof(int));
-            std::cout << chunk_in << std::endl;
-        }
-
-        rf.close();
     }
 
     void rerender() {
@@ -312,15 +153,12 @@ namespace window {
 
         rf.read((char *) &read_chunk_size, sizeof(read_chunk_size));
 
-        std::cout << read_chunk_size << std::endl;
-
         std::vector<chunk::chunk> read_chunks;
 
         for (int i = 0; i < read_chunk_size; i++) {
             chunk::chunk chunk_in = {0, 0};
             rf.read((char *) &chunk_in, sizeof(chunk::chunk));
             read_chunks.push_back(chunk_in);
-            std::cout << chunk_in.x << ", " << chunk_in.z << std::endl;
         }
 
         rf.close();
@@ -362,37 +200,12 @@ namespace window {
 
                     read_chunk_size++;
                     unsigned long chunk_size = read_chunk_size;
-                    std::cout << read_chunk_size << std::endl;
 
                     wf2.write((char *) &chunk_size, sizeof(chunk_size));
 
                     wf2.close();
-//
-//                    exit(1);
                 }
             }
-        }
-
-        {
-
-            std::ifstream rf("test.dat", std::ifstream::out | std::ifstream::binary);
-
-            unsigned long read_chunk_size;
-
-            rf.read((char *) &read_chunk_size, sizeof(read_chunk_size));
-
-            std::cout << read_chunk_size << std::endl;
-
-            std::vector<chunk::chunk> read_chunks;
-
-            for (int i = 0; i < read_chunk_size; i++) {
-                chunk::chunk chunk_in = {0, 0};
-                rf.read((char *) &chunk_in, sizeof(chunk::chunk));
-                read_chunks.push_back(chunk_in);
-                std::cout << chunk_in.x << ", " << chunk_in.z << std::endl;
-            }
-
-            rf.close();
         }
     }
 
@@ -571,11 +384,10 @@ namespace window {
 
         setup_hotbar();
 
-//        set_chunks_from_storage();
-
+        // Reset chunk storage
 //        write_file_test();
-//        second_test();
 
+        // Reset position storage
 //        {
 //            std::ofstream wf("world.dat", std::ofstream::trunc | std::ofstream::binary);
 //
@@ -590,6 +402,7 @@ namespace window {
 //            wf.close();
 //        }
 
+        // Initial read from position storage
         {
             std::ifstream rf("world.dat", std::ifstream::in | std::ifstream::binary);
 
@@ -724,33 +537,13 @@ namespace window {
                             rf.read((char *) &z_read, sizeof(int));
 
                             if (x_read == chunk.x && z_read == chunk.z) {
-//                                std::ofstream wf("test.dat", std::ofstream::app | std::ofstream::binary);
-//
-//                                wf.seekp(sizeof(unsigned long) + i * sizeof(chunk::chunk));
-//
-//                                wf.write((char *) &chunk, sizeof(chunk::chunk));
-//
-//                                wf.close();
-
                                 std::ofstream wf("test.dat", std::ofstream::binary | std::ofstream::in);
-//
+
                                 wf.seekp(sizeof(unsigned long) + i * sizeof(chunk::chunk));
 
                                 wf.write((char *) &chunk, sizeof(chunk));
 
                                 wf.close();
-//
-//                                std::ofstream wf2("test.dat", std::ofstream::binary | std::ofstream::in);
-//
-//                                wf.seekp(0, std::ofstream::beg);
-//
-//                                read_chunk_size++;
-//                                unsigned long chunk_size = read_chunk_size;
-//                                std::cout << read_chunk_size << std::endl;
-//
-//                                wf2.write((char *) &chunk_size, sizeof(chunk_size));
-//
-//                                wf2.close();
                             }
                         }
 
