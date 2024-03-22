@@ -20,6 +20,9 @@ add_executable(${PROJECT_NAME}
         ${IMGUI_SOURCE}
         src/run.cpp
         src/window/window.cpp
+        src/window/window.hpp
+        src/graphics/shader/shader.cpp
+        src/graphics/shader/shader.hpp
 )
 
 include_directories(lib/glad/include)
