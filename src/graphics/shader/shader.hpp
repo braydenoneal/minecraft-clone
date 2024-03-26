@@ -6,11 +6,11 @@
 using std::string, std::ifstream, std::stringstream;
 
 namespace shader {
-    GLuint create_shaders(const string &vertex_shader_file_path, const string &fragment_shader_file_path);
+    GLuint create(const string &vertex_shader_file_path, const string &fragment_shader_file_path);
 
-    void bind(GLuint shader_id);
+    void bind(GLuint id);
 
     void unbind();
 
-    void destroy(GLuint shader_id);
+    void destroy(GLuint id);
 }

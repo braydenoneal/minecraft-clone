@@ -3,12 +3,14 @@
 #include "string"
 #include "stb_image.h"
 
-namespace texture {
-    GLuint create_textures(const std::vector<std::string> &texture_file_paths, GLuint texture_width, GLuint texture_height);
+using std::vector, std::string;
 
-    void bind(GLuint texture_id);
+namespace texture {
+    GLuint create(const vector<string> &file_paths, GLint width, GLint height);
+
+    void bind(GLuint id);
 
     void unbind();
 
-    void destroy(GLuint texture_id);
+    void destroy(GLuint id);
 }

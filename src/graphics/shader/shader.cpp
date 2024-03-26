@@ -10,44 +10,44 @@ string parse_shader(const string &file_path) {
 }
 
 GLuint compile_shader(const string &file_path, GLenum shader_type) {
-    GLuint shader = glCreateShader(shader_type);
+    GLuint id = glCreateShader(shader_type);
 
     string shader_source = parse_shader(file_path);
     const char *source_char = shader_source.c_str();
 
-    glShaderSource(shader, 1, &source_char, nullptr);
-    glCompileShader(shader);
+    glShaderSource(id, 1, &source_char, nullptr);
+    glCompileShader(id);
 
-    return shader;
+    return id;
 }
 
 namespace shader {
-    GLuint create_shaders(const string &vertex_shader_file_path, const string &fragment_shader_file_path) {
+    GLuint create(const string &vertex_shader_file_path, const string &fragment_shader_file_path) {
         GLuint vertex_shader = compile_shader(vertex_shader_file_path, GL_VERTEX_SHADER);
         GLuint fragment_shader = compile_shader(fragment_shader_file_path, GL_FRAGMENT_SHADER);
 
-        GLuint shader_id = glCreateProgram();
-        glAttachShader(shader_id, vertex_shader);
-        glAttachShader(shader_id, fragment_shader);
+        GLuint id = glCreateProgram();
+        glAttachShader(id, vertex_shader);
+        glAttachShader(id, fragment_shader);
 
-        glLinkProgram(shader_id);
-        glValidateProgram(shader_id);
+        glLinkProgram(id);
+        glValidateProgram(id);
 
         glDeleteShader(vertex_shader);
         glDeleteShader(fragment_shader);
 
-        return shader_id;
+        return id;
     }
 
-    void bind(GLuint shader_id) {
-        glUseProgram(shader_id);
+    void bind(GLuint id) {
+        glUseProgram(id);
     }
 
     void unbind() {
         glUseProgram(0);
     }
 
-    void destroy(GLuint shader_id) {
-        glDeleteProgram(shader_id);
+    void destroy(GLuint id) {
+        glDeleteProgram(id);
     }
 }
