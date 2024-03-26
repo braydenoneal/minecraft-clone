@@ -33,6 +33,8 @@ add_executable(${PROJECT_NAME}
         src/gui/gui.hpp
         src/gui/screens/debug.cpp
         src/gui/screens/debug.hpp
+        src/graphics/buffer/vertex_buffer.cpp
+        src/graphics/buffer/vertex_buffer.hpp
 )
 
 include_directories(lib/glad/include)
