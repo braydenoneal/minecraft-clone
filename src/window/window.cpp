@@ -15,11 +15,10 @@ namespace window {
         glfwMakeContextCurrent(glfw_window);
 
         gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
-    }
 
-    void clear_screen() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(166.0f / 255.0f, 208.0f / 255.0f, 1.0f, 1.0f);
+        glfwSwapInterval(1);
+
+        glfwWindowHint(GLFW_SAMPLES, 4);
     }
 
     void next_frame() {

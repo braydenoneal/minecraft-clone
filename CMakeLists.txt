@@ -27,6 +27,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/texture/texture.hpp
         src/graphics/buffer/vertex_array.cpp
         src/graphics/buffer/vertex_array.hpp
+        src/graphics/render/render.cpp
+        src/graphics/render/render.hpp
 )
 
 include_directories(lib/glad/include)
