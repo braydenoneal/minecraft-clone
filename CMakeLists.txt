@@ -23,6 +23,8 @@ add_executable(${PROJECT_NAME}
         src/window/window.hpp
         src/graphics/shader/shader.cpp
         src/graphics/shader/shader.hpp
+        src/graphics/texture/texture.cpp
+        src/graphics/texture/texture.hpp
 )
 
 include_directories(lib/glad/include)
