@@ -2,15 +2,13 @@
 #include "GLFW/glfw3.h"
 
 namespace window {
-    void create_context();
+    GLFWwindow *create_context();
 
-    void clear_screen();
+    void next_frame(GLFWwindow *glfw_window);
 
-    void next_frame();
+    int should_close(GLFWwindow *glfw_window);
 
-    int should_close();
-
-    void close();
+    void close(GLFWwindow *glfw_window);
 
     void terminate();
 }

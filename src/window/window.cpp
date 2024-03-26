@@ -1,16 +1,14 @@
 #include "window.hpp"
 
 namespace window {
-    GLFWwindow *glfw_window;
-
-    void create_context() {
+    GLFWwindow *create_context() {
         glfwInit();
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-        glfw_window = glfwCreateWindow(640, 480, "Minecraft", nullptr, nullptr);
+        GLFWwindow *glfw_window = glfwCreateWindow(640, 480, "Minecraft", nullptr, nullptr);
 
         glfwMakeContextCurrent(glfw_window);
 
@@ -18,18 +16,19 @@ namespace window {
 
         glfwSwapInterval(1);
 
-        glfwWindowHint(GLFW_SAMPLES, 4);
+        return glfw_window;
     }
 
-    void next_frame() {
+    void next_frame(GLFWwindow *glfw_window) {
         glfwSwapBuffers(glfw_window);
+        glfwPollEvents();
     }
 
-    int should_close() {
+    int should_close(GLFWwindow *glfw_window) {
         return glfwWindowShouldClose(glfw_window);
     }
 
-    void close() {
+    void close(GLFWwindow *glfw_window) {
         glfwSetWindowShouldClose(glfw_window, GLFW_TRUE);
     }
 

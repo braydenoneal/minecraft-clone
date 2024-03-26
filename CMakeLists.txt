@@ -29,6 +29,10 @@ add_executable(${PROJECT_NAME}
         src/graphics/buffer/vertex_array.hpp
         src/graphics/render/render.cpp
         src/graphics/render/render.hpp
+        src/gui/gui.cpp
+        src/gui/gui.hpp
+        src/gui/screens/debug.cpp
+        src/gui/screens/debug.hpp
 )
 
 include_directories(lib/glad/include)
