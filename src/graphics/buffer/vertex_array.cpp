@@ -16,6 +16,7 @@ namespace vertex_array {
     GLuint create(const vector<attribute> &attributes) {
         GLuint id;
         glGenVertexArrays(1, &id);
+        bind(id);
 
         GLsizei stride = 0;
 
@@ -27,6 +28,8 @@ namespace vertex_array {
         GLint current_pointer = 0;
 
         for (attribute current_attribute: attributes) {
+            glEnableVertexAttribArray(current_index);
+
             glVertexAttribPointer(
                 current_index,
                 current_attribute.count,
@@ -40,6 +43,7 @@ namespace vertex_array {
             current_pointer += get_size_of_type(current_attribute.type) * current_attribute.count;
         }
 
+        unbind();
         return id;
     }
 

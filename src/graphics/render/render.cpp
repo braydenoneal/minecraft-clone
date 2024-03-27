@@ -11,6 +11,6 @@ namespace render {
 
     void clear_screen() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(166.0f / 255.0f, 208.0f / 255.0f, 1.0f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     }
 }

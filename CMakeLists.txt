@@ -35,6 +35,8 @@ add_executable(${PROJECT_NAME}
         src/gui/screens/debug.hpp
         src/graphics/buffer/vertex_buffer.cpp
         src/graphics/buffer/vertex_buffer.hpp
+        src/graphics/models/cube/cube.cpp
+        src/graphics/models/cube/cube.hpp
 )
 
 include_directories(lib/glad/include)
