@@ -3,6 +3,8 @@
 #include "../../buffer/vertex_array.hpp"
 #include "../../buffer/vertex_buffer.hpp"
 #include "vector"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 using std::vector;
 
@@ -15,4 +17,6 @@ namespace cube {
     };
 
     render_context create_context();
+
+    void set_uniforms(render_context cube_context);
 }

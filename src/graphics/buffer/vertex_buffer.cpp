@@ -17,8 +17,8 @@ namespace vertex_buffer {
         glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
     }
 
-    void render(GLsizei count) {
-        glDrawArrays(GL_TRIANGLES, 0, count);
+    void render(GLsizei vertex_count) {
+        glDrawArrays(GL_TRIANGLES, 0, vertex_count);
     }
 
     void unbind() {

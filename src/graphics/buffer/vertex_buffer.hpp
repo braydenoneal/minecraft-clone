@@ -7,7 +7,7 @@ namespace vertex_buffer {
 
     void set_data(GLsizeiptr size, const GLvoid *data);
 
-    void render(GLsizei count);
+    void render(GLsizei vertex_count);
 
     void unbind();
 
