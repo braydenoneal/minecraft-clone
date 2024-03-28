@@ -1,4 +1,5 @@
 #include "cube.hpp"
+#include "iostream"
 
 namespace cube {
     render_context create_context() {
@@ -8,6 +9,7 @@ namespace cube {
 
         GLuint vertex_array_id = vertex_array::create({
             {3, GL_FLOAT, GL_FALSE},
+            {1, GL_UNSIGNED_BYTE, GL_FALSE},
         });
         vertex_array::bind(vertex_array_id);
 
@@ -15,36 +17,44 @@ namespace cube {
         shader::bind(shader_id);
 
         GLuint texture_id = texture::create(
-                {"../res/textures/grass_block_side.png", "../res/textures/grass_block_side.png"}, 16, 16
+            {"../res/textures/grass_block_side.png"}, 16, 16
         );
         texture::bind(texture_id);
 
+        int texture_uniform = glGetUniformLocation(shader_id, "u_textures");
+        glUniform1i(texture_uniform, 0);
+
+        #pragma pack(push, 1)
         struct vertex {
             GLfloat x;
             GLfloat y;
             GLfloat z;
+            GLubyte t;
         };
+        #pragma pack(pop)
 
         vector<vertex> vertex_buffer_data = {
-            {1, 0, -5},
-            {0, 0, -5},
-            {1, 1, -5},
+            {1, 0, -5, 2},
+            {0, 0, -5, 0},
+            {1, 1, -5, 3},
 
-            {0, 1, -5},
-            {1, 1, -5},
-            {0, 0, -5},
+            {0, 1, -5, 1},
+            {1, 1, -5, 3},
+            {0, 0, -5, 0},
         };
 
         vertex_buffer::set_data((GLsizeiptr) (vertex_buffer_data.size() * sizeof(vertex)), &vertex_buffer_data[0]);
+
+        std::cout << sizeof(vertex) << std::endl;
 
         return {shader_id, texture_id, vertex_array_id, vertex_buffer_id};
     }
 
     void set_uniforms(render_context cube_context) {
         glm::mat4 perspective = glm::perspective(
-                glm::radians(70.0f),
-                (float) 640 / (float) 480,
-                0.05f, 2048.0f
+            glm::radians(70.0f),
+            (float) 640 / (float) 480,
+            0.05f, 2048.0f
         );
 
         auto camera_rotate = glm::mat4(1.0f);
