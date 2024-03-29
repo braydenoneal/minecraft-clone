@@ -4,10 +4,8 @@ render_context cube::create_context() {
     GLuint shader_id = shader::create("../res/shaders/vertex.glsl", "../res/shaders/fragment.glsl");
     shader::bind(shader_id);
 
-    GLuint texture_id = texture::create(
-            {"../res/textures/grass_block_side.png"}, 16, 16
-    );
-    texture::bind(texture_id);
+    texture.setTextures({"../res/textures/grass_block_side.png"}, 16, 16);
+    texture.bind();
 
     int texture_uniform = glGetUniformLocation(shader_id, "u_textures");
     glUniform1i(texture_uniform, 0);
@@ -23,7 +21,8 @@ render_context cube::create_context() {
         {0, 1, 0},
     };
 
-    VertexBuffer offset_buffer{(GLsizeiptr) (offset_data.size() * sizeof(offset)), &offset_data[0]};
+    VertexBuffer offset_buffer{};
+    offset_buffer.setData((GLsizeiptr) (offset_data.size() * sizeof(offset)), &offset_data[0]);
 
     struct vertex {
         GLfloat x;
@@ -44,12 +43,13 @@ render_context cube::create_context() {
         {0, 0, -5, 0, 0, 0},
     };
 
-    VertexBuffer cube_buffer{(GLsizeiptr) (vertex_buffer_data.size() * sizeof(vertex)), &vertex_buffer_data[0]};
+    VertexBuffer cube_buffer{};
+    cube_buffer.setData((GLsizeiptr) (vertex_buffer_data.size() * sizeof(vertex)), &vertex_buffer_data[0]);
 
     cube_array.addAttributes(cube_buffer, {{3, GL_FLOAT, GL_FALSE}, {3, GL_FLOAT, GL_FALSE}}, 0);
     cube_array.addAttributes(offset_buffer, {{3, GL_FLOAT, GL_FALSE}}, 1);
 
-    return {shader_id, texture_id};
+    return {shader_id};
 }
 
 void cube::set_uniforms(const render_context &cube_context) {

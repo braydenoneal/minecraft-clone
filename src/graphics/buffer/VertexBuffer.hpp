@@ -2,13 +2,15 @@
 
 class VertexBuffer {
 public:
-    VertexBuffer(GLsizeiptr size, const GLvoid *data);
+    VertexBuffer();
 
     void bind() const;
 
     static void unbind();
 
     ~VertexBuffer();
+
+    void setData(GLsizeiptr size, const GLvoid *data) const;
 
 private:
     GLuint id{};

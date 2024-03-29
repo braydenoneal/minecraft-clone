@@ -1,10 +1,7 @@
 #include "VertexBuffer.hpp"
 
-VertexBuffer::VertexBuffer(GLsizeiptr size, const GLvoid *data) {
+VertexBuffer::VertexBuffer() {
     glGenBuffers(1, &id);
-    bind();
-    glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
-    unbind();
 }
 
 void VertexBuffer::bind() const {
@@ -17,4 +14,10 @@ void VertexBuffer::unbind() {
 
 VertexBuffer::~VertexBuffer() {
     glDeleteBuffers(1, &id);
+}
+
+void VertexBuffer::setData(GLsizeiptr size, const GLvoid *data) const {
+    bind();
+    glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+    unbind();
 }

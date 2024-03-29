@@ -1,5 +1,5 @@
 #include "../../shader/shader.hpp"
-#include "../../texture/texture.hpp"
+#include "../../texture/Texture.hpp"
 #include "vector"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -10,12 +10,12 @@ using std::vector;
 
 struct render_context {
     GLuint shader_id;
-    GLuint texture_id;
 };
 
 class cube {
 public:
     VertexArray cube_array{};
+    Texture texture{};
 
     render_context create_context();
 

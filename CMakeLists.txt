@@ -23,8 +23,8 @@ add_executable(${PROJECT_NAME}
         src/window/window.hpp
         src/graphics/shader/shader.cpp
         src/graphics/shader/shader.hpp
-        src/graphics/texture/texture.cpp
-        src/graphics/texture/texture.hpp
+        src/graphics/texture/Texture.cpp
+        src/graphics/texture/Texture.hpp
         src/graphics/render/render.cpp
         src/graphics/render/render.hpp
         src/gui/gui.cpp
