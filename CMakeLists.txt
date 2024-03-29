@@ -25,18 +25,18 @@ add_executable(${PROJECT_NAME}
         src/graphics/shader/shader.hpp
         src/graphics/texture/texture.cpp
         src/graphics/texture/texture.hpp
-        src/graphics/buffer/vertex_array.cpp
-        src/graphics/buffer/vertex_array.hpp
         src/graphics/render/render.cpp
         src/graphics/render/render.hpp
         src/gui/gui.cpp
         src/gui/gui.hpp
         src/gui/screens/debug.cpp
         src/gui/screens/debug.hpp
-        src/graphics/buffer/vertex_buffer.cpp
-        src/graphics/buffer/vertex_buffer.hpp
         src/graphics/models/cube/cube.cpp
         src/graphics/models/cube/cube.hpp
+        src/graphics/buffer/VertexBuffer.cpp
+        src/graphics/buffer/VertexBuffer.hpp
+        src/graphics/buffer/VertexArray.cpp
+        src/graphics/buffer/VertexArray.hpp
 )
 
 include_directories(lib/glad/include)
