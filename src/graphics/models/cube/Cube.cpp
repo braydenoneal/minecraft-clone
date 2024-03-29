@@ -1,14 +1,13 @@
-#include "cube.hpp"
+#include "Cube.hpp"
 
-render_context cube::create_context() {
-    GLuint shader_id = shader::create("../res/shaders/vertex.glsl", "../res/shaders/fragment.glsl");
-    shader::bind(shader_id);
+Cube::Cube() {
+    shader.setShaders("../res/shaders/vertex.glsl", "../res/shaders/fragment.glsl");
+    shader.bind();
 
     texture.setTextures({"../res/textures/grass_block_side.png"}, 16, 16);
     texture.bind();
 
-    int texture_uniform = glGetUniformLocation(shader_id, "u_textures");
-    glUniform1i(texture_uniform, 0);
+    shader.setUniform1i("u_textures", 0);
 
     struct offset {
         GLfloat x;
@@ -48,11 +47,9 @@ render_context cube::create_context() {
 
     cube_array.addAttributes(cube_buffer, {{3, GL_FLOAT, GL_FALSE}, {3, GL_FLOAT, GL_FALSE}}, 0);
     cube_array.addAttributes(offset_buffer, {{3, GL_FLOAT, GL_FALSE}}, 1);
-
-    return {shader_id};
 }
 
-void cube::set_uniforms(const render_context &cube_context) {
+void Cube::set_uniforms() const {
     glm::mat4 perspective = glm::perspective(
         glm::radians(70.0f),
         (float) 1920 / (float) 1080,
@@ -69,6 +66,5 @@ void cube::set_uniforms(const render_context &cube_context) {
 
     glm::mat4 camera_matrix = perspective * camera_rotate * camera_translate;
 
-    int location = glGetUniformLocation(cube_context.shader_id, "u_camera");
-    glUniformMatrix4fv(location, 1, GL_FALSE, &camera_matrix[0][0]);
+    shader.setUniformMatrix4fv("u_camera", &camera_matrix[0][0]);
 }

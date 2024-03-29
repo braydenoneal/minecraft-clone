@@ -2,24 +2,22 @@
 #include "graphics/render/render.hpp"
 #include "gui/gui.hpp"
 #include "gui/screens/debug.hpp"
-
-#include "graphics/models/cube/cube.hpp"
+#include "graphics/models/cube/Cube.hpp"
 
 int main() {
     GLFWwindow *glfw_window = window::create_context();
     render::create_context();
     gui::create_context(glfw_window);
 
-    cube i_cube;
-    render_context cube_context = i_cube.create_context();
+    Cube cube{};
 
     while (!window::should_close(glfw_window)) {
         render::clear_screen();
 
-        i_cube.cube_array.bind();
+        cube.cube_array.bind();
         glDrawArraysInstanced(GL_TRIANGLES, 0, 12, 100);
 
-        cube::set_uniforms(cube_context);
+        cube.set_uniforms();
 
         gui::new_frame();
         debug::render();

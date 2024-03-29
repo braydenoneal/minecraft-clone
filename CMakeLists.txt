@@ -21,8 +21,8 @@ add_executable(${PROJECT_NAME}
         src/run.cpp
         src/window/window.cpp
         src/window/window.hpp
-        src/graphics/shader/shader.cpp
-        src/graphics/shader/shader.hpp
+        src/graphics/shader/Shader.cpp
+        src/graphics/shader/Shader.hpp
         src/graphics/texture/Texture.cpp
         src/graphics/texture/Texture.hpp
         src/graphics/render/render.cpp
@@ -31,8 +31,8 @@ add_executable(${PROJECT_NAME}
         src/gui/gui.hpp
         src/gui/screens/debug.cpp
         src/gui/screens/debug.hpp
-        src/graphics/models/cube/cube.cpp
-        src/graphics/models/cube/cube.hpp
+        src/graphics/models/cube/Cube.cpp
+        src/graphics/models/cube/Cube.hpp
         src/graphics/buffer/VertexBuffer.cpp
         src/graphics/buffer/VertexBuffer.hpp
         src/graphics/buffer/VertexArray.cpp
