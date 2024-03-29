@@ -15,9 +15,8 @@ int main() {
         render::clear_screen();
 
         cube.cube_array.bind();
-        glDrawArraysInstanced(GL_TRIANGLES, 0, 12, 100);
-
         cube.set_uniforms();
+        glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, cube.triangle_count, cube.instance_count);
 
         gui::new_frame();
         debug::render();

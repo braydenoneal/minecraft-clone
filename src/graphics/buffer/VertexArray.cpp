@@ -1,9 +1,11 @@
+#include <iostream>
 #include "VertexArray.hpp"
 
 GLsizei VertexAttribute::getSizeOfType(GLenum type) {
     switch (type) {
         case GL_FLOAT:
         case GL_UNSIGNED_INT:
+        case GL_INT:
             return 4;
         case GL_UNSIGNED_BYTE:
             return 1;
@@ -45,14 +47,24 @@ void VertexArray::addAttributes(const VertexBuffer &vertex_buffer,
     for (VertexAttribute attribute: attributes) {
         glEnableVertexAttribArray(attribute_count);
 
-        glVertexAttribPointer(
+        if (attribute.type != GL_INT) {
+            glVertexAttribPointer(
                 attribute_count,
                 attribute.count,
                 attribute.type,
                 attribute.normalized,
                 stride,
                 (const GLvoid *) (intptr_t) current_pointer
-        );
+            );
+        } else {
+            glVertexAttribIPointer(
+                attribute_count,
+                attribute.count,
+                attribute.type,
+                stride,
+                (const GLvoid *) (intptr_t) current_pointer
+            );
+        }
 
         glVertexAttribDivisor(attribute_count, divisor);
 

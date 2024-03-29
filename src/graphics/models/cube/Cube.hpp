@@ -13,6 +13,8 @@ public:
     Shader shader{};
     Texture texture{};
     VertexArray cube_array{};
+    GLsizei triangle_count{};
+    GLsizei instance_count{};
 
     Cube();
 
