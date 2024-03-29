@@ -39,12 +39,43 @@ namespace vertex_array {
                 (const GLvoid *) (intptr_t) current_pointer
             );
 
+            glVertexAttribDivisor(current_index, current_attribute.divisor);
+
             current_index++;
             current_pointer += get_size_of_type(current_attribute.type) * current_attribute.count;
         }
 
         unbind();
         return id;
+    }
+
+    void add_attributes(const vector<attribute> &attributes, GLuint starting_index) {
+        GLsizei stride = 0;
+
+        for (attribute current_attribute: attributes) {
+            stride += get_size_of_type(current_attribute.type) * current_attribute.count;
+        }
+
+        GLuint current_index = starting_index;
+        GLint current_pointer = 0;
+
+        for (attribute current_attribute: attributes) {
+            glEnableVertexAttribArray(current_index);
+
+            glVertexAttribPointer(
+                    current_index,
+                    current_attribute.count,
+                    current_attribute.type,
+                    current_attribute.normalized,
+                    stride,
+                    (const GLvoid *) (intptr_t) current_pointer
+            );
+
+            glVertexAttribDivisor(current_index, current_attribute.divisor);
+
+            current_index++;
+            current_pointer += get_size_of_type(current_attribute.type) * current_attribute.count;
+        }
     }
 
     void bind(GLuint id) {

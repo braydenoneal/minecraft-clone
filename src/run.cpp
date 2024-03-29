@@ -15,7 +15,9 @@ int main() {
     while (!window::should_close(glfw_window)) {
         render::clear_screen();
 
-        vertex_buffer::render(6);
+//        vertex_buffer::render(6);
+        vertex_array::bind(cube_context.vertex_array_id);
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 12, 100);
 
         cube::set_uniforms(cube_context);
 

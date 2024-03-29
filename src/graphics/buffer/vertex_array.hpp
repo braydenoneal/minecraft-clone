@@ -8,9 +8,12 @@ namespace vertex_array {
         GLint count;
         GLenum type;
         GLboolean normalized;
+        GLuint divisor;
     };
 
     GLuint create(const vector<attribute> &attributes);
+
+    void add_attributes(const vector<attribute> &attributes, GLuint starting_index);
 
     void bind(GLuint id);
 

@@ -8,7 +8,7 @@ namespace window {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-        GLFWwindow *glfw_window = glfwCreateWindow(640, 480, "Minecraft", nullptr, nullptr);
+        GLFWwindow *glfw_window = glfwCreateWindow(1920, 1080, "Minecraft", nullptr, nullptr);
 
         glfwMakeContextCurrent(glfw_window);
 
