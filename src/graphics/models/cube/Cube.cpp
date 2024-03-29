@@ -4,25 +4,28 @@ Cube::Cube() {
     shader.setShaders("../res/shaders/vertex.glsl", "../res/shaders/fragment.glsl");
     shader.bind();
 
-    texture.setTextures({"../res/textures/grass_block_side.png"}, 16, 16);
+    texture.setTextures({"../res/textures/grass_block_side.png",
+                         "../res/textures/grass_block_top.png",
+                         "../res/textures/dirt.png"}, 16, 16);
     texture.bind();
 
     shader.setUniform1i("u_textures", 0);
 
     struct offset {
-        GLfloat x;
-        GLfloat y;
-        GLfloat z;
-        GLint f;
+        GLfloat x_offset;
+        GLfloat y_offset;
+        GLfloat z_offset;
+        GLint face_index;
+        GLint texture_index;
     };
 
     vector<offset> offset_data = {
-        {0, 0, 0, 0},
-        {0, 0, 0, 1},
-        {0, 0, 0, 2},
-        {0, 0, 0, 3},
-        {0, 0, 0, 4},
-        {0, 0, 0, 5},
+        {0, 0, 0, 0, 0},
+        {0, 0, 0, 1, 0},
+        {0, 0, 0, 2, 2},
+        {0, 0, 0, 3, 1},
+        {0, 0, 0, 4, 0},
+        {0, 0, 0, 5, 0},
     };
 
     instance_count = (GLsizei) offset_data.size();
@@ -34,16 +37,15 @@ Cube::Cube() {
         GLfloat x;
         GLfloat y;
         GLfloat z;
-        GLfloat u;
-        GLfloat v;
-        GLfloat t;
+        GLfloat texture_x;
+        GLfloat texture_y;
     };
 
     vector<vertex> vertex_buffer_data = {
-        {0, 0, 0, 0, 0, 0},
-        {0, 1, 0, 0, 1, 0},
-        {0, 0, 1, 1, 0, 0},
-        {0, 1, 1, 1, 1, 0},
+        {0, 0, 0, 0, 0},
+        {0, 1, 0, 0, 1},
+        {0, 0, 1, 1, 0},
+        {0, 1, 1, 1, 1},
     };
 
     triangle_count = (GLsizei) vertex_buffer_data.size();
@@ -51,8 +53,8 @@ Cube::Cube() {
     VertexBuffer cube_buffer{};
     cube_buffer.setData((GLsizeiptr) (vertex_buffer_data.size() * sizeof(vertex)), &vertex_buffer_data[0]);
 
-    cube_array.addAttributes(cube_buffer, {{3, GL_FLOAT, GL_FALSE}, {3, GL_FLOAT, GL_FALSE}}, 0);
-    cube_array.addAttributes(offset_buffer, {{3, GL_FLOAT, GL_FALSE}, {1, GL_INT, GL_FALSE}}, 1);
+    cube_array.addAttributes(cube_buffer, {{3, GL_FLOAT, GL_FALSE}, {2, GL_FLOAT, GL_FALSE}}, 0);
+    cube_array.addAttributes(offset_buffer, {{3, GL_FLOAT, GL_FALSE}, {1, GL_INT, GL_FALSE}, {1, GL_INT, GL_FALSE}}, 1);
 }
 
 void Cube::set_uniforms() const {
