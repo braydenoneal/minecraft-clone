@@ -1,7 +1,5 @@
 #include "Cube.hpp"
 
-#include "glm/gtc/noise.hpp"
-
 Cube::Cube() {
     shader.setShaders("../res/shaders/vertex.glsl", "../res/shaders/fragment.glsl");
     shader.bind();
@@ -22,37 +20,13 @@ Cube::Cube() {
     };
 
     vector<offset> offset_data = {
-//        {0, 0, 0, 0, 0},
-//        {0, 0, 0, 1, 0},
-//        {0, 0, 0, 2, 2},
-//        {0, 0, 0, 3, 1},
-//        {0, 0, 0, 4, 0},
-//        {0, 0, 0, 5, 0},
-//
-//        {0, 1, 0, 0, 0},
-//        {0, 1, 0, 1, 0},
-//        {0, 1, 0, 2, 2},
-//        {0, 1, 0, 3, 1},
-//        {0, 1, 0, 4, 0},
-//        {0, 1, 0, 5, 0},
+        {0, 0, 0, 0, 0},
+        {0, 0, 0, 1, 0},
+        {0, 0, 0, 2, 2},
+        {0, 0, 0, 3, 1},
+        {0, 0, 0, 4, 0},
+        {0, 0, 0, 5, 0},
     };
-
-    for (int x = 0; x < 16 * 33; x++) {
-        for (int z = 0; z < 16 * 33; z++) {
-            float vertical_scale = 6;
-            float horizontal_scale = 16;
-            int ty = (int) (vertical_scale * glm::perlin(glm::vec2((float) x / horizontal_scale, (float) z / horizontal_scale)));
-            for (int y = -6; y <= ty; y++) {
-                offset_data.push_back({x, y, z, 0, 0});
-                offset_data.push_back({x, y, z, 1, 0});
-                offset_data.push_back({x, y, z, 2, 2});
-                offset_data.push_back({x, y, z, 3, 1});
-                offset_data.push_back({x, y, z, 4, 0});
-                offset_data.push_back({x, y, z, 5, 0});
-            }
-        }
-    }
-
 
     instance_count = (GLsizei) offset_data.size();
 
