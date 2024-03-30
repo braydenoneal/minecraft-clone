@@ -4,11 +4,11 @@ class VertexBuffer {
 public:
     VertexBuffer();
 
+    ~VertexBuffer();
+
     void bind() const;
 
     static void unbind();
-
-    ~VertexBuffer();
 
     void setData(GLsizeiptr size, const GLvoid *data) const;
 

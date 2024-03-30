@@ -5,6 +5,8 @@ class Window {
 public:
     Window();
 
+    ~Window();
+
     void swapBuffers();
 
     int shouldClose();
@@ -12,8 +14,6 @@ public:
     void close();
 
     GLFWwindow *getGlfwWindow();
-
-    ~Window();
 
 private:
     GLFWwindow *glfw_window;

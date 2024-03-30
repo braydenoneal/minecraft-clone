@@ -1,4 +1,3 @@
-#include <iostream>
 #include "VertexArray.hpp"
 
 GLsizei VertexAttribute::getSizeOfType(GLenum type) {
@@ -18,16 +17,16 @@ VertexArray::VertexArray() {
     glGenVertexArrays(1, &id);
 }
 
+VertexArray::~VertexArray() {
+    glDeleteVertexArrays(1, &id);
+}
+
 void VertexArray::bind() const {
     glBindVertexArray(id);
 }
 
 void VertexArray::unbind() {
     glBindVertexArray(0);
-}
-
-VertexArray::~VertexArray() {
-    glDeleteVertexArrays(1, &id);
 }
 
 void VertexArray::addAttributes(const VertexBuffer &vertex_buffer,

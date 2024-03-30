@@ -15,11 +15,11 @@ class VertexArray {
 public:
     VertexArray();
 
+    ~VertexArray();
+
     void bind() const;
 
     static void unbind();
-
-    ~VertexArray();
 
     void addAttributes(const VertexBuffer &vertex_buffer,
                        const std::vector<VertexAttribute> &attributes,

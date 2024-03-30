@@ -16,6 +16,10 @@ Window::Window() {
     glfwSwapInterval(1);
 }
 
+Window::~Window() {
+    glfwTerminate();
+}
+
 void Window::swapBuffers() {
     glfwSwapBuffers(glfw_window);
     glfwPollEvents();
@@ -31,8 +35,4 @@ void Window::close() {
 
 GLFWwindow *Window::getGlfwWindow() {
     return glfw_window;
-}
-
-Window::~Window() {
-    glfwTerminate();
 }
