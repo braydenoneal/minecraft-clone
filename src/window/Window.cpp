@@ -6,6 +6,7 @@ Window::Window() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
     glfw_window = glfwCreateWindow(1920, 1080, "Minecraft", nullptr, nullptr);
 
@@ -14,6 +15,8 @@ Window::Window() {
     gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 
     glfwSwapInterval(1);
+
+    glfwGetWindowSize(glfw_window, &width, &height);
 }
 
 Window::~Window() {
@@ -35,4 +38,8 @@ void Window::close() {
 
 GLFWwindow *Window::getGlfwWindow() {
     return glfw_window;
+}
+
+float Window::getAspectRatio() const {
+    return (float) width / (float) height;
 }

@@ -57,12 +57,8 @@ Cube::Cube() {
     cube_array.addAttributes(offset_buffer, {{3, GL_INT, GL_FALSE}, {1, GL_INT, GL_FALSE}, {1, GL_INT, GL_FALSE}}, 1);
 }
 
-void Cube::set_uniforms(glm::vec3 camera_position, glm::vec3 camera_angle) const {
-    glm::mat4 perspective = glm::perspective(
-        glm::radians(70.0f),
-        (float) 1920 / (float) 1080,
-        0.05f, 2048.0f
-    );
+void Cube::set_uniforms(float aspect_ratio, glm::vec3 camera_position, glm::vec3 camera_angle) const {
+    glm::mat4 perspective = glm::perspective(glm::radians(70.0f), aspect_ratio, 0.05f, 2048.0f);
 
     auto camera_rotate = glm::mat4(1.0f);
 

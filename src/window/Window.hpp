@@ -15,6 +15,10 @@ public:
 
     GLFWwindow *getGlfwWindow();
 
+    [[nodiscard]] float getAspectRatio() const;
+
 private:
     GLFWwindow *glfw_window;
+    int width{};
+    int height{};
 };

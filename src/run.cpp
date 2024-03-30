@@ -18,7 +18,7 @@ int main() {
         render::clear_screen();
 
         cube.cube_array.bind();
-        cube.set_uniforms(camera_position, camera_angle);
+        cube.set_uniforms(window.getAspectRatio(), camera_position, camera_angle);
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, cube.triangle_count, cube.instance_count);
 
         gui::new_frame();
