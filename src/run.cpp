@@ -1,20 +1,20 @@
-#include "window/window.hpp"
+#include "window/Window.hpp"
 #include "graphics/render/render.hpp"
 #include "gui/gui.hpp"
 #include "gui/screens/debug.hpp"
 #include "graphics/models/cube/Cube.hpp"
 
 int main() {
-    GLFWwindow *glfw_window = window::create_context();
+    Window window{};
     render::create_context();
-    gui::create_context(glfw_window);
+    gui::create_context(window.getGlfwWindow());
 
     glm::vec3 camera_position = {3, 3, 3};
     glm::vec3 camera_angle = {glm::radians(-45.0f), glm::radians(45.0f), 0};
 
     Cube cube{};
 
-    while (!window::should_close(glfw_window)) {
+    while (!window.shouldClose()) {
         render::clear_screen();
 
         cube.cube_array.bind();
@@ -25,10 +25,8 @@ int main() {
         debug::render();
         gui::render();
 
-        window::next_frame(glfw_window);
+        window.swapBuffers();
     }
-
-    window::terminate();
 
     return 0;
 }

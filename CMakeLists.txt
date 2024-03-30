@@ -19,8 +19,8 @@ add_executable(${PROJECT_NAME}
         lib/stb/src/stb_image.cpp
         ${IMGUI_SOURCE}
         src/run.cpp
-        src/window/window.cpp
-        src/window/window.hpp
+        src/window/Window.cpp
+        src/window/Window.hpp
         src/graphics/shader/Shader.cpp
         src/graphics/shader/Shader.hpp
         src/graphics/texture/Texture.cpp
