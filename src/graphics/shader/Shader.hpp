@@ -7,13 +7,13 @@ class Shader {
 public:
     Shader();
 
+    ~Shader();
+
     void setShaders(const std::string &vertex_shader_file_path, const std::string &fragment_shader_file_path) const;
 
     void bind() const;
 
     static void unbind();
-
-    ~Shader();
 
     void setUniformMatrix4fv(const GLchar *name, const GLfloat *value) const;
 

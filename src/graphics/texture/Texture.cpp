@@ -4,6 +4,10 @@ Texture::Texture() {
     glGenTextures(1, &id);
 }
 
+Texture::~Texture() {
+    glDeleteTextures(1, &id);
+}
+
 void Texture::setTextures(const std::vector<std::string> &file_paths, GLint width, GLint height) const {
     bind();
 
@@ -64,8 +68,4 @@ void Texture::bind() const {
 
 void Texture::unbind() {
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-}
-
-Texture::~Texture() {
-    glDeleteTextures(1, &id);
 }

@@ -25,8 +25,6 @@ add_executable(${PROJECT_NAME}
         src/graphics/shader/Shader.hpp
         src/graphics/texture/Texture.cpp
         src/graphics/texture/Texture.hpp
-        src/graphics/render/render.cpp
-        src/graphics/render/render.hpp
         src/gui/gui.cpp
         src/gui/gui.hpp
         src/gui/screens/debug.cpp
@@ -37,6 +35,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/buffer/VertexBuffer.hpp
         src/graphics/buffer/VertexArray.cpp
         src/graphics/buffer/VertexArray.hpp
+        src/graphics/Graphics.cpp
+        src/graphics/Graphics.hpp
 )
 
 include_directories(lib/glad/include)

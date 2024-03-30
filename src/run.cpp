@@ -1,12 +1,12 @@
 #include "window/Window.hpp"
-#include "graphics/render/render.hpp"
+#include "graphics/Graphics.hpp"
 #include "gui/gui.hpp"
 #include "gui/screens/debug.hpp"
 #include "graphics/models/cube/Cube.hpp"
 
 int main() {
     Window window{};
-    render::create_context();
+    Graphics graphics{};
     gui::create_context(window.getGlfwWindow());
 
     glm::vec3 camera_position = {3, 3, 3};
@@ -15,7 +15,7 @@ int main() {
     Cube cube{};
 
     while (!window.shouldClose()) {
-        render::clear_screen();
+        graphics.clearScreen();
 
         cube.cube_array.bind();
         cube.set_uniforms(window.getAspectRatio(), camera_position, camera_angle);

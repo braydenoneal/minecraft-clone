@@ -4,6 +4,10 @@ Shader::Shader() {
     id = glCreateProgram();
 }
 
+Shader::~Shader() {
+    glDeleteProgram(id);
+}
+
 void Shader::setShaders(const std::string &vertex_shader_file_path,
                         const std::string &fragment_shader_file_path) const {
     GLuint vertex_shader = compile_shader(vertex_shader_file_path, GL_VERTEX_SHADER);
@@ -25,10 +29,6 @@ void Shader::bind() const {
 
 void Shader::unbind() {
     glUseProgram(0);
-}
-
-Shader::~Shader() {
-    glDeleteProgram(id);
 }
 
 void Shader::setUniformMatrix4fv(const GLchar *name, const GLfloat *value) const {
