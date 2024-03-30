@@ -18,17 +18,17 @@ add_executable(${PROJECT_NAME}
         lib/glad/src/glad.c
         lib/stb/src/stb_image.cpp
         ${IMGUI_SOURCE}
-        src/run.cpp
+        src/Run.cpp
         src/window/Window.cpp
         src/window/Window.hpp
         src/graphics/shader/Shader.cpp
         src/graphics/shader/Shader.hpp
         src/graphics/texture/Texture.cpp
         src/graphics/texture/Texture.hpp
-        src/gui/gui.cpp
-        src/gui/gui.hpp
-        src/gui/screens/debug.cpp
-        src/gui/screens/debug.hpp
+        src/gui/Gui.cpp
+        src/gui/Gui.hpp
+        src/gui/screens/DebugScreen.cpp
+        src/gui/screens/DebugScreen.hpp
         src/graphics/models/cube/Cube.cpp
         src/graphics/models/cube/Cube.hpp
         src/graphics/buffer/VertexBuffer.cpp
@@ -37,6 +37,7 @@ add_executable(${PROJECT_NAME}
         src/graphics/buffer/VertexArray.hpp
         src/graphics/Graphics.cpp
         src/graphics/Graphics.hpp
+        src/gui/Screen.hpp
 )
 
 include_directories(lib/glad/include)
