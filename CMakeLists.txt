@@ -44,6 +44,8 @@ add_executable(${PROJECT_NAME}
         src/world/WorldState.hpp
         src/util/math/Math.cpp
         src/util/math/Math.hpp
+        src/world/chunk/Chunk.cpp
+        src/world/chunk/Chunk.hpp
 )
 
 include_directories(lib/glad/include)

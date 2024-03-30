@@ -20,6 +20,7 @@ Window::Window() {
 
     glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetInputMode(glfw_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    glfwSetCursorPos(glfw_window, 0, 0);
 }
 
 Window::~Window() {

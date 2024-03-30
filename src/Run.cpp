@@ -9,12 +9,10 @@
 int main() {
     Window window{};
     Graphics graphics{};
-    WorldState world_state{};
-    Input input{window, world_state};
-
     Gui::create(window.getGlfwWindow());
     DebugScreen debug_screen{};
-
+    WorldState world_state{};
+    Input input{window, world_state};
     Cube cube{};
 
     while (!window.shouldClose()) {
