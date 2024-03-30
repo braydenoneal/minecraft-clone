@@ -38,6 +38,12 @@ add_executable(${PROJECT_NAME}
         src/graphics/Graphics.cpp
         src/graphics/Graphics.hpp
         src/gui/Screen.hpp
+        src/input/Input.cpp
+        src/input/Input.hpp
+        src/world/WorldState.cpp
+        src/world/WorldState.hpp
+        src/util/math/Math.cpp
+        src/util/math/Math.hpp
 )
 
 include_directories(lib/glad/include)

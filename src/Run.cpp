@@ -1,5 +1,7 @@
 #include "window/Window.hpp"
 #include "graphics/Graphics.hpp"
+#include "world/WorldState.hpp"
+#include "input/Input.hpp"
 #include "gui/Gui.hpp"
 #include "gui/screens/DebugScreen.hpp"
 #include "graphics/models/cube/Cube.hpp"
@@ -7,19 +9,21 @@
 int main() {
     Window window{};
     Graphics graphics{};
+    WorldState world_state{};
+    Input input{window, world_state};
+
     Gui::create(window.getGlfwWindow());
     DebugScreen debug_screen{};
-
-    glm::vec3 camera_position = {3, 3, 3};
-    glm::vec3 camera_angle = {glm::radians(-45.0f), glm::radians(45.0f), 0};
 
     Cube cube{};
 
     while (!window.shouldClose()) {
+        input.pollEvents();
+
         graphics.clearScreen();
 
         cube.cube_array.bind();
-        cube.set_uniforms(window.getAspectRatio(), camera_position, camera_angle);
+        cube.set_uniforms(window.getAspectRatio(), world_state.camera_position, world_state.camera_angle);
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, cube.triangle_count, cube.instance_count);
 
         Gui::newFrame();

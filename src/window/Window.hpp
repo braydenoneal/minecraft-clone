@@ -1,3 +1,5 @@
+#pragma once
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -13,12 +15,17 @@ public:
 
     void close();
 
+    void toggleMaximize();
+
     GLFWwindow *getGlfwWindow();
 
     [[nodiscard]] float getAspectRatio() const;
 
+    void setSize(int new_width, int height);
+
 private:
-    GLFWwindow *glfw_window;
+    GLFWwindow *glfw_window{};
     int width{};
     int height{};
+    bool maximized{true};
 };
