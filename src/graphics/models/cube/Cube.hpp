@@ -18,5 +18,5 @@ public:
 
     Cube();
 
-    void set_uniforms() const;
+    void set_uniforms(glm::vec3 camera_position, glm::vec3 camera_angle) const;
 };

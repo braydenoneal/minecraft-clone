@@ -1,5 +1,7 @@
 #include "Cube.hpp"
 
+#include "glm/gtc/noise.hpp"
+
 Cube::Cube() {
     shader.setShaders("../res/shaders/vertex.glsl", "../res/shaders/fragment.glsl");
     shader.bind();
@@ -12,21 +14,45 @@ Cube::Cube() {
     shader.setUniform1i("u_textures", 0);
 
     struct offset {
-        GLfloat x_offset;
-        GLfloat y_offset;
-        GLfloat z_offset;
+        GLint x_offset;
+        GLint y_offset;
+        GLint z_offset;
         GLint face_index;
         GLint texture_index;
     };
 
     vector<offset> offset_data = {
-        {0, 0, 0, 0, 0},
-        {0, 0, 0, 1, 0},
-        {0, 0, 0, 2, 2},
-        {0, 0, 0, 3, 1},
-        {0, 0, 0, 4, 0},
-        {0, 0, 0, 5, 0},
+//        {0, 0, 0, 0, 0},
+//        {0, 0, 0, 1, 0},
+//        {0, 0, 0, 2, 2},
+//        {0, 0, 0, 3, 1},
+//        {0, 0, 0, 4, 0},
+//        {0, 0, 0, 5, 0},
+//
+//        {0, 1, 0, 0, 0},
+//        {0, 1, 0, 1, 0},
+//        {0, 1, 0, 2, 2},
+//        {0, 1, 0, 3, 1},
+//        {0, 1, 0, 4, 0},
+//        {0, 1, 0, 5, 0},
     };
+
+    for (int x = 0; x < 16 * 33; x++) {
+        for (int z = 0; z < 16 * 33; z++) {
+            float vertical_scale = 6;
+            float horizontal_scale = 16;
+            int ty = (int) (vertical_scale * glm::perlin(glm::vec2((float) x / horizontal_scale, (float) z / horizontal_scale)));
+            for (int y = -6; y <= ty; y++) {
+                offset_data.push_back({x, y, z, 0, 0});
+                offset_data.push_back({x, y, z, 1, 0});
+                offset_data.push_back({x, y, z, 2, 2});
+                offset_data.push_back({x, y, z, 3, 1});
+                offset_data.push_back({x, y, z, 4, 0});
+                offset_data.push_back({x, y, z, 5, 0});
+            }
+        }
+    }
+
 
     instance_count = (GLsizei) offset_data.size();
 
@@ -54,10 +80,10 @@ Cube::Cube() {
     cube_buffer.setData((GLsizeiptr) (vertex_buffer_data.size() * sizeof(vertex)), &vertex_buffer_data[0]);
 
     cube_array.addAttributes(cube_buffer, {{3, GL_FLOAT, GL_FALSE}, {2, GL_FLOAT, GL_FALSE}}, 0);
-    cube_array.addAttributes(offset_buffer, {{3, GL_FLOAT, GL_FALSE}, {1, GL_INT, GL_FALSE}, {1, GL_INT, GL_FALSE}}, 1);
+    cube_array.addAttributes(offset_buffer, {{3, GL_INT, GL_FALSE}, {1, GL_INT, GL_FALSE}, {1, GL_INT, GL_FALSE}}, 1);
 }
 
-void Cube::set_uniforms() const {
+void Cube::set_uniforms(glm::vec3 camera_position, glm::vec3 camera_angle) const {
     glm::mat4 perspective = glm::perspective(
         glm::radians(70.0f),
         (float) 1920 / (float) 1080,
@@ -66,11 +92,11 @@ void Cube::set_uniforms() const {
 
     auto camera_rotate = glm::mat4(1.0f);
 
-    camera_rotate = glm::rotate(camera_rotate, 1 * glm::radians(45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    camera_rotate = glm::rotate(camera_rotate, 1 * glm::radians(-45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    camera_rotate = glm::rotate(camera_rotate, 0 * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    camera_rotate = glm::rotate(camera_rotate, -camera_angle.x, glm::vec3(1.0f, 0.0f, 0.0f));
+    camera_rotate = glm::rotate(camera_rotate, -camera_angle.y, glm::vec3(0.0f, 1.0f, 0.0f));
+    camera_rotate = glm::rotate(camera_rotate, -camera_angle.z, glm::vec3(0.0f, 0.0f, 1.0f));
 
-    glm::mat4 camera_translate = glm::translate(glm::mat4(1.0f), -glm::vec3(3, 3, 3));
+    glm::mat4 camera_translate = glm::translate(glm::mat4(1.0f), -camera_position);
     glm::mat4 camera_matrix = perspective * camera_rotate * camera_translate;
 
     shader.setUniformMatrix4fv("u_camera", &camera_matrix[0][0]);

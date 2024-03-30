@@ -3,7 +3,7 @@
 layout (location = 0) in vec4 position;
 layout (location = 1) in vec2 texture_uv_index;
 
-layout (location = 2) in vec3 offset;
+layout (location = 2) in ivec3 offset;
 layout (location = 3) in int face;
 layout (location = 4) in int texture_index_in;
 
