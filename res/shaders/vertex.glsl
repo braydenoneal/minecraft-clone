@@ -11,6 +11,7 @@ uniform mat4 u_camera;
 
 out vec2 texture_coordinate;
 out float texture_index;
+out float brightness;
 
 const vec3 texture_uvs[4] = vec3[4](
     vec3(0, 0, 0),
@@ -28,7 +29,10 @@ vec3 face_offsets[6] = vec3[6](
     vec3(0 + position.z, 0 + position.y, 1 + position.x)
 );
 
+float brightnesses[6] = float[6](0.8, 0.8, 0.4, 1.0, 0.6, 0.6);
+
 void main() {
+    brightness = brightnesses[face];
     texture_index = float(texture_index_in);
     vec3 new_position = face_offsets[face];
     vec3 offset_position = vec3(new_position.x + offset.x, new_position.y + offset.y, new_position.z + offset.z);
