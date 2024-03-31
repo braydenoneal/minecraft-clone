@@ -35,12 +35,6 @@ Cube::Cube() {
     cube_array.addAttributes(offset_buffer, {{3, GL_INT, GL_FALSE}, {1, GL_INT, GL_FALSE}, {1, GL_INT, GL_FALSE}}, 1);
 }
 
-void Cube::renderChunk(int x, int y, int z) {
-    chunkToMesh(Chunk{{x, y, z}}, offset_data);
-    instance_count = (GLsizei) offset_data.size();
-    offset_buffer.setData((GLsizeiptr) (offset_data.size() * sizeof(offset)), &offset_data[0]);
-}
-
 void Cube::setUniforms(float aspect_ratio, glm::vec3 camera_position, glm::vec3 camera_angle) const {
     glm::mat4 perspective = glm::perspective(glm::radians(70.0f), aspect_ratio, 0.05f, 2048.0f);
 

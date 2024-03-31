@@ -4,31 +4,40 @@ ChunkLoader::ChunkLoader(WorldState &world_state_reference, Cube &cube_reference
         : world_state(world_state_reference), cube(cube_reference) {}
 
 void ChunkLoader::setRenderQueue() {
-    std::vector<Position> positions{};
+    int next_x_chunk = std::floor(world_state.camera_position.x / (float) CHUNK_SIZE);
+    int next_z_chunk = std::floor(world_state.camera_position.z / (float) CHUNK_SIZE);
 
-    int x_chunk = std::floor(world_state.camera_position.x / (float) CHUNK_SIZE);
-    int z_chunk = std::floor(world_state.camera_position.z / (float) CHUNK_SIZE);
+    if (next_x_chunk != x_chunk || next_z_chunk != z_chunk) {
+        x_chunk = next_x_chunk;
+        z_chunk = next_z_chunk;
 
-    for (int x = x_chunk - radius; x <= x + radius; x++) {
-        for (int z = z_chunk - radius; z <= z + radius; z++) {
-            positions.push_back({x, 0, z});
-        }
-    }
+        std::vector<Position> positions{};
 
-    unloadMeshes(positions);
-    unloadChunks(positions);
-
-    for (auto position: positions) {
-        bool add_to_queue = true;
-
-        for (auto &chunk: chunks) {
-            if (chunk.position.x == position.x && chunk.position.z == position.z) {
-                add_to_queue = false;
+        for (int x = x_chunk - radius; x <= x_chunk + radius; x++) {
+            for (int z = z_chunk - radius; z <= z_chunk + radius; z++) {
+                if (pow(x - x_chunk, 2) + pow(z - z_chunk, 2) < pow(radius + 1, 2)) {
+                    positions.push_back({x, 0, z});
+                }
             }
         }
 
-        if (add_to_queue) {
-            render_queue.push(position);
+        unloadMeshes(positions);
+        unloadChunks(positions);
+
+        for (auto position: positions) {
+            bool add_to_queue = true;
+
+            for (auto &chunk: chunks) {
+                if (chunk.position.x == position.x && chunk.position.z == position.z) {
+                    add_to_queue = false;
+                }
+            }
+
+            if (add_to_queue) {
+                render_queue.push(position);
+                Chunk chunk(position);
+                chunks.push_back(chunk);
+            }
         }
     }
 }
@@ -94,17 +103,21 @@ void ChunkLoader::unloadChunks(const std::vector<Position> &positions) {
 }
 
 void ChunkLoader::renderQueue() {
-    Position position = render_queue.front();
+    if (!render_queue.empty()) {
+        Position position = render_queue.front();
 
-    render_queue.pop();
+        render_queue.pop();
 
-    Chunk chunk(position);
+        for (const auto &chunk: chunks) {
+            if (chunk.position.x == position.x && chunk.position.z == position.z) {
+                std::vector<offset> mesh{};
 
-    chunks.push_back(chunk);
+                Cube::chunkToMesh(chunk, mesh);
 
-    std::vector<offset> mesh{};
+                meshes.push_back({position, mesh});
 
-    Cube::chunkToMesh(chunk, mesh);
-
-    cube.combineMeshes(meshes);
+                cube.combineMeshes(meshes);
+            }
+        }
+    }
 }

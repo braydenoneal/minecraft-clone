@@ -5,6 +5,7 @@
 #include "gui/Gui.hpp"
 #include "gui/screens/DebugScreen.hpp"
 #include "graphics/models/cube/Cube.hpp"
+#include "world/chunk/ChunkLoader.hpp"
 
 int main() {
     Window window{};
@@ -14,58 +15,17 @@ int main() {
     WorldState world_state{};
     Input input{window, world_state};
     Cube cube{};
-
-    int r = 0;
-    int x = -r;
-    int ry = 0;
-    int y = -ry;
-    int z = -r;
-    int d = 0;
+    ChunkLoader chunk_loader{world_state, cube};
 
     while (!window.shouldClose()) {
         input.pollEvents();
 
         graphics.clearScreen();
 
+        chunk_loader.setRenderQueue();
+        chunk_loader.renderQueue();
+
         cube.cube_array.bind();
-
-        cube.renderChunk(x, y, z);
-
-        y++;
-
-        if (y >= ry) {
-            y = -ry;
-
-            if (d == 0) {
-                x++;
-
-                if (x >= r) {
-                    d = 1;
-                }
-            } else if (d == 1) {
-                z++;
-
-                if (z >= r) {
-                    d = 2;
-                }
-            } else if (d == 2) {
-                x--;
-
-                if (x <= -r) {
-                    d = 3;
-                }
-            } else {
-                z--;
-
-                if (z <= -r) {
-                    d = 0;
-                    r++;
-                    x = -r;
-                    z = -r;
-                }
-            }
-        }
-
         cube.setUniforms(window.getAspectRatio(), world_state.camera_position, world_state.camera_angle);
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, cube.triangle_count, cube.instance_count);
 

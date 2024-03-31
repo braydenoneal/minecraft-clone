@@ -25,5 +25,7 @@ private:
     std::vector<Chunk> chunks{};
     std::vector<Mesh> meshes{};
     std::queue<Position> render_queue{};
+    int x_chunk{-1};
+    int z_chunk{-1};
     int radius = 16;
 };

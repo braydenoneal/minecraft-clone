@@ -20,8 +20,8 @@ struct offset {
 };
 
 struct Mesh {
-    std::vector<offset> mesh;
     Position position;
+    std::vector<offset> mesh;
 };
 
 class Cube {
@@ -35,8 +35,6 @@ public:
     VertexBuffer offset_buffer{};
 
     Cube();
-
-    void renderChunk(int x, int y, int z);
 
     void setUniforms(float aspect_ratio, glm::vec3 camera_position, glm::vec3 camera_angle) const;
 
