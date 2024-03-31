@@ -1,3 +1,8 @@
+#pragma once
+
+#include <glm/gtc/noise.hpp>
+#include <vector>
+
 #define CHUNK_SIZE 16
 
 struct Block {
@@ -13,7 +18,11 @@ struct Position {
 class Chunk {
 public:
     Position position{};
-    Block blocks[CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE]{};
+    std::vector<Block> blocks{CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE};
 
-    Block get(int block_x, int block_y, int block_z);
+    explicit Chunk(Position chunk_position);
+
+    [[nodiscard]] Block get(int block_x, int block_y, int block_z) const;
+
+    void set(int block_x, int block_y, int block_z, Block block);
 };
