@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <queue>
+#include <deque>
 
 #include "../../graphics/models/cube/Cube.hpp"
 #include "../WorldState.hpp"
@@ -17,6 +17,8 @@ public:
 
     void unloadChunks(const std::vector<Position> &positions);
 
+    void unloadQueue(const std::vector<Position> &positions);
+
     void renderQueue();
 
 private:
@@ -24,7 +26,7 @@ private:
     Cube &cube;
     std::vector<Chunk> chunks{};
     std::vector<Mesh> meshes{};
-    std::queue<Position> render_queue{};
+    std::deque<Position> queue{};
     int x_chunk{-1};
     int z_chunk{-1};
     int radius = 16;

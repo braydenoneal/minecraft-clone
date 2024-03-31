@@ -4,7 +4,7 @@
 
 class WorldState {
 public:
-    glm::vec3 camera_position {0, 256, 0};
+    glm::vec3 camera_position {0, 16, 0};
     glm::vec3 camera_angle {glm::radians(-90.0f), glm::radians(0.0f), 0};
-    float camera_speed{0.5};
+    float camera_speed{1};
 };

@@ -14,7 +14,7 @@ Window::Window() {
 
     gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
 
     glfwGetWindowSize(glfw_window, &width, &height);
 
