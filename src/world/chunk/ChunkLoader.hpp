@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <deque>
+#include <algorithm>
 
 #include "../../graphics/models/cube/Cube.hpp"
 #include "../WorldState.hpp"
@@ -30,4 +31,13 @@ private:
     int x_chunk{-1};
     int z_chunk{-1};
     int radius = 16;
+
+    class QueueSorter {
+    public:
+        ChunkLoader &chunk_loader;
+
+        explicit QueueSorter(ChunkLoader &chunk_loader_reference);
+
+        bool operator() (Position position_1, Position position_2) const;
+    };
 };

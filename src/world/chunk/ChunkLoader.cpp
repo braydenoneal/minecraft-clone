@@ -46,6 +46,9 @@ void ChunkLoader::setRenderQueue() {
                 queue.push_back(position);
             }
         }
+
+        QueueSorter queue_sorter(*this);
+        std::sort(queue.begin(), queue.end(), queue_sorter);
     }
 }
 
@@ -157,4 +160,11 @@ void ChunkLoader::renderQueue() {
 
         cube.combineMeshes(meshes);
     }
+}
+
+ChunkLoader::QueueSorter::QueueSorter(ChunkLoader &chunk_loader_reference) : chunk_loader(chunk_loader_reference) {}
+
+bool ChunkLoader::QueueSorter::operator()(Position position_1, Position position_2) const {
+    return sqrt(pow(position_1.x - chunk_loader.x_chunk, 2) + pow(position_1.z - chunk_loader.z_chunk, 2))
+        < sqrt(pow(position_2.x - chunk_loader.x_chunk, 2) + pow(position_2.z - chunk_loader.z_chunk, 2));
 }
