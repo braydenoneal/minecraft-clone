@@ -43,6 +43,8 @@ void ChunkLoader::setRenderQueue() {
             }
 
             if (add_to_queue) {
+                Chunk chunk(position);
+                chunks.push_back(chunk);
                 queue.push_back(position);
             }
         }
@@ -148,17 +150,17 @@ void ChunkLoader::renderQueue() {
 
         queue.pop_front();
 
-        Chunk chunk(position);
+        for (const auto &chunk: chunks) {
+            if (position.x == chunk.position.x && position.z == chunk.position.z) {
+                std::vector<offset> mesh{};
 
-        chunks.push_back(chunk);
+                Cube::chunkToMesh(chunk, mesh, chunks);
 
-        std::vector<offset> mesh{};
+                meshes.push_back({position, mesh});
 
-        Cube::chunkToMesh(chunk, mesh);
-
-        meshes.push_back({position, mesh});
-
-        cube.combineMeshes(meshes);
+                cube.combineMeshes(meshes);
+            }
+        }
     }
 }
 

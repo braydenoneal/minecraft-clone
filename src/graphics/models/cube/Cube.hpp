@@ -38,7 +38,10 @@ public:
 
     void setUniforms(float aspect_ratio, glm::vec3 camera_position, glm::vec3 camera_angle) const;
 
-    static void chunkToMesh(const Chunk &chunk, vector<offset> &mesh);
+    static void chunkToMesh(const Chunk &chunk, vector<offset> &mesh, const std::vector<Chunk> &chunks);
 
     void combineMeshes(const vector<Mesh> &meshes);
+
+private:
+    [[nodiscard]] static int pos(int block_x, int block_y, int block_z);
 };

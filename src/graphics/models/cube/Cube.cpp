@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Cube.hpp"
 
 Cube::Cube() {
@@ -50,10 +51,59 @@ void Cube::setUniforms(float aspect_ratio, glm::vec3 camera_position, glm::vec3 
     shader.setUniformMatrix4fv("u_camera", &camera_matrix[0][0]);
 }
 
-void Cube::chunkToMesh(const Chunk &chunk, vector<offset> &mesh) {
+void Cube::chunkToMesh(const Chunk &chunk, vector<offset> &mesh, const std::vector<Chunk> &chunks) {
     vector<offset> new_mesh{};
 
-    bool render_edges = false;
+    std::vector<Block> blocks((CHUNK_SIZE + 2) * (CHUNK_SIZE + 2) * (CHUNK_SIZE + 2), {1});
+
+    for (int x = 0; x < CHUNK_SIZE; x++) {
+        for (int y = 0; y < CHUNK_SIZE; y++) {
+            for (int z = 0; z < CHUNK_SIZE; z++) {
+                blocks[pos(x, y, z)] = chunk.get(x, y, z);
+            }
+        }
+    }
+
+    struct Direction {
+        int x;
+        int y;
+        int z;
+    };
+
+    std::vector<Direction> directions = {
+        {-1, +0, +0}, {+1, +0, +0}, {+0, -1, +0}, {+0, +1, +0}, {+0, +0, -1}, {+0, +0, +1}, {-1, -1, +0}, {-1, +1, +0},
+        {+1, -1, +0}, {+1, +1, +0}, {-1, +0, -1}, {-1, +0, +1}, {+1, +0, -1}, {+1, +0, +1}, {+0, -1, -1}, {+0, -1, +1},
+        {+0, +1, -1}, {+0, +1, +1}, {-1, -1, -1}, {-1, -1, +1}, {-1, +1, -1}, {-1, +1, +1}, {+1, -1, -1}, {+1, -1, +1},
+        {+1, +1, -1}, {+1, +1, +1},
+    };
+
+    for (auto direction: directions) {
+        for (const auto &adjacent_chunk: chunks) {
+            if (chunk.position.x + direction.x == adjacent_chunk.position.x
+                    && chunk.position.y + direction.y == adjacent_chunk.position.y
+                    && chunk.position.z + direction.z == adjacent_chunk.position.z) {
+                int get_x = -direction.x * CHUNK_SIZE;
+                int start_x = direction.x < 1 ? direction.x : CHUNK_SIZE;
+                int end_x = start_x + (direction.x == 0 ? CHUNK_SIZE : 1);
+
+                int get_y = -direction.y * CHUNK_SIZE;
+                int start_y = direction.y < 1 ? direction.y : CHUNK_SIZE;
+                int end_y = start_y + (direction.y == 0 ? CHUNK_SIZE : 1);
+
+                int get_z = -direction.z * CHUNK_SIZE;
+                int start_z = direction.z < 1 ? direction.z : CHUNK_SIZE;
+                int end_z = start_z + (direction.z == 0 ? CHUNK_SIZE : 1);
+
+                for (int x = start_x; x < end_x; x++) {
+                    for (int y = start_y; y < end_y; y++) {
+                        for (int z = start_z; z < end_z; z++) {
+                            blocks[pos(x, y, z)] = adjacent_chunk.get(get_x + x, get_y + y, get_z + z);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     for (int x = 0; x < CHUNK_SIZE; x++) {
         for (int y = 0; y < CHUNK_SIZE; y++) {
@@ -65,36 +115,24 @@ void Cube::chunkToMesh(const Chunk &chunk, vector<offset> &mesh) {
                     int y_offset = y + chunk.position.y * CHUNK_SIZE;
                     int z_offset = z + chunk.position.z * CHUNK_SIZE;
 
-                    if (x > 0 && chunk.get(x - 1, y, z).id == 0
-                            || (x <= 0 && render_edges)
-                            ) {
+                    if (blocks[pos(x - 1, y, z)].id == 0) {
                         mesh.push_back({x_offset, y_offset, z_offset, 0, 0});
                     }
-                    if (x < CHUNK_SIZE - 1 && chunk.get(x + 1, y, z).id == 0
-                            || (x >= CHUNK_SIZE - 1 && render_edges)
-                            ) {
+                    if (blocks[pos(x + 1, y, z)].id == 0) {
                         mesh.push_back({x_offset, y_offset, z_offset, 1, 0});
                     }
 
-                    if (y > 0 && chunk.get(x, y - 1, z).id == 0
-                            || (y <= 0 && render_edges)
-                            ) {
+                    if (blocks[pos(x, y - 1, z)].id == 0) {
                         mesh.push_back({x_offset, y_offset, z_offset, 2, 2});
                     }
-                    if (y < CHUNK_SIZE - 1 && chunk.get(x, y + 1, z).id == 0
-                            || (y >= CHUNK_SIZE - 1 && render_edges)
-                            ) {
+                    if (blocks[pos(x, y + 1, z)].id == 0) {
                         mesh.push_back({x_offset, y_offset, z_offset, 3, 1});
                     }
 
-                    if (z > 0 && chunk.get(x, y, z - 1).id == 0
-                            || (z <= 0 && render_edges)
-                            ) {
+                    if (blocks[pos(x, y, z - 1)].id == 0) {
                         mesh.push_back({x_offset, y_offset, z_offset, 4, 0});
                     }
-                    if (z < CHUNK_SIZE - 1 && chunk.get(x, y, z + 1).id == 0
-                            || (z >= CHUNK_SIZE - 1 && render_edges)
-                            ) {
+                    if (blocks[pos(x, y, z + 1)].id == 0) {
                         mesh.push_back({x_offset, y_offset, z_offset, 5, 0});
                     }
                 }
@@ -115,4 +153,8 @@ void Cube::combineMeshes(const vector<Mesh> &meshes) {
     offset_data = total_mesh;
     instance_count = (GLsizei) offset_data.size();
     offset_buffer.setData((GLsizeiptr) (offset_data.size() * sizeof(offset)), &offset_data[0]);
+}
+
+int Cube::pos(int block_x, int block_y, int block_z) {
+    return (block_x + 1) * (CHUNK_SIZE + 2) * (CHUNK_SIZE + 2) + (block_y + 1) * (CHUNK_SIZE + 2) + (block_z + 1);
 }

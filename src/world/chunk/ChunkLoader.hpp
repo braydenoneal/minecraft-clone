@@ -30,7 +30,7 @@ private:
     std::deque<Position> queue{};
     int x_chunk{-1};
     int z_chunk{-1};
-    int radius = 16;
+    int radius = 8;
 
     class QueueSorter {
     public:
