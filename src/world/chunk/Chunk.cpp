@@ -1,5 +1,9 @@
 #include "Chunk.hpp"
 
+bool Position::operator==(const Position &position) const {
+    return x == position.x && y == position.y && z == position.z;
+}
+
 Chunk::Chunk(Position chunk_position) {
     position = chunk_position;
 
@@ -8,12 +12,12 @@ Chunk::Chunk(Position chunk_position) {
             auto x_position = (float) (x + position.x * CHUNK_SIZE);
             auto z_position = (float) (z + position.z * CHUNK_SIZE);
 
-            float vertical_scale = 6;
-            float horizontal_scale = 16;
+            float vertical_scale = 7;
+            float horizontal_scale = 24;
             float noise_value = glm::perlin(glm::vec2(x_position / horizontal_scale, z_position / horizontal_scale));
             float surface_y = vertical_scale + vertical_scale * noise_value - (float) (chunk_position.y * CHUNK_SIZE);
 
-            for (int y = 0; y <= (int) surface_y && y < CHUNK_SIZE; y++) {
+            for (int y = 0; y <= (int) std::round(surface_y) && y < CHUNK_SIZE; y++) {
                 set(x, y, z, {1});
             }
         }

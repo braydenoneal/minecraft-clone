@@ -5,10 +5,12 @@ ChunkLoader::ChunkLoader(WorldState &world_state_reference, Cube &cube_reference
 
 void ChunkLoader::setRenderQueue() {
     int next_x_chunk = std::floor(world_state.camera_position.x / (float) CHUNK_SIZE);
+    int next_y_chunk = std::floor(world_state.camera_position.y / (float) CHUNK_SIZE);
     int next_z_chunk = std::floor(world_state.camera_position.z / (float) CHUNK_SIZE);
 
-    if (next_x_chunk != x_chunk || next_z_chunk != z_chunk) {
+    if (next_x_chunk != x_chunk || next_y_chunk != y_chunk || next_z_chunk != z_chunk) {
         x_chunk = next_x_chunk;
+        y_chunk = next_y_chunk;
         z_chunk = next_z_chunk;
 
         std::vector<Position> mesh_positions{};
@@ -35,13 +37,13 @@ void ChunkLoader::setRenderQueue() {
             bool add_to_queue = true;
 
             for (auto &chunk: meshes) {
-                if (chunk.position.x == position.x && chunk.position.z == position.z) {
+                if (chunk.position == position) {
                     add_to_queue = false;
                 }
             }
 
             for (auto &queue_position: previous_queue) {
-                if (queue_position.x == position.x && queue_position.z == position.z) {
+                if (queue_position == position) {
                     add_to_queue = false;
                 }
             }
@@ -55,13 +57,13 @@ void ChunkLoader::setRenderQueue() {
             bool add_to_queue = true;
 
             for (auto &chunk: chunks) {
-                if (chunk.position.x == position.x && chunk.position.z == position.z) {
+                if (chunk.position == position) {
                     add_to_queue = false;
                 }
             }
 
             for (auto &queue_position: previous_queue) {
-                if (queue_position.x == position.x && queue_position.z == position.z) {
+                if (queue_position == position) {
                     add_to_queue = false;
                 }
             }
@@ -84,7 +86,7 @@ void ChunkLoader::unloadMeshes(const std::vector<Position> &positions) {
         bool remove = true;
 
         for (auto position: positions) {
-            if (mesh.position.x == position.x && mesh.position.z == position.z) {
+            if (mesh.position == position) {
                 remove = false;
             }
         }
@@ -98,7 +100,7 @@ void ChunkLoader::unloadMeshes(const std::vector<Position> &positions) {
         int remove_index = 0;
 
         for (int i = 0; i < meshes.size(); i++) {
-            if (meshes[i].position.x == position.x && meshes[i].position.z == position.z) {
+            if (meshes[i].position == position) {
                 remove_index = i;
             }
         }
@@ -114,7 +116,7 @@ void ChunkLoader::unloadChunks(const std::vector<Position> &positions) {
         bool remove = true;
 
         for (auto position: positions) {
-            if (chunk.position.x == position.x && chunk.position.z == position.z) {
+            if (chunk.position == position) {
                 remove = false;
             }
         }
@@ -128,7 +130,7 @@ void ChunkLoader::unloadChunks(const std::vector<Position> &positions) {
         int remove_index = 0;
 
         for (int i = 0; i < chunks.size(); i++) {
-            if (chunks[i].position.x == position.x && chunks[i].position.z == position.z) {
+            if (chunks[i].position == position) {
                 remove_index = i;
             }
         }
@@ -144,7 +146,7 @@ void ChunkLoader::unloadQueue(const vector<Position> &positions) {
         bool remove = true;
 
         for (auto position: positions) {
-            if (queue_position.x == position.x && queue_position.z == position.z) {
+            if (queue_position == position) {
                 remove = false;
             }
         }
@@ -158,7 +160,7 @@ void ChunkLoader::unloadQueue(const vector<Position> &positions) {
         int remove_index = 0;
 
         for (int i = 0; i < queue.size(); i++) {
-            if (queue[i].x == position.x && queue[i].z == position.z) {
+            if (queue[i] == position) {
                 remove_index = i;
             }
         }
@@ -174,7 +176,7 @@ void ChunkLoader::renderQueue() {
         queue.pop_front();
 
         for (const auto &chunk: chunks) {
-            if (position.x == chunk.position.x && position.z == chunk.position.z) {
+            if (position == chunk.position) {
                 std::vector<offset> mesh{};
 
                 Cube::chunkToMesh(chunk, mesh, chunks);
@@ -190,6 +192,10 @@ void ChunkLoader::renderQueue() {
 ChunkLoader::QueueSorter::QueueSorter(ChunkLoader &chunk_loader_reference) : chunk_loader(chunk_loader_reference) {}
 
 bool ChunkLoader::QueueSorter::operator()(Position position_1, Position position_2) const {
-    return sqrt(pow(position_1.x - chunk_loader.x_chunk, 2) + pow(position_1.z - chunk_loader.z_chunk, 2))
-        < sqrt(pow(position_2.x - chunk_loader.x_chunk, 2) + pow(position_2.z - chunk_loader.z_chunk, 2));
+    return sqrt(pow(position_1.x - chunk_loader.x_chunk, 2) +
+                pow(position_1.y - chunk_loader.y_chunk, 2) +
+                pow(position_1.z - chunk_loader.z_chunk, 2))
+        < sqrt(pow(position_2.x - chunk_loader.x_chunk, 2) +
+                pow(position_2.y - chunk_loader.y_chunk, 2) +
+                pow(position_2.z - chunk_loader.z_chunk, 2));
 }

@@ -1,7 +1,9 @@
 #pragma once
 
 #include <glm/gtc/noise.hpp>
+#include <glm/gtc/random.hpp>
 #include <vector>
+#include <cmath>
 
 #define CHUNK_SIZE 16
 
@@ -13,6 +15,8 @@ struct Position {
     int x;
     int y;
     int z;
+
+    bool operator==(Position const &position) const;
 };
 
 class Chunk {
