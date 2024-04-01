@@ -11,23 +11,47 @@ void ChunkLoader::setRenderQueue() {
         x_chunk = next_x_chunk;
         z_chunk = next_z_chunk;
 
-        std::vector<Position> positions{};
+        std::vector<Position> mesh_positions{};
+        std::vector<Position> chunk_positions{};
 
-        for (int x = x_chunk - radius; x <= x_chunk + radius; x++) {
-            for (int z = z_chunk - radius; z <= z_chunk + radius; z++) {
+        for (int x = x_chunk - radius - 1; x <= x_chunk + radius + 1; x++) {
+            for (int z = z_chunk - radius - 1; z <= z_chunk + radius + 1; z++) {
                 if (pow(x - x_chunk, 2) + pow(z - z_chunk, 2) < pow(radius + 1, 2)) {
-                    positions.push_back({x, 0, z});
+                    mesh_positions.push_back({x, 0, z});
+                }
+                if (pow(x - x_chunk, 2) + pow(z - z_chunk, 2) < pow(radius + 2, 2)) {
+                    chunk_positions.push_back({x, 0, z});
                 }
             }
         }
 
-        unloadMeshes(positions);
-        unloadChunks(positions);
-        unloadQueue(positions);
+        unloadMeshes(mesh_positions);
+        unloadChunks(chunk_positions);
+        unloadQueue(mesh_positions);
 
         std::deque<Position> previous_queue = queue;
 
-        for (auto position: positions) {
+        for (auto position: mesh_positions) {
+            bool add_to_queue = true;
+
+            for (auto &chunk: meshes) {
+                if (chunk.position.x == position.x && chunk.position.z == position.z) {
+                    add_to_queue = false;
+                }
+            }
+
+            for (auto &queue_position: previous_queue) {
+                if (queue_position.x == position.x && queue_position.z == position.z) {
+                    add_to_queue = false;
+                }
+            }
+
+            if (add_to_queue) {
+                queue.push_back(position);
+            }
+        }
+
+        for (auto position: chunk_positions) {
             bool add_to_queue = true;
 
             for (auto &chunk: chunks) {
@@ -45,7 +69,6 @@ void ChunkLoader::setRenderQueue() {
             if (add_to_queue) {
                 Chunk chunk(position);
                 chunks.push_back(chunk);
-                queue.push_back(position);
             }
         }
 
