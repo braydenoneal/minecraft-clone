@@ -11,13 +11,19 @@
 
 using std::vector;
 
+#pragma pack(push, 1)
 struct offset {
     GLint x_offset;
     GLint y_offset;
     GLint z_offset;
-    GLint face_index;
-    GLint texture_index;
+    GLubyte face_index;
+    GLubyte texture_index;
+    GLubyte occlusion_nn;
+    GLubyte occlusion_np;
+    GLubyte occlusion_pn;
+    GLubyte occlusion_pp;
 };
+#pragma pack(pop)
 
 struct Mesh {
     Position position;

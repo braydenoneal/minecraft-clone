@@ -46,7 +46,7 @@ void VertexArray::addAttributes(const VertexBuffer &vertex_buffer,
     for (VertexAttribute attribute: attributes) {
         glEnableVertexAttribArray(attribute_count);
 
-        if (attribute.type != GL_INT) {
+        if (attribute.type != GL_INT && attribute.type != GL_UNSIGNED_BYTE) {
             glVertexAttribPointer(
                 attribute_count,
                 attribute.count,

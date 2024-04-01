@@ -1,12 +1,11 @@
-#include <iostream>
 #include "Cube.hpp"
 
 Cube::Cube() {
     shader.setShaders("../res/shaders/vertex.glsl", "../res/shaders/fragment.glsl");
     shader.bind();
 
-    texture.setTextures({"../res/textures/grass_block_side.png",
-                         "../res/textures/grass_block_top.png",
+    texture.setTextures({"../res/textures/grass_block_side_modern.png",
+                         "../res/textures/grass_block_top_modern.png",
                          "../res/textures/dirt.png"}, 16, 16);
     texture.bind();
 
@@ -33,7 +32,8 @@ Cube::Cube() {
     cube_buffer.setData((GLsizeiptr) (vertex_buffer_data.size() * sizeof(vertex)), &vertex_buffer_data[0]);
 
     cube_array.addAttributes(cube_buffer, {{3, GL_FLOAT, GL_FALSE}, {2, GL_FLOAT, GL_FALSE}}, 0);
-    cube_array.addAttributes(offset_buffer, {{3, GL_INT, GL_FALSE}, {1, GL_INT, GL_FALSE}, {1, GL_INT, GL_FALSE}}, 1);
+    cube_array.addAttributes(offset_buffer, {{3, GL_INT, GL_FALSE}, {1, GL_UNSIGNED_BYTE, GL_FALSE},
+                                             {1, GL_UNSIGNED_BYTE, GL_FALSE}, {4, GL_UNSIGNED_BYTE, GL_FALSE}}, 1);
 }
 
 void Cube::setUniforms(float aspect_ratio, glm::vec3 camera_position, glm::vec3 camera_angle) const {
@@ -116,24 +116,108 @@ void Cube::chunkToMesh(const Chunk &chunk, vector<offset> &mesh, const std::vect
                     int z_offset = z + chunk.position.z * CHUNK_SIZE;
 
                     if (blocks[pos(x - 1, y, z)].id == 0) {
-                        mesh.push_back({x_offset, y_offset, z_offset, 0, 0});
+                        bool n0 = blocks[pos(x - 1, y - 1, z    )].id != 0;
+                        bool p0 = blocks[pos(x - 1, y + 1, z    )].id != 0;
+                        bool n1 = blocks[pos(x - 1, y    , z - 1)].id != 0;
+                        bool p1 = blocks[pos(x - 1, y    , z + 1)].id != 0;
+                        bool nn = blocks[pos(x - 1, y - 1, z - 1)].id != 0;
+                        bool np = blocks[pos(x - 1, y - 1, z + 1)].id != 0;
+                        bool pn = blocks[pos(x - 1, y + 1, z - 1)].id != 0;
+                        bool pp = blocks[pos(x - 1, y + 1, z + 1)].id != 0;
+
+                        GLubyte occlusion_nn = n0 && n1 ? 3 : n0 + n1 + nn;
+                        GLubyte occlusion_np = n0 && p1 ? 3 : n0 + p1 + np;
+                        GLubyte occlusion_pn = p0 && n1 ? 3 : p0 + n1 + pn;
+                        GLubyte occlusion_pp = p0 && p1 ? 3 : p0 + p1 + pp;
+
+                        mesh.push_back({x_offset, y_offset, z_offset, 0, 0, occlusion_nn, occlusion_pn, occlusion_np, occlusion_pp});
                     }
                     if (blocks[pos(x + 1, y, z)].id == 0) {
-                        mesh.push_back({x_offset, y_offset, z_offset, 1, 0});
+                        bool n0 = blocks[pos(x + 1, y - 1, z    )].id != 0;
+                        bool p0 = blocks[pos(x + 1, y + 1, z    )].id != 0;
+                        bool n1 = blocks[pos(x + 1, y    , z - 1)].id != 0;
+                        bool p1 = blocks[pos(x + 1, y    , z + 1)].id != 0;
+                        bool nn = blocks[pos(x + 1, y - 1, z - 1)].id != 0;
+                        bool np = blocks[pos(x + 1, y - 1, z + 1)].id != 0;
+                        bool pn = blocks[pos(x + 1, y + 1, z - 1)].id != 0;
+                        bool pp = blocks[pos(x + 1, y + 1, z + 1)].id != 0;
+
+                        GLubyte occlusion_nn = n0 && n1 ? 3 : n0 + n1 + nn;
+                        GLubyte occlusion_np = n0 && p1 ? 3 : n0 + p1 + np;
+                        GLubyte occlusion_pn = p0 && n1 ? 3 : p0 + n1 + pn;
+                        GLubyte occlusion_pp = p0 && p1 ? 3 : p0 + p1 + pp;
+
+                        mesh.push_back({x_offset, y_offset, z_offset, 1, 0, occlusion_np, occlusion_pp, occlusion_nn, occlusion_pn});
                     }
 
                     if (blocks[pos(x, y - 1, z)].id == 0) {
-                        mesh.push_back({x_offset, y_offset, z_offset, 2, 2});
+                        bool n0 = blocks[pos(x - 1, y - 1, z    )].id != 0;
+                        bool p0 = blocks[pos(x + 1, y - 1, z    )].id != 0;
+                        bool n1 = blocks[pos(x    , y - 1, z - 1)].id != 0;
+                        bool p1 = blocks[pos(x    , y - 1, z + 1)].id != 0;
+                        bool nn = blocks[pos(x - 1, y - 1, z - 1)].id != 0;
+                        bool np = blocks[pos(x - 1, y - 1, z + 1)].id != 0;
+                        bool pn = blocks[pos(x + 1, y - 1, z - 1)].id != 0;
+                        bool pp = blocks[pos(x + 1, y - 1, z + 1)].id != 0;
+
+                        GLubyte occlusion_nn = n0 && n1 ? 3 : n0 + n1 + nn;
+                        GLubyte occlusion_np = n0 && p1 ? 3 : n0 + p1 + np;
+                        GLubyte occlusion_pn = p0 && n1 ? 3 : p0 + n1 + pn;
+                        GLubyte occlusion_pp = p0 && p1 ? 3 : p0 + p1 + pp;
+
+                        mesh.push_back({x_offset, y_offset, z_offset, 2, 2, occlusion_nn, occlusion_np, occlusion_pn, occlusion_pp});
                     }
                     if (blocks[pos(x, y + 1, z)].id == 0) {
-                        mesh.push_back({x_offset, y_offset, z_offset, 3, 1});
+                        bool n0 = blocks[pos(x - 1, y + 1, z    )].id != 0;
+                        bool p0 = blocks[pos(x + 1, y + 1, z    )].id != 0;
+                        bool n1 = blocks[pos(x    , y + 1, z - 1)].id != 0;
+                        bool p1 = blocks[pos(x    , y + 1, z + 1)].id != 0;
+                        bool nn = blocks[pos(x - 1, y + 1, z - 1)].id != 0;
+                        bool np = blocks[pos(x - 1, y + 1, z + 1)].id != 0;
+                        bool pn = blocks[pos(x + 1, y + 1, z - 1)].id != 0;
+                        bool pp = blocks[pos(x + 1, y + 1, z + 1)].id != 0;
+
+                        GLubyte occlusion_nn = n0 && n1 ? 3 : n0 + n1 + nn;
+                        GLubyte occlusion_np = n0 && p1 ? 3 : n0 + p1 + np;
+                        GLubyte occlusion_pn = p0 && n1 ? 3 : p0 + n1 + pn;
+                        GLubyte occlusion_pp = p0 && p1 ? 3 : p0 + p1 + pp;
+
+                        mesh.push_back({x_offset, y_offset, z_offset, 3, 1, occlusion_np, occlusion_nn, occlusion_pp, occlusion_pn});
                     }
 
                     if (blocks[pos(x, y, z - 1)].id == 0) {
-                        mesh.push_back({x_offset, y_offset, z_offset, 4, 0});
+                        bool n0 = blocks[pos(x - 1, y    , z - 1)].id != 0;
+                        bool p0 = blocks[pos(x + 1, y    , z - 1)].id != 0;
+                        bool n1 = blocks[pos(x    , y - 1, z - 1)].id != 0;
+                        bool p1 = blocks[pos(x    , y + 1, z - 1)].id != 0;
+                        bool nn = blocks[pos(x - 1, y - 1, z - 1)].id != 0;
+                        bool np = blocks[pos(x - 1, y + 1, z - 1)].id != 0;
+                        bool pn = blocks[pos(x + 1, y - 1, z - 1)].id != 0;
+                        bool pp = blocks[pos(x + 1, y + 1, z - 1)].id != 0;
+
+                        GLubyte occlusion_nn = n0 && n1 ? 3 : n0 + n1 + nn;
+                        GLubyte occlusion_np = n0 && p1 ? 3 : n0 + p1 + np;
+                        GLubyte occlusion_pn = p0 && n1 ? 3 : p0 + n1 + pn;
+                        GLubyte occlusion_pp = p0 && p1 ? 3 : p0 + p1 + pp;
+
+                        mesh.push_back({x_offset, y_offset, z_offset, 4, 0, occlusion_pn, occlusion_pp, occlusion_nn, occlusion_np});
                     }
                     if (blocks[pos(x, y, z + 1)].id == 0) {
-                        mesh.push_back({x_offset, y_offset, z_offset, 5, 0});
+                        bool n0 = blocks[pos(x - 1, y    , z + 1)].id != 0;
+                        bool p0 = blocks[pos(x + 1, y    , z + 1)].id != 0;
+                        bool n1 = blocks[pos(x    , y - 1, z + 1)].id != 0;
+                        bool p1 = blocks[pos(x    , y + 1, z + 1)].id != 0;
+                        bool nn = blocks[pos(x - 1, y - 1, z + 1)].id != 0;
+                        bool np = blocks[pos(x - 1, y + 1, z + 1)].id != 0;
+                        bool pn = blocks[pos(x + 1, y - 1, z + 1)].id != 0;
+                        bool pp = blocks[pos(x + 1, y + 1, z + 1)].id != 0;
+
+                        GLubyte occlusion_nn = n0 && n1 ? 3 : n0 + n1 + nn;
+                        GLubyte occlusion_np = n0 && p1 ? 3 : n0 + p1 + np;
+                        GLubyte occlusion_pn = p0 && n1 ? 3 : p0 + n1 + pn;
+                        GLubyte occlusion_pp = p0 && p1 ? 3 : p0 + p1 + pp;
+
+                        mesh.push_back({x_offset, y_offset, z_offset, 5, 0, occlusion_nn, occlusion_np, occlusion_pn, occlusion_pp});
                     }
                 }
             }
