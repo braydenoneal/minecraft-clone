@@ -1,3 +1,5 @@
+#include <thread>
+
 #include "window/Window.hpp"
 #include "graphics/Graphics.hpp"
 #include "world/WorldState.hpp"
@@ -8,22 +10,28 @@
 #include "world/chunk/ChunkLoader.hpp"
 
 int main() {
-    Window window{};
+    std::mutex mesh_lock{};
+    Window window{mesh_lock};
     Graphics graphics{};
     Gui::create(window.getGlfwWindow());
     DebugScreen debug_screen{};
     WorldState world_state{};
     Input input{window, world_state};
+    std::vector<offset> mesh{};
     Cube cube{};
-    ChunkLoader chunk_loader{world_state, cube};
+    ChunkLoader chunk_loader{world_state, mesh_lock, mesh};
+
+    std::thread chunk_thread(&ChunkLoader::chunkLoop, &chunk_loader);
+    chunk_thread.detach();
 
     while (!window.shouldClose()) {
         input.pollEvents();
 
         graphics.clearScreen();
 
-        chunk_loader.setRenderQueue();
-        chunk_loader.renderQueue();
+        mesh_lock.lock();
+        cube.setMesh(mesh);
+        mesh_lock.unlock();
 
         cube.cube_array.bind();
         cube.setUniforms(window.getAspectRatio(), world_state.camera_position, world_state.camera_angle);

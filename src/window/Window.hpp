@@ -2,10 +2,11 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <mutex>
 
 class Window {
 public:
-    Window();
+    Window(std::mutex &_m_reference);
 
     ~Window();
 
@@ -28,4 +29,5 @@ private:
     int width{};
     int height{};
     bool maximized{true};
+    std::mutex &_m;
 };

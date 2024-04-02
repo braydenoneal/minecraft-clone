@@ -1,6 +1,6 @@
 #include "Window.hpp"
 
-Window::Window() {
+Window::Window(std::mutex &_m_reference) : _m(_m_reference) {
     glfwInit();
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -32,6 +32,7 @@ void Window::swapBuffers() {
 }
 
 int Window::shouldClose() {
+    std::lock_guard<std::mutex> lock(_m);
     return glfwWindowShouldClose(glfw_window);
 }
 

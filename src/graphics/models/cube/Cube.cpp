@@ -227,16 +227,15 @@ void Cube::chunkToMesh(const Chunk &chunk, vector<offset> &mesh, const std::vect
     mesh.insert(mesh.end(), new_mesh.begin(), new_mesh.end());
 }
 
-void Cube::combineMeshes(const vector<Mesh> &meshes) {
-    vector<offset> total_mesh{};
-
-    for (const Mesh &mesh: meshes) {
-        total_mesh.insert(total_mesh.end(), mesh.mesh.begin(), mesh.mesh.end());
-    }
-
+void Cube::setMesh(std::vector<offset> &total_mesh) {
     offset_data = total_mesh;
-    instance_count = (GLsizei) offset_data.size();
+    auto new_instance_count = (GLsizei) offset_data.size();
+
+//    if (new_instance_count != instance_count) {
+    instance_count = new_instance_count;
+
     offset_buffer.setData((GLsizeiptr) (offset_data.size() * sizeof(offset)), &offset_data[0]);
+//    }
 }
 
 int Cube::pos(int block_x, int block_y, int block_z) {

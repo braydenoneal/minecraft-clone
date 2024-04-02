@@ -1,14 +1,15 @@
+#include <iostream>
 #include "ChunkLoader.hpp"
 
-ChunkLoader::ChunkLoader(WorldState &world_state_reference, Cube &cube_reference)
-        : world_state(world_state_reference), cube(cube_reference) {}
+ChunkLoader::ChunkLoader(WorldState &world_state_reference, std::mutex &mesh_lock_reference, std::vector<offset> &mesh_reference)
+        : world_state(world_state_reference), mesh_lock(mesh_lock_reference), mesh(mesh_reference) {}
 
 void ChunkLoader::setRenderQueue() {
     int next_x_chunk = std::floor(world_state.camera_position.x / (float) CHUNK_SIZE);
     int next_y_chunk = std::floor(world_state.camera_position.y / (float) CHUNK_SIZE);
     int next_z_chunk = std::floor(world_state.camera_position.z / (float) CHUNK_SIZE);
 
-    if (next_x_chunk != x_chunk || next_y_chunk != y_chunk || next_z_chunk != z_chunk) {
+    if (next_x_chunk != x_chunk || next_z_chunk != z_chunk) {
         x_chunk = next_x_chunk;
         y_chunk = next_y_chunk;
         z_chunk = next_z_chunk;
@@ -177,15 +178,38 @@ void ChunkLoader::renderQueue() {
 
         for (const auto &chunk: chunks) {
             if (position == chunk.position) {
-                std::vector<offset> mesh{};
+                std::vector<offset> new_mesh1{};
 
-                Cube::chunkToMesh(chunk, mesh, chunks);
+                Cube::chunkToMesh(chunk, new_mesh1, chunks);
 
-                meshes.push_back({position, mesh});
+                meshes.push_back({position, new_mesh1});
 
-                cube.combineMeshes(meshes);
+                // TODO: Chunk culling: Combine only the meshes of chunks that are in the camera frustum
+                std::vector<offset>::size_type mesh_size = 0;
+
+                for (const auto &new_mesh: meshes) {
+                    mesh_size += new_mesh.mesh.size();
+                }
+
+                vector<offset> total_mesh;
+                total_mesh.reserve(mesh_size);
+
+                for (const Mesh &new_mesh: meshes) {
+                    total_mesh.insert(total_mesh.end(), new_mesh.mesh.begin(), new_mesh.mesh.end());
+                }
+
+                mesh_lock.lock();
+                mesh = total_mesh;
+                mesh_lock.unlock();
             }
         }
+    }
+}
+
+void ChunkLoader::chunkLoop() {
+    while (true) {
+        setRenderQueue();
+        renderQueue();
     }
 }
 

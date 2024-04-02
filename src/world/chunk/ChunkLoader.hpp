@@ -3,6 +3,7 @@
 #include <vector>
 #include <deque>
 #include <algorithm>
+#include <mutex>
 
 #include "../../graphics/models/cube/Cube.hpp"
 #include "../WorldState.hpp"
@@ -10,7 +11,7 @@
 
 class ChunkLoader {
 public:
-    ChunkLoader(WorldState &world_state_reference, Cube &cube_reference);
+    ChunkLoader(WorldState &world_state_reference, std::mutex &mesh_lock_reference, std::vector<offset> &mesh_reference);
 
     void setRenderQueue();
 
@@ -22,16 +23,19 @@ public:
 
     void renderQueue();
 
+    void chunkLoop();
+
 private:
     WorldState &world_state;
-    Cube &cube;
     std::vector<Chunk> chunks{};
     std::vector<Mesh> meshes{};
     std::deque<Position> queue{};
     int x_chunk{-1};
     int y_chunk{-1};
     int z_chunk{-1};
-    int radius = 8;
+    int radius = 24;
+    std::vector<offset> &mesh;
+    std::mutex &mesh_lock;
 
     class QueueSorter {
     public:

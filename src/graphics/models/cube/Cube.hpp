@@ -46,7 +46,7 @@ public:
 
     static void chunkToMesh(const Chunk &chunk, vector<offset> &mesh, const std::vector<Chunk> &chunks);
 
-    void combineMeshes(const vector<Mesh> &meshes);
+    void setMesh(std::vector<offset> &total_mesh);
 
 private:
     [[nodiscard]] static int pos(int block_x, int block_y, int block_z);
