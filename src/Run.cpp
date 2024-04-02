@@ -9,6 +9,9 @@
 #include "graphics/models/cube/Cube.hpp"
 #include "world/chunk/ChunkLoader.hpp"
 
+#include <iostream>
+#include <chrono>
+
 int main() {
     Window window{};
     Graphics graphics{};
@@ -27,6 +30,8 @@ int main() {
     chunk_thread.detach();
 
     while (!window.shouldClose()) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+
         input.pollEvents();
 
         graphics.clearScreen();
@@ -46,6 +51,10 @@ int main() {
         Gui::render();
 
         window.swapBuffers();
+
+        auto t2 = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+        std::cout << duration << "\n";
     }
 
     return 0;

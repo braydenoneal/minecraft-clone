@@ -228,13 +228,12 @@ void Cube::chunkToMesh(const Chunk &chunk, vector<offset> &mesh, const std::vect
 }
 
 void Cube::setMesh(std::vector<offset> &total_mesh) {
-    offset_data = total_mesh;
-    auto new_instance_count = (GLsizei) offset_data.size();
+    auto new_instance_count = (GLsizei) total_mesh.size();
 
     // TODO: Replace size comparison with a better way of checking the mesh for changes
     if (new_instance_count != instance_count) {
+        offset_data = total_mesh;
         instance_count = new_instance_count;
-
         offset_buffer.setData((GLsizeiptr) (offset_data.size() * sizeof(offset)), &offset_data[0]);
     }
 }
