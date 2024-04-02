@@ -159,30 +159,15 @@ void ChunkLoader::setRenderQueue() {
             }
 
             if (add_to_queue) {
-                chunk_queue.push_back(position);
+                chunks.emplace_back(position);
             }
         }
 
         std::sort(queue.begin(), queue.end(), QueueSorter(*this));
-        std::sort(chunk_queue.begin(), chunk_queue.end(), QueueSorter(*this));
-
-        Position position = chunk_queue.front();
-
-        chunk_queue.pop_front();
-
-        chunks.emplace_back(position);
     }
 }
 
 void ChunkLoader::renderQueue() {
-    for (int i = 0; i < 8; i++) {
-        if (!chunk_queue.empty()) {
-            Position position = chunk_queue.front();
-            chunk_queue.pop_front();
-            chunks.emplace_back(position);
-        }
-    }
-
     if (!queue.empty()) {
         Position position = queue.front();
 

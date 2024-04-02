@@ -30,7 +30,6 @@ private:
     std::vector<Chunk> chunks{};
     std::vector<Mesh> meshes{};
     std::deque<Position> queue{};
-    std::deque<Position> chunk_queue{};
     int x_chunk{-1};
     int y_chunk{-1};
     int z_chunk{-1};

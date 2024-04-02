@@ -14,7 +14,7 @@ void main() {
     texture_color.rgb *= 1.0f - (occlusion_value * 0.15f);
     texture_color.rgb *= brightness;
     float fog_distance = gl_FragCoord.z / gl_FragCoord.w;
-//    texture_color = mix(texture_color, vec4(121.0f / 255.0f, 166.0f / 255.0f, 1.0f, 1.0f),
-//        (1.0 - exp2(-0.0000000005 * fog_distance * fog_distance * fog_distance * fog_distance * fog_distance)));
+    texture_color = mix(texture_color, vec4(121.0f / 255.0f, 166.0f / 255.0f, 1.0f, 1.0f),
+        (1.0 - exp2(-0.00000000005 * fog_distance * fog_distance * fog_distance * fog_distance * fog_distance)));
     color = texture_color;
 }
