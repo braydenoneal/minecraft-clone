@@ -63,7 +63,7 @@ void ChunkLoader::unloadChunks(const std::vector<Position> &positions) {
     }
 }
 
-void ChunkLoader::unloadQueue(const vector<Position> &positions) {
+void ChunkLoader::unloadQueue(const std::vector<Position> &positions) {
     std::vector<Position> remove_positions{};
 
     for (auto &queue_position: queue) {

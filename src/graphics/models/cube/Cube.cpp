@@ -19,7 +19,7 @@ Cube::Cube() {
         GLfloat texture_y;
     };
 
-    vector<vertex> vertex_buffer_data = {
+    std::vector<vertex> vertex_buffer_data = {
         {0, 0, 0, 0, 0},
         {0, 1, 0, 0, 1},
         {0, 0, 1, 1, 0},
@@ -51,8 +51,8 @@ void Cube::setUniforms(float aspect_ratio, glm::vec3 camera_position, glm::vec3 
     shader.setUniformMatrix4fv("u_camera", &camera_matrix[0][0]);
 }
 
-void Cube::chunkToMesh(const Chunk &chunk, vector<offset> &mesh, const std::vector<Chunk> &chunks) {
-    vector<offset> new_mesh{};
+void Cube::chunkToMesh(const Chunk &chunk, std::vector<offset> &mesh, const std::vector<Chunk> &chunks) {
+    std::vector<offset> new_mesh{};
 
     std::vector<Block> blocks((CHUNK_SIZE + 2) * (CHUNK_SIZE + 2) * (CHUNK_SIZE + 2), {1});
 

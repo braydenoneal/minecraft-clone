@@ -9,8 +9,6 @@
 #include "../../buffer/VertexArray.hpp"
 #include "../../../world/chunk/Chunk.hpp"
 
-using std::vector;
-
 #pragma pack(push, 1)
 struct offset {
     GLint x_offset;
@@ -37,14 +35,14 @@ public:
     VertexArray cube_array{};
     GLsizei triangle_count{};
     GLsizei instance_count{};
-    vector<offset> offset_data{};
+    std::vector<offset> offset_data{};
     VertexBuffer offset_buffer{};
 
     Cube();
 
     void setUniforms(float aspect_ratio, glm::vec3 camera_position, glm::vec3 camera_angle) const;
 
-    static void chunkToMesh(const Chunk &chunk, vector<offset> &mesh, const std::vector<Chunk> &chunks);
+    static void chunkToMesh(const Chunk &chunk, std::vector<offset> &mesh, const std::vector<Chunk> &chunks);
 
     void setMesh(std::vector<offset> &total_mesh);
 
