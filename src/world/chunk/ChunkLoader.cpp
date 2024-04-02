@@ -187,15 +187,14 @@ void ChunkLoader::renderQueue() {
                     mesh_size += mesh.mesh.size();
                 }
 
-                vector<offset> new_total_mesh;
-                new_total_mesh.reserve(mesh_size);
+                std::unique_lock<std::mutex> mesh_unique_lock(mesh_lock);
+
+                total_mesh.clear();
+                total_mesh.reserve(mesh_size);
 
                 for (const Mesh &mesh: meshes) {
-                    new_total_mesh.insert(new_total_mesh.end(), mesh.mesh.begin(), mesh.mesh.end());
+                    total_mesh.insert(total_mesh.end(), mesh.mesh.begin(), mesh.mesh.end());
                 }
-
-                std::unique_lock<std::mutex> mesh_unique_lock(mesh_lock);
-                total_mesh = new_total_mesh;
             }
         }
     }
