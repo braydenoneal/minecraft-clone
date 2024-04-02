@@ -34,7 +34,7 @@ private:
     int x_chunk{-1};
     int y_chunk{-1};
     int z_chunk{-1};
-    int radius = 32;
+    int radius = 16;
     std::mutex &mesh_lock;
     std::vector<offset> &total_mesh;
 
