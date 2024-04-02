@@ -30,10 +30,11 @@ private:
     std::vector<Chunk> chunks{};
     std::vector<Mesh> meshes{};
     std::deque<Position> queue{};
+    std::deque<Position> chunk_queue{};
     int x_chunk{-1};
     int y_chunk{-1};
     int z_chunk{-1};
-    int radius = 16;
+    int radius = 32;
     std::mutex &mesh_lock;
     std::vector<offset> &total_mesh;
 
