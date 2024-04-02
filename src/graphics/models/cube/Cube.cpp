@@ -231,11 +231,12 @@ void Cube::setMesh(std::vector<offset> &total_mesh) {
     offset_data = total_mesh;
     auto new_instance_count = (GLsizei) offset_data.size();
 
-//    if (new_instance_count != instance_count) {
-    instance_count = new_instance_count;
+    // TODO: Replace size comparison with a better way of checking the mesh for changes
+    if (new_instance_count != instance_count) {
+        instance_count = new_instance_count;
 
-    offset_buffer.setData((GLsizeiptr) (offset_data.size() * sizeof(offset)), &offset_data[0]);
-//    }
+        offset_buffer.setData((GLsizeiptr) (offset_data.size() * sizeof(offset)), &offset_data[0]);
+    }
 }
 
 int Cube::pos(int block_x, int block_y, int block_z) {

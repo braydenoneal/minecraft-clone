@@ -143,106 +143,141 @@ void ChunkLoader::setRenderQueue() {
             }
         }
 
-//        for (auto position: chunk_positions) {
-//            bool add_to_queue = true;
-//
-//            for (auto &chunk: chunks) {
-//                if (chunk.position == position) {
-//                    add_to_queue = false;
-//                }
-//            }
-//
-//            for (auto &queue_position: previous_queue) {
-//                if (queue_position == position) {
-//                    add_to_queue = false;
-//                }
-//            }
-//
-//            if (add_to_queue) {
-//                Chunk chunk(position);
-//                chunks.push_back(chunk);
-//            }
-//        }
+        for (auto position: chunk_positions) {
+            bool add_to_queue = true;
+
+            for (auto &chunk: meshes) {
+                if (chunk.position == position) {
+                    add_to_queue = false;
+                }
+            }
+
+            for (auto &queue_position: previous_queue) {
+                if (queue_position == position) {
+                    add_to_queue = false;
+                }
+            }
+
+            if (add_to_queue) {
+                Chunk chunk(position);
+                chunks.push_back(chunk);
+            }
+        }
 
         QueueSorter queue_sorter(*this);
         std::sort(queue.begin(), queue.end(), queue_sorter);
     }
 }
 
+//void ChunkLoader::renderQueue() {
+//    if (!queue.empty()) {
+//        Position position = queue.front();
+//
+//        bool generate_chunk_data = true;
+//
+//        for (const auto &chunk: chunks) {
+//            if (position == chunk.position) {
+//                generate_chunk_data = false;
+//            }
+//        }
+//
+//        if (generate_chunk_data) {
+//            Chunk chunk(position);
+//            chunks.push_back(chunk);
+//        } else {
+//            bool nx    = true;
+//            bool px    = true;
+//            bool nz    = true;
+//            bool pz    = true;
+//            bool nx_nz = true;
+//            bool nx_pz = true;
+//            bool px_nz = true;
+//            bool px_pz = true;
+//
+//            for (const auto &chunk: chunks) {
+//                       if (position.x - 1 == chunk.position.x && position.z     == chunk.position.z) {
+//                    nx = true;
+//                } else if (position.x + 1 == chunk.position.x && position.z     == chunk.position.z) {
+//                    px = true;
+//                } else if (position.x     == chunk.position.x && position.z - 1 == chunk.position.z) {
+//                    nz = true;
+//                } else if (position.x     == chunk.position.x && position.z + 1 == chunk.position.z) {
+//                    pz = true;
+//                } else if (position.x - 1 == chunk.position.x && position.z - 1 == chunk.position.z) {
+//                    nx_nz = true;
+//                } else if (position.x - 1 == chunk.position.x && position.z + 1 == chunk.position.z) {
+//                    nx_pz = true;
+//                } else if (position.x + 1 == chunk.position.x && position.z - 1 == chunk.position.z) {
+//                    px_nz = true;
+//                } else if (position.x + 1 == chunk.position.x && position.z + 1 == chunk.position.z) {
+//                    px_pz = true;
+//                }
+//            }
+//
+//            queue.pop_front();
+//
+//            if (nx && px && nz && pz && nx_nz && nx_pz && px_nz && px_pz) {
+//                for (const auto &chunk: chunks) {
+//                    if (position == chunk.position) {
+//                        std::vector<offset> new_mesh{};
+//
+//                        Cube::chunkToMesh(chunk, new_mesh, chunks);
+//
+//                        meshes.push_back({position, new_mesh});
+//
+//                        std::vector<offset>::size_type mesh_size = 0;
+//
+//                        for (const auto &mesh: meshes) {
+//                            mesh_size += mesh.mesh.size();
+//                        }
+//
+//                        vector<offset> new_total_mesh;
+//                        new_total_mesh.reserve(mesh_size);
+//
+//                        for (const Mesh &mesh: meshes) {
+//                            new_total_mesh.insert(new_total_mesh.end(), mesh.mesh.begin(), mesh.mesh.end());
+//                        }
+//
+//                        std::unique_lock<std::mutex> mesh_unique_lock(mesh_lock);
+//                        total_mesh = new_total_mesh;
+//                    }
+//                }
+//            } else {
+//                queue.push_back(position);
+//            }
+//        }
+//    }
+//}
+
 void ChunkLoader::renderQueue() {
     if (!queue.empty()) {
         Position position = queue.front();
 
-        bool generate_chunk_data = true;
+        queue.pop_front();
 
         for (const auto &chunk: chunks) {
             if (position == chunk.position) {
-                generate_chunk_data = false;
-            }
-        }
+                std::vector<offset> new_mesh{};
 
-        if (generate_chunk_data) {
-            Chunk chunk(position);
-            chunks.push_back(chunk);
-        } else {
-            bool nx = false;
-            bool px = false;
-            bool nz = false;
-            bool pz = false;
-            bool nx_nz = false;
-            bool nx_pz = false;
-            bool px_nz = false;
-            bool px_pz = false;
+                Cube::chunkToMesh(chunk, new_mesh, chunks);
 
-            for (const auto &chunk: chunks) {
-                if (position.x - 1 == chunk.position.x && position.z == chunk.position.z) {
-                    nx = true;
-                } else if (position.x + 1 == chunk.position.x && position.z == chunk.position.z) {
-                    px = true;
-                } else if (position.x == chunk.position.x && position.z - 1 == chunk.position.z) {
-                    nz = true;
-                } else if (position.x == chunk.position.x && position.z + 1 == chunk.position.z) {
-                    pz = true;
-                } else if (position.x - 1 == chunk.position.x && position.z - 1 == chunk.position.z) {
-                    nx_nz = true;
-                } else if (position.x - 1 == chunk.position.x && position.z + 1 == chunk.position.z) {
-                    nx_pz = true;
-                } else if (position.x + 1 == chunk.position.x && position.z - 1 == chunk.position.z) {
-                    px_nz = true;
-                } else if (position.x + 1 == chunk.position.x && position.z + 1 == chunk.position.z) {
-                    px_pz = true;
+                meshes.push_back({position, new_mesh});
+
+                std::vector<offset>::size_type mesh_size = 0;
+
+                for (const auto &mesh: meshes) {
+                    mesh_size += mesh.mesh.size();
                 }
-            }
 
-            if (nx && px && nz && pz && nx_nz && nx_pz && px_nz && px_pz) {
-                for (const auto &chunk: chunks) {
-                    if (position == chunk.position) {
-                        std::vector<offset> new_mesh{};
+                vector<offset> new_total_mesh;
+                new_total_mesh.reserve(mesh_size);
 
-                        Cube::chunkToMesh(chunk, new_mesh, chunks);
-
-                        meshes.push_back({position, new_mesh});
-
-                        std::vector<offset>::size_type mesh_size = 0;
-
-                        for (const auto &mesh: meshes) {
-                            mesh_size += mesh.mesh.size();
-                        }
-
-                        vector<offset> new_total_mesh;
-                        new_total_mesh.reserve(mesh_size);
-
-                        for (const Mesh &mesh: meshes) {
-                            new_total_mesh.insert(new_total_mesh.end(), mesh.mesh.begin(), mesh.mesh.end());
-                        }
-
-                        mesh_lock.lock();
-                        total_mesh = new_total_mesh;
-                        mesh_lock.unlock();
-
-                        queue.pop_front();
-                    }
+                for (const Mesh &mesh: meshes) {
+                    new_total_mesh.insert(new_total_mesh.end(), mesh.mesh.begin(), mesh.mesh.end());
                 }
+
+                std::unique_lock<std::mutex> mesh_unique_lock(mesh_lock);
+                total_mesh = new_total_mesh;
             }
         }
     }

@@ -29,9 +29,10 @@ int main() {
 
         graphics.clearScreen();
 
-        mesh_lock.lock();
-        cube.setMesh(mesh);
-        mesh_lock.unlock();
+        std::unique_lock<std::mutex> unique_mesh_lock(mesh_lock, std::try_to_lock);
+        if (unique_mesh_lock) {
+            cube.setMesh(mesh);
+        }
 
         cube.cube_array.bind();
         cube.setUniforms(window.getAspectRatio(), world_state.camera_position, world_state.camera_angle);

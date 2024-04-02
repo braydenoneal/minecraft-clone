@@ -14,7 +14,7 @@ Window::Window(std::mutex &_m_reference) : _m(_m_reference) {
 
     gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 
-    glfwSwapInterval(1);
+    glfwSwapInterval(vsync_enabled);
 
     glfwGetWindowSize(glfw_window, &width, &height);
 

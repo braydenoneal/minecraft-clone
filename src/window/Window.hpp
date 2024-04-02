@@ -29,5 +29,6 @@ private:
     int width{};
     int height{};
     bool maximized{true};
+    bool vsync_enabled{true};
     std::mutex &_m;
 };
