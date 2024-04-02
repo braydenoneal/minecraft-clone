@@ -13,13 +13,13 @@ class ChunkLoader {
 public:
     ChunkLoader(WorldState &world_state_reference, std::mutex &mesh_lock_reference, std::vector<offset> &mesh_reference);
 
-    void setRenderQueue();
-
     void unloadMeshes(const std::vector<Position> &positions);
 
     void unloadChunks(const std::vector<Position> &positions);
 
     void unloadQueue(const std::vector<Position> &positions);
+
+    void setRenderQueue();
 
     void renderQueue();
 
@@ -33,9 +33,9 @@ private:
     int x_chunk{-1};
     int y_chunk{-1};
     int z_chunk{-1};
-    int radius = 24;
-    std::vector<offset> &mesh;
+    int radius = 16;
     std::mutex &mesh_lock;
+    std::vector<offset> &total_mesh;
 
     class QueueSorter {
     public:
