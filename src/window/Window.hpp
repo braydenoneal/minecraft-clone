@@ -6,7 +6,7 @@
 
 class Window {
 public:
-    Window(std::mutex &_m_reference);
+    Window();
 
     ~Window();
 
@@ -30,5 +30,4 @@ private:
     int height{};
     bool maximized{true};
     bool vsync_enabled{true};
-    std::mutex &_m;
 };

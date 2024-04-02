@@ -10,15 +10,17 @@
 #include "world/chunk/ChunkLoader.hpp"
 
 int main() {
-    std::mutex mesh_lock{};
-    Window window{mesh_lock};
+    Window window{};
     Graphics graphics{};
     Gui::create(window.getGlfwWindow());
     DebugScreen debug_screen{};
     WorldState world_state{};
     Input input{window, world_state};
-    std::vector<offset> mesh{};
+
     Cube cube{};
+
+    std::mutex mesh_lock{};
+    std::vector<offset> mesh{};
     ChunkLoader chunk_loader{world_state, mesh_lock, mesh};
 
     std::thread chunk_thread(&ChunkLoader::chunkLoop, &chunk_loader);
@@ -30,6 +32,7 @@ int main() {
         graphics.clearScreen();
 
         std::unique_lock<std::mutex> unique_mesh_lock(mesh_lock, std::try_to_lock);
+
         if (unique_mesh_lock) {
             cube.setMesh(mesh);
         }
