@@ -6,7 +6,12 @@ Physics::Physics(Input &input_reference, WorldState &world_state_reference)
 
 void Physics::updateLoop() {
     while (true) {
-        world_state.camera_position = world_state.previous_camera_position;
+        if (moving) {
+            world_state.camera_position = Math::translate_in_direction_by_amount(
+                    world_state.camera_position, world_state.camera_angle.y,
+                    glm::vec3(0.0f, 0.0f, -world_state.camera_speed * (1 - previous_time_factor)));
+        }
+
         previous_time_factor = 0;
         moving = false;
 
@@ -16,7 +21,6 @@ void Physics::updateLoop() {
                     case GLFW_KEY_W:
                         moving = true;
                         last_update = steady_clock::now();
-                        world_state.previous_camera_position = world_state.camera_position;
                         break;
                     case GLFW_KEY_A:
                         world_state.camera_position = Math::translate_in_direction_by_amount(
@@ -50,21 +54,21 @@ void Physics::updateLoop() {
 }
 
 glm::vec3 Physics::getIntermediatePosition() {
-    auto now_time = steady_clock::now();
-
-    auto difference_microseconds = duration_cast<microseconds>(now_time - last_update).count();
-
-    float time_factor = (float) difference_microseconds / (float) update_frequency_microseconds;
-
     if (moving) {
-        world_state.previous_camera_position = Math::translate_in_direction_by_amount(
-                world_state.previous_camera_position, world_state.camera_angle.y,
+        auto now_time = steady_clock::now();
+
+        auto difference_microseconds = duration_cast<microseconds>(now_time - last_update).count();
+
+        float time_factor = (float) difference_microseconds / (float) update_frequency_microseconds;
+
+        world_state.camera_position = Math::translate_in_direction_by_amount(
+                world_state.camera_position, world_state.camera_angle.y,
                 glm::vec3(0.0f, 0.0f, -world_state.camera_speed * (time_factor - previous_time_factor)));
+
+        previous_time_factor = time_factor;
     }
 
-    previous_time_factor = time_factor;
-
-    return world_state.previous_camera_position;
+    return world_state.camera_position;
 }
 
 /*   w

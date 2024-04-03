@@ -20,8 +20,8 @@ public:
 private:
     Input &input;
     WorldState &world_state;
-    steady_clock::time_point last_update;
     int update_frequency_microseconds = (int) (1e6 / 60.0f);
+    steady_clock::time_point last_update;
     float previous_time_factor{0};
     bool moving = false;
 };
