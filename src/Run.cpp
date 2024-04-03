@@ -1,6 +1,4 @@
 #include <thread>
-#include <iostream>
-#include <chrono>
 
 #include "window/Window.hpp"
 #include "graphics/Graphics.hpp"
@@ -34,8 +32,6 @@ int main() {
     chunk_thread.detach();
 
     while (!window.shouldClose()) {
-        auto t1 = std::chrono::high_resolution_clock::now();
-
         input.pollEvents();
 
         graphics.clearScreen();
@@ -55,10 +51,6 @@ int main() {
         Gui::render();
 
         window.swapBuffers();
-
-        auto t2 = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
-//        std::cout << duration << "\n";
     }
 
     return 0;
