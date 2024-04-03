@@ -36,41 +36,6 @@ void Input::pollEvents() {
     } else if (world_state.camera_angle.y >= (float) M_PI) {
         world_state.camera_angle.y -= (float) M_PI * 2;
     }
-
-    for (std::pair<const int, int> key: keys) {
-        if (key.second) {
-            switch (key.first) {
-                case GLFW_KEY_W:
-                    world_state.camera_position = Math::translate_in_direction_by_amount(
-                            world_state.camera_position, world_state.camera_angle.y,
-                            glm::vec3(0.0f, 0.0f, -world_state.camera_speed));
-                    break;
-                case GLFW_KEY_A:
-                    world_state.camera_position = Math::translate_in_direction_by_amount(
-                            world_state.camera_position, world_state.camera_angle.y,
-                            glm::vec3(-world_state.camera_speed, 0.0f, 0.0f));
-                    break;
-                case GLFW_KEY_S:
-                    world_state.camera_position = Math::translate_in_direction_by_amount(
-                            world_state.camera_position, world_state.camera_angle.y,
-                            glm::vec3(0.0f, 0.0f, world_state.camera_speed));
-                    break;
-                case GLFW_KEY_D:
-                    world_state.camera_position = Math::translate_in_direction_by_amount(
-                            world_state.camera_position, world_state.camera_angle.y,
-                            glm::vec3(world_state.camera_speed, 0.0f, 0.0f));
-                    break;
-                case GLFW_KEY_SPACE:
-                    world_state.camera_position.y += world_state.camera_speed;
-                    break;
-                case GLFW_KEY_LEFT_SHIFT:
-                    world_state.camera_position.y -= world_state.camera_speed;
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
 }
 
 void Input::key_callback(GLFWwindow *glfw_window, int key, [[maybe_unused]] int scancode, int action,

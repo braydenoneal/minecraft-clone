@@ -106,12 +106,12 @@ void ChunkLoader::setRenderQueue() {
         std::vector<Position> mesh_positions{};
         std::vector<Position> chunk_positions{};
 
-        for (int x = x_chunk - radius - 1; x <= x_chunk + radius + 1; x++) {
-            for (int z = z_chunk - radius - 1; z <= z_chunk + radius + 1; z++) {
+        for (int x = x_chunk - radius - 2; x <= x_chunk + radius + 2; x++) {
+            for (int z = z_chunk - radius - 2; z <= z_chunk + radius + 2; z++) {
                 if (pow(x - x_chunk, 2) + pow(z - z_chunk, 2) < pow(radius + 1, 2)) {
                     mesh_positions.push_back({x, 0, z});
                 }
-                if (pow(x - x_chunk, 2) + pow(z - z_chunk, 2) < pow(radius + 2, 2)) {
+                if (pow(x - x_chunk, 2) + pow(z - z_chunk, 2) < pow(radius + 4, 2)) {
                     chunk_positions.push_back({x, 0, z});
                 }
             }

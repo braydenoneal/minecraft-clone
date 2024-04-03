@@ -1,4 +1,6 @@
 #include <thread>
+#include <iostream>
+#include <chrono>
 
 #include "window/Window.hpp"
 #include "graphics/Graphics.hpp"
@@ -8,9 +10,7 @@
 #include "gui/screens/DebugScreen.hpp"
 #include "graphics/models/cube/Cube.hpp"
 #include "world/chunk/ChunkLoader.hpp"
-
-#include <iostream>
-#include <chrono>
+#include "physics/Physics.hpp"
 
 int main() {
     Window window{};
@@ -19,6 +19,10 @@ int main() {
     DebugScreen debug_screen{};
     WorldState world_state{};
     Input input{window, world_state};
+    Physics physics{input, world_state};
+
+    std::thread update_thread(&Physics::updateLoop, &physics);
+    update_thread.detach();
 
     Cube cube{};
 
@@ -43,7 +47,7 @@ int main() {
         }
 
         cube.cube_array.bind();
-        cube.setUniforms(window.getAspectRatio(), world_state.camera_position, world_state.camera_angle);
+        cube.setUniforms(window.getAspectRatio(), physics.getIntermediatePosition(), world_state.camera_angle);
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, cube.triangle_count, cube.instance_count);
 
         Gui::newFrame();
@@ -54,7 +58,7 @@ int main() {
 
         auto t2 = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
-        std::cout << duration << "\n";
+//        std::cout << duration << "\n";
     }
 
     return 0;

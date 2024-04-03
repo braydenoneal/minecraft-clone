@@ -48,6 +48,8 @@ add_executable(${PROJECT_NAME}
         src/world/chunk/Chunk.hpp
         src/world/chunk/ChunkLoader.cpp
         src/world/chunk/ChunkLoader.hpp
+        src/physics/Physics.cpp
+        src/physics/Physics.hpp
 )
 
 include_directories(lib/glad/include)

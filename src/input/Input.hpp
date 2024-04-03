@@ -15,10 +15,10 @@ public:
 
     void pollEvents();
 
+    std::map<int, int> keys{};
 private:
     Window &window;
     WorldState &world_state;
-    std::map<int, int> keys{};
     double cursor_x = 0.0;
     double cursor_y = 0.0;
     double cursor_difference_x = 0.0;
