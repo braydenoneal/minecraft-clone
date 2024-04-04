@@ -25,7 +25,7 @@ void Skybox::draw() const {
     glDrawArrays(GL_TRIANGLES, 0, vertex_count);
 }
 
-void Skybox::setUniforms(float aspect_ratio, glm::vec3 camera_angle) const {
+void Skybox::setUniforms(float aspect_ratio, glm::vec3 camera_position, glm::vec3 camera_angle) const {
     glm::mat4 perspective = glm::perspective(glm::radians(70.0f), aspect_ratio, 0.05f, 2048.0f);
 
     auto camera_rotate = glm::mat4(1.0f);
@@ -37,4 +37,5 @@ void Skybox::setUniforms(float aspect_ratio, glm::vec3 camera_angle) const {
     glm::mat4 camera_matrix = perspective * camera_rotate;
 
     shader.setUniformMatrix4fv("u_camera", &camera_matrix[0][0]);
+    shader.setUniform4fv("u_position", &camera_position[0]);
 }

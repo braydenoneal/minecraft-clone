@@ -27,5 +27,5 @@ public:
 
     void draw() const;
 
-    void setUniforms(float aspect_ratio, glm::vec3 camera_angle) const;
+    void setUniforms(float aspect_ratio, glm::vec3 camera_position, glm::vec3 camera_angle) const;
 };

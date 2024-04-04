@@ -19,6 +19,8 @@ public:
 
     void setUniformMatrix4fv(const GLchar *name, const GLfloat *value) const;
 
+    void setUniform4fv(const GLchar *name, const GLfloat *value) const;
+
     void setUniform1i(const GLchar *name, GLint value) const;
 
     void setUniform1f(const GLchar *name, GLfloat value) const;

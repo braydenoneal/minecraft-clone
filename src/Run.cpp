@@ -52,7 +52,7 @@ int main() {
 
         skybox.shader.bind();
         skybox.vertex_array.bind();
-        skybox.setUniforms(window.getAspectRatio(), world_state.camera_angle);
+        skybox.setUniforms(window.getAspectRatio(), physics.getIntermediatePosition(), world_state.camera_angle);
         skybox.draw();
         VertexArray::unbind();
         Shader::unbind();
