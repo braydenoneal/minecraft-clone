@@ -21,6 +21,8 @@ public:
 
     void setUniform1i(const GLchar *name, GLint value) const;
 
+    void setUniform1f(const GLchar *name, GLfloat value) const;
+
 private:
     GLuint id{};
 

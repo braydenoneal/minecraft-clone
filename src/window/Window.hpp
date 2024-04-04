@@ -22,6 +22,8 @@ public:
 
     [[nodiscard]] float getAspectRatio() const;
 
+    [[nodiscard]] int getWidth() const;
+
     void setSize(int new_width, int height);
 
 private:

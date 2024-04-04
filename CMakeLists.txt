@@ -50,6 +50,8 @@ add_executable(${PROJECT_NAME}
         src/world/chunk/ChunkLoader.hpp
         src/physics/Physics.cpp
         src/physics/Physics.hpp
+        src/graphics/models/ui/Crosshair.cpp
+        src/graphics/models/ui/Crosshair.hpp
 )
 
 include_directories(lib/glad/include)

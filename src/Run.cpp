@@ -9,6 +9,7 @@
 #include "graphics/models/cube/Cube.hpp"
 #include "world/chunk/ChunkLoader.hpp"
 #include "physics/Physics.hpp"
+#include "graphics/models/ui/Crosshair.hpp"
 
 int main() {
     Window window{};
@@ -31,6 +32,8 @@ int main() {
     std::thread chunk_thread(&ChunkLoader::chunkLoop, &chunk_loader);
     chunk_thread.detach();
 
+    Crosshair crosshair{};
+
     while (!window.shouldClose()) {
         input.pollEvents();
 
@@ -42,9 +45,24 @@ int main() {
             cube.setMesh(mesh);
         }
 
+        glDisable(GL_BLEND);
+
+        cube.shader.bind();
         cube.cube_array.bind();
         cube.setUniforms(window.getAspectRatio(), physics.getIntermediatePosition(), world_state.camera_angle);
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, cube.triangle_count, cube.instance_count);
+        VertexArray::unbind();
+        Shader::unbind();
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ZERO);
+
+        crosshair.shader.bind();
+        crosshair.vertex_array.bind();
+        crosshair.setUniforms(window.getAspectRatio(), (float) window.getWidth());
+        crosshair.draw();
+        VertexArray::unbind();
+        Shader::unbind();
 
         Gui::newFrame();
         debug_screen.render();

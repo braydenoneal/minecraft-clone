@@ -59,6 +59,10 @@ float Window::getAspectRatio() const {
     return (float) width / (float) height;
 }
 
+int Window::getWidth() const {
+    return width;
+}
+
 void Window::setSize(int new_width, int new_height) {
     width = new_width;
     height = new_height;

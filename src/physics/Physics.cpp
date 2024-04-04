@@ -7,9 +7,15 @@ Physics::Physics(Input &input_reference, WorldState &world_state_reference)
 void Physics::updateLoop() {
     while (true) {
         if (moving) {
+            auto now_time = steady_clock::now();
+
+            auto difference_microseconds = duration_cast<microseconds>(now_time - last_update).count();
+
+            float time_factor = (float) difference_microseconds / (float) update_frequency_microseconds;
+
             world_state.camera_position = Math::translate_in_direction_by_amount(
                     world_state.camera_position, world_state.camera_angle.y,
-                    glm::vec3(0.0f, 0.0f, -world_state.camera_speed * (1 - previous_time_factor)));
+                    glm::vec3(0.0f, 0.0f, -world_state.camera_speed * (time_factor - previous_time_factor)));
         }
 
         previous_time_factor = 0;

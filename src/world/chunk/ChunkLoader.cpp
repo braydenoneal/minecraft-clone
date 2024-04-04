@@ -1,3 +1,4 @@
+#include <iostream>
 #include "ChunkLoader.hpp"
 
 ChunkLoader::ChunkLoader(WorldState &world_state_reference, std::mutex &mesh_lock_reference, std::vector<offset> &mesh_reference)
@@ -110,9 +111,11 @@ void ChunkLoader::setRenderQueue() {
             for (int z = z_chunk - radius - 2; z <= z_chunk + radius + 2; z++) {
                 if (pow(x - x_chunk, 2) + pow(z - z_chunk, 2) < pow(radius + 1, 2)) {
                     mesh_positions.push_back({x, 0, z});
+                    mesh_positions.push_back({x, 1, z});
                 }
                 if (pow(x - x_chunk, 2) + pow(z - z_chunk, 2) < pow(radius + 4, 2)) {
                     chunk_positions.push_back({x, 0, z});
+                    chunk_positions.push_back({x, 1, z});
                 }
             }
         }
