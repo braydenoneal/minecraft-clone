@@ -9,6 +9,7 @@ layout (location = 4) in int texture_index_in;
 layout (location = 5) in ivec4 occlusion_value_in;
 
 uniform mat4 u_camera;
+uniform vec3 u_position;
 
 out vec2 texture_coordinate;
 out float texture_index;
@@ -35,5 +36,5 @@ void main() {
     vec3 offset_position = vec3(new_position.x + offset.x, new_position.y + offset.y, new_position.z + offset.z);
     gl_Position = u_camera * vec4(offset_position, position.w);
     texture_coordinate = texture_uv_index;
-    fog_position = offset_position;
+    fog_position = offset_position - u_position;
 }

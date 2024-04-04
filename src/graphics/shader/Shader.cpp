@@ -38,6 +38,11 @@ void Shader::setUniformMatrix4fv(const GLchar *name, const GLfloat *value) const
 void Shader::setUniform4fv(const GLchar *name, const GLfloat *value) const {
     glUniform4fv(glGetUniformLocation(id, name), 1, value);
 }
+
+void Shader::setUniform3fv(const GLchar *name, const GLfloat *value) const {
+    glUniform3fv(glGetUniformLocation(id, name), 1, value);
+}
+
 void Shader::setUniform1i(const GLchar *name, GLint value) const {
     glUniform1i(glGetUniformLocation(id, name), value);
 }

@@ -49,6 +49,7 @@ void Cube::setUniforms(float aspect_ratio, glm::vec3 camera_position, glm::vec3 
     glm::mat4 camera_matrix = perspective * camera_rotate * camera_translate;
 
     shader.setUniformMatrix4fv("u_camera", &camera_matrix[0][0]);
+    shader.setUniform3fv("u_position", &camera_position[0]);
 }
 
 void Cube::chunkToMesh(const Chunk &chunk, std::vector<offset> &mesh, const std::vector<Chunk> &chunks) {
