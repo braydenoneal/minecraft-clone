@@ -14,6 +14,7 @@ out vec2 texture_coordinate;
 out float texture_index;
 out float brightness;
 out float occlusion_value;
+out vec3 fog_position;
 
 vec3 face_offsets[6] = vec3[6](
     vec3(0 + position.x, 0 + position.y, 0 + position.z),
@@ -34,4 +35,5 @@ void main() {
     vec3 offset_position = vec3(new_position.x + offset.x, new_position.y + offset.y, new_position.z + offset.z);
     gl_Position = u_camera * vec4(offset_position, position.w);
     texture_coordinate = texture_uv_index;
+    fog_position = offset_position;
 }
