@@ -8,6 +8,6 @@ uniform vec4 u_position;
 out vec3 pos;
 
 void main() {
-    gl_Position = u_camera * vec4(position.x * 100, position.y + 10, position.z * 100, position.w);
-    pos = vec3(position.x * 100, position.y + 10, position.z * 100);
+    gl_Position = u_camera * vec4(position.x * 100, position.y + 1, position.z * 100, position.w);
+    pos = vec3(position.x * 100, position.y + 1, position.z * 100);
 }
