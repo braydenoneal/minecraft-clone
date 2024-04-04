@@ -3,7 +3,6 @@
 layout (location = 0) in vec4 position;
 
 uniform mat4 u_camera;
-uniform vec4 u_position;
 
 out vec3 pos;
 
