@@ -10,6 +10,7 @@
 #include "world/chunk/ChunkLoader.hpp"
 #include "physics/Physics.hpp"
 #include "graphics/models/ui/Crosshair.hpp"
+#include "graphics/models/skybox/Skybox.hpp"
 
 int main() {
     Window window{};
@@ -32,6 +33,7 @@ int main() {
     std::thread chunk_thread(&ChunkLoader::chunkLoop, &chunk_loader);
     chunk_thread.detach();
 
+    Skybox skybox{};
     Crosshair crosshair{};
 
     while (!window.shouldClose()) {
@@ -46,6 +48,17 @@ int main() {
         }
 
         glDisable(GL_BLEND);
+        glDisable(GL_DEPTH_TEST);
+
+        skybox.shader.bind();
+        skybox.vertex_array.bind();
+        skybox.setUniforms(window.getAspectRatio(), world_state.camera_angle);
+        skybox.draw();
+        VertexArray::unbind();
+        Shader::unbind();
+
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
 
         cube.shader.bind();
         cube.cube_array.bind();
