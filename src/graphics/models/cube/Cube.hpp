@@ -35,7 +35,6 @@ public:
     VertexArray cube_array{};
     GLsizei triangle_count{};
     GLsizei instance_count{};
-    std::vector<offset> offset_data{};
     VertexBuffer offset_buffer{};
 
     Cube();

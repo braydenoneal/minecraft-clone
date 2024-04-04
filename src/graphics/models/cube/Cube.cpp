@@ -233,9 +233,8 @@ void Cube::setMesh(std::vector<offset> &total_mesh) {
 
     // TODO: Replace size comparison with a better way of checking the mesh for changes
     if (new_instance_count != instance_count) {
-        offset_data = total_mesh;
         instance_count = new_instance_count;
-        offset_buffer.setData((GLsizeiptr) (offset_data.size() * sizeof(offset)), &offset_data[0]);
+        offset_buffer.setData((GLsizeiptr) (total_mesh.size() * sizeof(offset)), &total_mesh[0]);
     }
 }
 

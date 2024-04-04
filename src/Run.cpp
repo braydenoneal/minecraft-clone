@@ -41,10 +41,12 @@ int main() {
 
         graphics.clearScreen();
 
-        std::unique_lock<std::mutex> unique_mesh_lock(mesh_lock, std::try_to_lock);
+        {
+            std::unique_lock<std::mutex> unique_mesh_lock(mesh_lock, std::try_to_lock);
 
-        if (unique_mesh_lock) {
-            cube.setMesh(mesh);
+            if (unique_mesh_lock) {
+                cube.setMesh(mesh);
+            }
         }
 
         glDisable(GL_BLEND);
