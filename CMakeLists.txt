@@ -54,6 +54,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/models/ui/Crosshair.hpp
         src/graphics/models/skybox/Skybox.cpp
         src/graphics/models/skybox/Skybox.hpp
+        src/physics/collision/Collision.cpp
+        src/physics/collision/Collision.hpp
 )
 
 include_directories(lib/glad/include)

@@ -1,13 +1,14 @@
 #include "Physics.hpp"
 
-
-Physics::Physics(Input &input_reference, WorldState &world_state_reference)
-        : input(input_reference), world_state(world_state_reference) {}
+Physics::Physics(Input &input_reference, WorldState &world_state_reference, Collision &collision_reference)
+        : input(input_reference), world_state(world_state_reference), collision(collision_reference) {}
 
 void Physics::processMovement() {
     auto now_time = steady_clock::now();
     auto difference_microseconds = duration_cast<microseconds>(now_time - last_update).count();
     float time_factor = (float) difference_microseconds / (float) update_frequency_microseconds;
+
+    glm::vec3 previous_camera_position = world_state.camera_position;
 
     for (std::pair<const int, int> key: input.keys) {
         if (key.second) {
@@ -42,6 +43,10 @@ void Physics::processMovement() {
                     break;
             }
         }
+    }
+
+    if (!collision.canMoveTo(world_state.camera_position)) {
+        world_state.camera_position = previous_camera_position;
     }
 
     previous_time_factor = time_factor;

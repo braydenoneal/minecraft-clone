@@ -9,6 +9,7 @@
 #include "graphics/models/cube/Cube.hpp"
 #include "world/chunk/ChunkLoader.hpp"
 #include "physics/Physics.hpp"
+#include "physics/collision/Collision.hpp"
 #include "graphics/models/ui/Crosshair.hpp"
 #include "graphics/models/skybox/Skybox.hpp"
 
@@ -19,10 +20,6 @@ int main() {
     DebugScreen debug_screen{};
     WorldState world_state{};
     Input input{window, world_state};
-    Physics physics{input, world_state};
-
-    std::thread update_thread(&Physics::updateLoop, &physics);
-    update_thread.detach();
 
     Cube cube{};
 
@@ -32,6 +29,12 @@ int main() {
 
     std::thread chunk_thread(&ChunkLoader::chunkLoop, &chunk_loader);
     chunk_thread.detach();
+
+    Collision collision{chunk_loader};
+    Physics physics{input, world_state, collision};
+
+    std::thread update_thread(&Physics::updateLoop, &physics);
+    update_thread.detach();
 
     Skybox skybox{};
     Crosshair crosshair{};
