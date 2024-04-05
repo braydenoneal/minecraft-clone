@@ -13,6 +13,16 @@ Block Collision::getBlockAtPosition(glm::vec3 position) {
             int y = (int) std::floor(position.y) % CHUNK_SIZE;
             int z = (int) std::floor(position.z) % CHUNK_SIZE;
 
+            if (x < 0) {
+                x += CHUNK_SIZE;
+            }
+            if (y < 0) {
+                y += CHUNK_SIZE;
+            }
+            if (z < 0) {
+                z += CHUNK_SIZE;
+            }
+
             return chunk.get(x, y, z);
         }
     }
@@ -33,7 +43,7 @@ bool Collision::canMoveTo(glm::vec3 position) {
                     glm::vec3 block_min = {x, y, z};
                     glm::vec3 block_max = {x + 1, y + 1, z + 1};
 
-                    if (!intersects(player_min, player_max, block_min, block_max)) {
+                    if (intersects(player_min, player_max, block_min, block_max)) {
                         can_move = false;
                     }
                 }
