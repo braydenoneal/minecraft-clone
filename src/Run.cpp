@@ -41,6 +41,8 @@ int main() {
 
         graphics.clearScreen();
 
+        physics.processMovement();
+
         {
             std::unique_lock<std::mutex> unique_mesh_lock(mesh_lock, std::try_to_lock);
 
@@ -64,7 +66,7 @@ int main() {
 
         cube.shader.bind();
         cube.cube_array.bind();
-        cube.setUniforms(window.getAspectRatio(), physics.getIntermediatePosition(), world_state.camera_angle);
+        cube.setUniforms(window.getAspectRatio(), world_state.camera_position, world_state.camera_angle);
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, cube.triangle_count, cube.instance_count);
         VertexArray::unbind();
         Shader::unbind();

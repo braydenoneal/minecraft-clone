@@ -13,9 +13,9 @@ class Physics {
 public:
     Physics(Input &input_reference, WorldState &world_state_reference);
 
-    void updateLoop();
+    void processMovement();
 
-    glm::vec3 getIntermediatePosition();
+    void updateLoop();
 
 private:
     Input &input;
