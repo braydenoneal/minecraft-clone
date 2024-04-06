@@ -12,6 +12,7 @@
 #include "physics/collision/Collision.hpp"
 #include "graphics/models/ui/Crosshair.hpp"
 #include "graphics/models/skybox/Skybox.hpp"
+#include "graphics/models/debug/BoundingBox.hpp"
 
 int main() {
     Window window{};
@@ -38,6 +39,7 @@ int main() {
 
     Skybox skybox{};
     Crosshair crosshair{};
+    BoundingBox bounding_box{};
 
     while (!window.shouldClose()) {
         input.pollEvents();
@@ -71,6 +73,15 @@ int main() {
         cube.cube_array.bind();
         cube.setUniforms(window.getAspectRatio(), world_state.camera_position, world_state.camera_angle);
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, cube.triangle_count, cube.instance_count);
+        VertexArray::unbind();
+        Shader::unbind();
+
+        glLineWidth(4);
+
+        bounding_box.shader.bind();
+        bounding_box.vertex_array.bind();
+        bounding_box.setUniforms(window.getAspectRatio(), world_state.camera_angle);
+        bounding_box.draw();
         VertexArray::unbind();
         Shader::unbind();
 

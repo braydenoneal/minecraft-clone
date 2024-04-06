@@ -56,6 +56,8 @@ add_executable(${PROJECT_NAME}
         src/graphics/models/skybox/Skybox.hpp
         src/physics/collision/Collision.cpp
         src/physics/collision/Collision.hpp
+        src/graphics/models/debug/BoundingBox.cpp
+        src/graphics/models/debug/BoundingBox.hpp
 )
 
 include_directories(lib/glad/include)
