@@ -8,36 +8,36 @@ void Physics::processMovement() {
     auto difference_microseconds = duration_cast<microseconds>(now_time - last_update).count();
     float time_factor = (float) difference_microseconds / (float) update_frequency_microseconds;
 
-    glm::vec3 previous_camera_position = world_state.camera_position;
+    glm::vec3 next_camera_position = world_state.camera_position;
 
     for (std::pair<const int, int> key: input.keys) {
         if (key.second) {
             switch (key.first) {
                 case GLFW_KEY_W:
-                    world_state.camera_position = Math::translate_in_direction_by_amount(
-                            world_state.camera_position, world_state.camera_angle.y,
+                    next_camera_position = Math::translate_in_direction_by_amount(
+                            next_camera_position, world_state.camera_angle.y,
                             glm::vec3(0.0f, 0.0f, -world_state.camera_speed * (time_factor - previous_time_factor)));
                     break;
                 case GLFW_KEY_A:
-                    world_state.camera_position = Math::translate_in_direction_by_amount(
-                            world_state.camera_position, world_state.camera_angle.y,
+                    next_camera_position = Math::translate_in_direction_by_amount(
+                            next_camera_position, world_state.camera_angle.y,
                             glm::vec3(-world_state.camera_speed * (time_factor - previous_time_factor), 0.0f, 0.0f));
                     break;
                 case GLFW_KEY_S:
-                    world_state.camera_position = Math::translate_in_direction_by_amount(
-                            world_state.camera_position, world_state.camera_angle.y,
+                    next_camera_position = Math::translate_in_direction_by_amount(
+                            next_camera_position, world_state.camera_angle.y,
                             glm::vec3(0.0f, 0.0f, world_state.camera_speed * (time_factor - previous_time_factor)));
                     break;
                 case GLFW_KEY_D:
-                    world_state.camera_position = Math::translate_in_direction_by_amount(
-                            world_state.camera_position, world_state.camera_angle.y,
+                    next_camera_position = Math::translate_in_direction_by_amount(
+                            next_camera_position, world_state.camera_angle.y,
                             glm::vec3(world_state.camera_speed * (time_factor - previous_time_factor), 0.0f, 0.0f));
                     break;
                 case GLFW_KEY_SPACE:
-                    world_state.camera_position.y += world_state.camera_speed * (time_factor - previous_time_factor);
+                    next_camera_position.y += world_state.camera_speed * (time_factor - previous_time_factor);
                     break;
                 case GLFW_KEY_LEFT_SHIFT:
-                    world_state.camera_position.y -= world_state.camera_speed * (time_factor - previous_time_factor);
+                    next_camera_position.y -= world_state.camera_speed * (time_factor - previous_time_factor);
                     break;
                 default:
                     break;
@@ -45,8 +45,8 @@ void Physics::processMovement() {
         }
     }
 
-    if (world_state.camera_position != previous_camera_position && !collision.canMoveTo(world_state.camera_position)) {
-        world_state.camera_position = previous_camera_position;
+    if (world_state.camera_position != next_camera_position && collision.canMoveTo(next_camera_position)) {
+        world_state.camera_position = next_camera_position;
     }
 
     previous_time_factor = time_factor;
