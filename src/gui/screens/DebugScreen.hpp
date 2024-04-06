@@ -1,10 +1,14 @@
 #pragma once
 
 #include <imgui.h>
+#include <vector>
 
 #include "../Screen.hpp"
 
-class DebugScreen: public Screen {
+class DebugScreen {
 public:
-    void render() const override;
+    void render();
+
+private:
+    std::vector<float> past_frame_rates{};
 };

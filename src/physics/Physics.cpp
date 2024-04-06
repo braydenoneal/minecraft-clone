@@ -45,8 +45,8 @@ void Physics::processMovement() {
         }
     }
 
-    if (world_state.camera_position != next_camera_position && collision.canMoveTo(next_camera_position)) {
-        world_state.camera_position = next_camera_position;
+    if (world_state.camera_position != next_camera_position) {
+        world_state.camera_position = collision.canMoveTo(world_state.camera_position, next_camera_position);
     }
 
     previous_time_factor = time_factor;

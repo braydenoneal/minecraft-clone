@@ -1,4 +1,5 @@
 #include <thread>
+#include <iostream>
 
 #include "window/Window.hpp"
 #include "graphics/Graphics.hpp"
@@ -26,7 +27,7 @@ int main() {
 
     std::mutex mesh_lock{};
     std::vector<offset> mesh{};
-    ChunkLoader chunk_loader{world_state, mesh_lock, mesh};
+    ChunkLoader chunk_loader{mesh_lock, mesh, world_state.camera_position};
 
     std::thread chunk_thread(&ChunkLoader::chunkLoop, &chunk_loader);
     chunk_thread.detach();

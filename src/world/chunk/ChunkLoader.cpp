@@ -1,8 +1,8 @@
 #include <iostream>
 #include "ChunkLoader.hpp"
 
-ChunkLoader::ChunkLoader(WorldState &world_state_reference, std::mutex &mesh_lock_reference, std::vector<offset> &mesh_reference)
-        : world_state(world_state_reference), mesh_lock(mesh_lock_reference), total_mesh(mesh_reference) {}
+ChunkLoader::ChunkLoader(std::mutex &mesh_lock_reference, std::vector<offset> &mesh_reference, glm::vec3 &camera_position)
+        : mesh_lock(mesh_lock_reference), total_mesh(mesh_reference), camera_position(camera_position) {}
 
 void ChunkLoader::unloadMeshes(const std::vector<Position> &positions) {
     std::vector<Position> remove_meshes{};
@@ -95,9 +95,9 @@ void ChunkLoader::unloadQueue(const std::vector<Position> &positions) {
 }
 
 void ChunkLoader::setRenderQueue() {
-    int next_x_chunk = std::floor(world_state.camera_position.x / (float) CHUNK_SIZE);
-    int next_y_chunk = std::floor(world_state.camera_position.y / (float) CHUNK_SIZE);
-    int next_z_chunk = std::floor(world_state.camera_position.z / (float) CHUNK_SIZE);
+    int next_x_chunk = std::floor(camera_position.x / (float) CHUNK_SIZE);
+    int next_y_chunk = std::floor(camera_position.y / (float) CHUNK_SIZE);
+    int next_z_chunk = std::floor(camera_position.z / (float) CHUNK_SIZE);
 
     if (next_x_chunk != x_chunk || next_z_chunk != z_chunk) {
         x_chunk = next_x_chunk;

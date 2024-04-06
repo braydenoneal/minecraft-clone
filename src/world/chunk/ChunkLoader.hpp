@@ -13,7 +13,7 @@ class ChunkLoader {
 public:
     std::vector<Chunk> chunks{};
 
-    ChunkLoader(WorldState &world_state_reference, std::mutex &mesh_lock_reference, std::vector<offset> &mesh_reference);
+    ChunkLoader(std::mutex &mesh_lock_reference, std::vector<offset> &mesh_reference, glm::vec3 &camera_position);
 
     void unloadMeshes(const std::vector<Position> &positions);
 
@@ -28,7 +28,7 @@ public:
     void chunkLoop();
 
 private:
-    WorldState &world_state;
+    glm::vec3 &camera_position;
     std::vector<Mesh> meshes{};
     std::deque<Position> queue{};
     int x_chunk{-1};
