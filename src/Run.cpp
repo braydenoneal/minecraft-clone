@@ -32,7 +32,8 @@ int main() {
     chunk_thread.detach();
 
     Collision collision{chunk_loader};
-    Physics physics{input, world_state, collision};
+    std::mutex physics_lock{};
+    Physics physics{input, world_state, collision, physics_lock};
 
     std::thread update_thread(&Physics::updateLoop, &physics);
     update_thread.detach();
@@ -46,7 +47,9 @@ int main() {
 
         graphics.clearScreen();
 
+        physics_lock.lock();
         physics.processMovement();
+        physics_lock.unlock();
 
         {
             std::unique_lock<std::mutex> unique_mesh_lock(mesh_lock, std::try_to_lock);

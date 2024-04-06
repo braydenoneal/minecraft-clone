@@ -12,7 +12,7 @@ using namespace std::chrono;
 
 class Physics {
 public:
-    Physics(Input &input_reference, WorldState &world_state_reference, Collision &collision_reference);
+    Physics(Input &input, WorldState &world_state, Collision &collision, std::mutex &lock);
 
     void processMovement();
 
@@ -25,4 +25,5 @@ private:
     int update_frequency_microseconds = (int) (1e6 / 60.0f);
     steady_clock::time_point last_update;
     float previous_time_factor{0};
+    std::mutex &lock;
 };

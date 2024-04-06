@@ -1,7 +1,7 @@
 #include "Physics.hpp"
 
-Physics::Physics(Input &input_reference, WorldState &world_state_reference, Collision &collision_reference)
-        : input(input_reference), world_state(world_state_reference), collision(collision_reference) {}
+Physics::Physics(Input &input, WorldState &world_state, Collision &collision, std::mutex &lock)
+        : input(input), world_state(world_state), collision(collision), lock(lock) {}
 
 void Physics::processMovement() {
     auto now_time = steady_clock::now();
@@ -54,10 +54,12 @@ void Physics::processMovement() {
 
 void Physics::updateLoop() {
     while (true) {
+        lock.lock();
         processMovement();
 
         last_update = steady_clock::now();
         previous_time_factor = 0;
+        lock.unlock();
 
         std::this_thread::sleep_for(std::chrono::microseconds(update_frequency_microseconds));
     }
