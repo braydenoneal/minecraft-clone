@@ -46,6 +46,9 @@ int main() {
     BoundingBox bounding_box{};
     Pig pig{};
 
+    float pig_rotation = 0;
+    float pig_rotation_direction = 1;
+
     while (!window.shouldClose()) {
         input.pollEvents();
 
@@ -88,7 +91,19 @@ int main() {
         pig.shader.bind();
         pig.vertex_array.bind();
         pig.texture.bind();
-        pig.setUniforms(window.getAspectRatio(), world_state.camera_position, world_state.camera_angle);
+        if (pig_rotation > 1) {
+            pig_rotation_direction = -1;
+        } else if (pig_rotation < -1) {
+            pig_rotation_direction = 1;
+        }
+        pig_rotation += 0.05f * pig_rotation_direction;
+        pig.setLegBackRightRotation(0, 0, -pig_rotation);
+        pig.setLegBackLeftRotation(0, 0, pig_rotation);
+        pig.setLegFrontRightRotation(0, 0, pig_rotation);
+        pig.setLegFrontLeftRotation(0, 0, -pig_rotation);
+        pig.setHeadRotation(0, 0, pig_rotation / 2);
+        pig.setUniforms(window.getAspectRatio(), world_state.camera_position, world_state.camera_angle,
+                        glm::vec3(0, 1 + pig_rotation / 2, 0), glm::vec3(0, pig_rotation, 0));
         pig.draw();
         Texture::unbind();
         VertexArray::unbind();
