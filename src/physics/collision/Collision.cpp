@@ -102,7 +102,7 @@ glm::vec3 Collision::moveTo(glm::vec3 start_position, glm::vec3 end_position, gl
             intersection_point.z < plane_point.z - 0.5 - 0.3 || intersection_point.z > plane_point.z + 0.5 + 0.3) {
             intersection_point = end_position;
         } else {
-            intersection_point = moveTo(intersection_point, intersection_point + glm::vec3(0, 0, ray_direction.z / 1000), cube_position);
+//            intersection_point = moveTo(intersection_point, intersection_point + glm::vec3(0, 0, ray_direction.z / 1000), cube_position);
         }
     }
 
@@ -114,7 +114,7 @@ glm::vec3 Collision::moveTo(glm::vec3 start_position, glm::vec3 end_position, gl
             intersection_point.z < plane_point.z - 0.5 - 0.3 || intersection_point.z > plane_point.z + 0.5 + 0.3) {
             intersection_point = end_position;
         } else {
-            intersection_point = moveTo(intersection_point, intersection_point + glm::vec3(0, 0, ray_direction.z / 1000), cube_position);
+//            intersection_point = moveTo(intersection_point, intersection_point + glm::vec3(0, 0, ray_direction.z / 1000), cube_position);
         }
     }
 
@@ -146,7 +146,7 @@ glm::vec3 Collision::moveTo(glm::vec3 start_position, glm::vec3 end_position, gl
             intersection_point.y < plane_point.y - 0.5 - 0.2 || intersection_point.y > plane_point.y + 0.5 + 1.6) {
             intersection_point = end_position;
         } else {
-            intersection_point = moveTo(intersection_point, intersection_point + glm::vec3(ray_direction.x / 1000, 0, 0), cube_position);
+//            intersection_point = moveTo(intersection_point, intersection_point + glm::vec3(ray_direction.x / 1000, 0, 0), cube_position);
         }
     }
 
@@ -158,7 +158,7 @@ glm::vec3 Collision::moveTo(glm::vec3 start_position, glm::vec3 end_position, gl
             intersection_point.y < plane_point.y - 0.5 - 0.2 || intersection_point.y > plane_point.y + 0.5 + 1.6) {
             intersection_point = end_position;
         } else {
-            intersection_point = moveTo(intersection_point, intersection_point + glm::vec3(ray_direction.x / 1000, 0, 0), cube_position);
+//            intersection_point = moveTo(intersection_point, intersection_point + glm::vec3(ray_direction.x / 1000, 0, 0), cube_position);
         }
     }
 

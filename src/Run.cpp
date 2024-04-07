@@ -14,6 +14,7 @@
 #include "graphics/models/ui/Crosshair.hpp"
 #include "graphics/models/skybox/Skybox.hpp"
 #include "graphics/models/debug/BoundingBox.hpp"
+#include "graphics/models/entity/pig/Pig.hpp"
 
 int main() {
     Window window{};
@@ -41,7 +42,9 @@ int main() {
 
     Skybox skybox{};
     Crosshair crosshair{};
+    bool render_bounding_box = false;
     BoundingBox bounding_box{};
+    Pig pig{};
 
     while (!window.shouldClose()) {
         input.pollEvents();
@@ -75,19 +78,32 @@ int main() {
 
         cube.shader.bind();
         cube.cube_array.bind();
+        cube.texture.bind();
         cube.setUniforms(window.getAspectRatio(), world_state.camera_position, world_state.camera_angle);
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, cube.triangle_count, cube.instance_count);
+        Texture::unbind();
         VertexArray::unbind();
         Shader::unbind();
 
-        glLineWidth(4);
-
-        bounding_box.shader.bind();
-        bounding_box.vertex_array.bind();
-        bounding_box.setUniforms(window.getAspectRatio(), world_state.camera_angle);
-        bounding_box.draw();
+        pig.shader.bind();
+        pig.vertex_array.bind();
+        pig.texture.bind();
+        pig.setUniforms(window.getAspectRatio(), world_state.camera_position, world_state.camera_angle);
+        pig.draw();
+        Texture::unbind();
         VertexArray::unbind();
         Shader::unbind();
+
+        if (render_bounding_box) {
+            glLineWidth(4);
+
+            bounding_box.shader.bind();
+            bounding_box.vertex_array.bind();
+            bounding_box.setUniforms(window.getAspectRatio(), world_state.camera_angle);
+            bounding_box.draw();
+            VertexArray::unbind();
+            Shader::unbind();
+        }
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ZERO);

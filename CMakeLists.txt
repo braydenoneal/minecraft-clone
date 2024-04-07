@@ -58,6 +58,8 @@ add_executable(${PROJECT_NAME}
         src/physics/collision/Collision.hpp
         src/graphics/models/debug/BoundingBox.cpp
         src/graphics/models/debug/BoundingBox.hpp
+        src/graphics/models/entity/pig/Pig.cpp
+        src/graphics/models/entity/pig/Pig.hpp
 )
 
 include_directories(lib/glad/include)
