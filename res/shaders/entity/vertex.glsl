@@ -31,7 +31,7 @@ void main() {
     vec4 origined_pos = vec4(position.x - rotate_origin.x, position.y - rotate_origin.y, position.z - rotate_origin.z, 1);
     vec4 rotated_position = rotx * roty * rotz * origined_pos;
     vec4 final_position = vec4(rotated_position.x + rotate_origin.x, rotated_position.y + rotate_origin.y, rotated_position.z + rotate_origin.z, 1);
-    gl_Position = u_camera * (final_position + vec4(0, 16, 0, 0));
+    gl_Position = u_camera * (final_position);
     texture_coordinate = texture_uv;
     texture_brightness = brightness;
 }

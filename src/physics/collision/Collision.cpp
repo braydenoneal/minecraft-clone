@@ -2,34 +2,6 @@
 
 Collision::Collision(ChunkLoader &chunk_loader_reference) : chunk_loader(chunk_loader_reference) {}
 
-Block Collision::getBlockAtPosition(glm::vec3 position) {
-    int chunk_x = std::floor(position.x / (float) CHUNK_SIZE);
-    int chunk_y = std::floor(position.y / (float) CHUNK_SIZE);
-    int chunk_z = std::floor(position.z / (float) CHUNK_SIZE);
-
-    for (const auto &chunk: chunk_loader.chunks) {
-        if (chunk_x == chunk.position.x && chunk_y == chunk.position.y && chunk_z == chunk.position.z) {
-            int x = (int) std::floor(position.x) % CHUNK_SIZE;
-            int y = (int) std::floor(position.y) % CHUNK_SIZE;
-            int z = (int) std::floor(position.z) % CHUNK_SIZE;
-
-            if (x < 0) {
-                x += CHUNK_SIZE;
-            }
-            if (y < 0) {
-                y += CHUNK_SIZE;
-            }
-            if (z < 0) {
-                z += CHUNK_SIZE;
-            }
-
-            return chunk.get(x, y, z);
-        }
-    }
-
-    return {0};
-}
-
 glm::vec3 Collision::canMoveTo(glm::vec3 start_position, glm::vec3 end_position) {
     glm::vec3 player_min = {end_position.x - 0.3f, end_position.y - 1.6f, end_position.z - 0.3f};
     glm::vec3 player_max = {end_position.x + 0.3f, end_position.y + 0.2f, end_position.z + 0.3f};
@@ -39,7 +11,7 @@ glm::vec3 Collision::canMoveTo(glm::vec3 start_position, glm::vec3 end_position)
     for (int x = (int) std::floor(player_min.x); x < (int) std::ceil(player_max.x); x++) {
         for (int y = (int) std::floor(player_min.y); y < (int) std::ceil(player_max.y); y++) {
             for (int z = (int) std::floor(player_min.z); z < (int) std::ceil(player_max.z); z++) {
-                if (getBlockAtPosition(glm::vec3((float) x, (float) y, (float) z)).id != 0) {
+                if (chunk_loader.getBlockAtPosition(glm::vec3((float) x, (float) y, (float) z)).id != 0) {
                     glm::vec3 block_min = {x, y, z};
                     glm::vec3 block_max = {x + 1, y + 1, z + 1};
 

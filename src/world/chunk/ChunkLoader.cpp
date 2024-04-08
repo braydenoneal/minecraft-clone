@@ -210,6 +210,34 @@ void ChunkLoader::chunkLoop() {
     }
 }
 
+Block ChunkLoader::getBlockAtPosition(glm::vec3 position) {
+    int chunk_x = std::floor(position.x / (float) CHUNK_SIZE);
+    int chunk_y = std::floor(position.y / (float) CHUNK_SIZE);
+    int chunk_z = std::floor(position.z / (float) CHUNK_SIZE);
+
+    for (const auto &chunk: chunks) {
+        if (chunk_x == chunk.position.x && chunk_y == chunk.position.y && chunk_z == chunk.position.z) {
+            int x = (int) std::floor(position.x) % CHUNK_SIZE;
+            int y = (int) std::floor(position.y) % CHUNK_SIZE;
+            int z = (int) std::floor(position.z) % CHUNK_SIZE;
+
+            if (x < 0) {
+                x += CHUNK_SIZE;
+            }
+            if (y < 0) {
+                y += CHUNK_SIZE;
+            }
+            if (z < 0) {
+                z += CHUNK_SIZE;
+            }
+
+            return chunk.get(x, y, z);
+        }
+    }
+
+    return {0};
+}
+
 ChunkLoader::QueueSorter::QueueSorter(ChunkLoader &chunk_loader_reference) : chunk_loader(chunk_loader_reference) {}
 
 bool ChunkLoader::QueueSorter::operator()(Position position_1, Position position_2) const {

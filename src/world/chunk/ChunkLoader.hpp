@@ -27,6 +27,8 @@ public:
 
     void chunkLoop();
 
+    Block getBlockAtPosition(glm::vec3 position);
+
 private:
     glm::vec3 &camera_position;
     std::vector<Mesh> meshes{};

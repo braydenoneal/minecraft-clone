@@ -1,5 +1,4 @@
 #include <thread>
-#include <iostream>
 
 #include "window/Window.hpp"
 #include "graphics/Graphics.hpp"
@@ -15,6 +14,7 @@
 #include "graphics/models/skybox/Skybox.hpp"
 #include "graphics/models/debug/BoundingBox.hpp"
 #include "graphics/models/entity/pig/Pig.hpp"
+#include "physics/entity/Pig.hpp"
 
 int main() {
     Window window{};
@@ -44,10 +44,14 @@ int main() {
     Crosshair crosshair{};
     bool render_bounding_box = false;
     BoundingBox bounding_box{};
-    Pig pig{};
 
-    float pig_rotation = 0;
-    float pig_rotation_direction = 1;
+    int pig_count = 32;
+    std::vector<PigPhysics> pigs{};
+    pigs.reserve(pig_count);
+
+    for (int i = 0; i < pig_count; i++) {
+        pigs.push_back(*(new PigPhysics(chunk_loader, *(new Pig()))));
+    }
 
     while (!window.shouldClose()) {
         input.pollEvents();
@@ -88,26 +92,9 @@ int main() {
         VertexArray::unbind();
         Shader::unbind();
 
-        pig.shader.bind();
-        pig.vertex_array.bind();
-        pig.texture.bind();
-        if (pig_rotation > 1) {
-            pig_rotation_direction = -1;
-        } else if (pig_rotation < -1) {
-            pig_rotation_direction = 1;
+        for (auto &pig: pigs) {
+            pig.stepAnimation(window.getAspectRatio(), world_state.camera_position, world_state.camera_angle);
         }
-        pig_rotation += 0.05f * pig_rotation_direction;
-        pig.setLegBackRightRotation(0, 0, -pig_rotation);
-        pig.setLegBackLeftRotation(0, 0, pig_rotation);
-        pig.setLegFrontRightRotation(0, 0, pig_rotation);
-        pig.setLegFrontLeftRotation(0, 0, -pig_rotation);
-        pig.setHeadRotation(0, 0, pig_rotation / 2);
-        pig.setUniforms(window.getAspectRatio(), world_state.camera_position, world_state.camera_angle,
-                        glm::vec3(0, 1 + pig_rotation / 2, 0), glm::vec3(0, pig_rotation, 0));
-        pig.draw();
-        Texture::unbind();
-        VertexArray::unbind();
-        Shader::unbind();
 
         if (render_bounding_box) {
             glLineWidth(4);
