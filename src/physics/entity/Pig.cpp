@@ -85,7 +85,16 @@ void PigPhysics::stepAnimation(float aspect_ratio, glm::vec3 camera_position, gl
     }
     pos_int += (position - previous_pig_position) / (float) anim_time;
     if (rot_counter < 40) {
-        rot_int += (rotation - previous_pig_rotation) / 40.0f;
+        glm::vec3 rot1 = rotation - previous_pig_rotation;
+        glm::vec3 rot2 = {0, -(glm::radians(360.0f) - rot1.y), 0};
+        if (rot1.y < 0) {
+            rot2 = {0, glm::radians(360.0f) + rot1.y, 0};
+        }
+        if (abs(rot1.y) < abs(rot2.y)) {
+            rot_int += rot1 / 40.0f;
+        } else {
+            rot_int += rot2 / 40.0f;
+        }
     }
     rot_counter++;
     glm::vec3 new_pos = previous_pig_position + pos_int;
