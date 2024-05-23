@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
-project(glengine)
+project(minecraft-clone)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -12,7 +12,7 @@ file(GLOB IMGUI_SOURCE
     "lib/imgui/backends/imgui_impl_glfw.cpp"
 )
 
-add_executable(glengine
+add_executable(minecraft-clone
         lib/glad/src/glad.c
         lib/stb/src/stb_image.cpp
         ${IMGUI_SOURCE}
@@ -32,4 +32,4 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(dir ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory(lib/glfw)
-target_link_libraries(glengine glfw)
+target_link_libraries(minecraft-clone glfw)
