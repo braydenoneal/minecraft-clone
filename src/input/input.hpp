@@ -94,6 +94,18 @@ namespace input {
                     user_state::field_of_view = 30.0f;
                     user_state::mouse_sensitivity /= 2.0f;
                     break;
+                case GLFW_KEY_1:
+                    window::selected_block = 1;
+                    break;
+                case GLFW_KEY_2:
+                    window::selected_block = 2;
+                    break;
+                case GLFW_KEY_3:
+                    window::selected_block = 3;
+                    break;
+                case GLFW_KEY_4:
+                    window::selected_block = 4;
+                    break;
                 default:
                     break;
             }

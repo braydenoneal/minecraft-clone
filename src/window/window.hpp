@@ -35,6 +35,7 @@ namespace window {
     int air_time = 0;
     bool jumping = false;
     int selected_block = 1;
+    bool reset_save_files = false;
 
     std::vector<chunk::chunk> chunks;
     std::vector<chunk::chunk_mesh> chunk_meshes;
@@ -45,10 +46,38 @@ namespace window {
 
     int auto_save_counter = 0;
 
-    void write_file_test() {
+    void reset_region_file() {
         std::ofstream wf("test.dat", std::ofstream::trunc | std::ofstream::binary);
         unsigned long blank_region = 0;
         wf.write((char *) &blank_region, sizeof(blank_region));
+        wf.close();
+    }
+
+    void reset_world_file() {
+        std::ofstream wf("world.dat", std::ofstream::trunc | std::ofstream::binary);
+
+        glm::vec3 position = game_state::camera_position;
+
+        wf.write((char *) &position, sizeof(position));
+
+        glm::vec3 angle = game_state::camera_angle;
+
+        wf.write((char *) &angle, sizeof(angle));
+
+        wf.close();
+    }
+
+    void save_world_file() {
+        std::ofstream wf("world.dat", std::ofstream::trunc | std::ofstream::binary);
+
+        glm::vec3 position = game_state::camera_position;
+
+        wf.write((char *) &position, sizeof(position));
+
+        glm::vec3 angle = game_state::camera_angle;
+
+        wf.write((char *) &angle, sizeof(angle));
+
         wf.close();
     }
 
@@ -385,23 +414,10 @@ namespace window {
 
         setup_hotbar();
 
-        // Reset chunk storage
-//        write_file_test();
-
-        // Reset position storage
-//        {
-//            std::ofstream wf("world.dat", std::ofstream::trunc | std::ofstream::binary);
-//
-//            glm::vec3 position = game_state::camera_position;
-//
-//            wf.write((char *) &position, sizeof(position));
-//
-//            glm::vec3 angle = game_state::camera_angle;
-//
-//            wf.write((char *) &angle, sizeof(angle));
-//
-//            wf.close();
-//        }
+        if (reset_save_files) {
+            reset_region_file();
+            reset_world_file();
+        }
 
         // Initial read from position storage
         {
@@ -443,6 +459,7 @@ namespace window {
     }
 
     void close() {
+        save_world_file();
         glfwSetWindowShouldClose(input_state::glfw_window, GLFW_TRUE);
     }
 
@@ -532,15 +549,15 @@ namespace window {
                         for (unsigned long i = 0; i < read_chunk_size; i++) {
                             int x_read;
                             int z_read;
-                            rf.seekg(sizeof(unsigned long) + i * sizeof(chunk::chunk));
+                            rf.seekg((std::streamoff) (sizeof(unsigned long) + i * sizeof(chunk::chunk)));
                             rf.read((char *) &x_read, sizeof(int));
-                            rf.seekg(sizeof(unsigned long) + i * sizeof(chunk::chunk) + sizeof(int));
+                            rf.seekg((std::streamoff) (sizeof(unsigned long) + i * sizeof(chunk::chunk) + sizeof(int)));
                             rf.read((char *) &z_read, sizeof(int));
 
                             if (x_read == chunk.x && z_read == chunk.z) {
                                 std::ofstream wf("test.dat", std::ofstream::binary | std::ofstream::in);
 
-                                wf.seekp(sizeof(unsigned long) + i * sizeof(chunk::chunk));
+                                wf.seekp((std::streamoff) (sizeof(unsigned long) + i * sizeof(chunk::chunk)));
 
                                 wf.write((char *) &chunk, sizeof(chunk));
 
@@ -570,7 +587,7 @@ namespace window {
         glm::vec3 previous_position = start_position;
         float step_amount = 0.01f;
         float distance = 0.0f;
-        int block = -1;
+        int block;
 
         while (distance < distance_cap) {
             block = get_block_of_position(current_position, chunk_datas);
@@ -636,18 +653,7 @@ namespace window {
             if (auto_save_counter > 600) {
                 auto_save_counter = 0;
                 std::cout << "Saving position..." << std::endl;
-
-                std::ofstream wf("world.dat", std::ofstream::trunc | std::ofstream::binary);
-
-                glm::vec3 position = game_state::camera_position;
-
-                wf.write((char *) &position, sizeof(position));
-
-                glm::vec3 angle = game_state::camera_angle;
-
-                wf.write((char *) &angle, sizeof(angle));
-
-                wf.close();
+                save_world_file();
                 std::cout << "Done" << std::endl;
             }
 
@@ -716,9 +722,9 @@ namespace window {
         // Setup camera uniform
         {
             glm::mat4 perspective = glm::perspective(
-                glm::radians(user_state::field_of_view),
-                (float) input_state::window_width / (float) input_state::window_height,
-                0.05f, 2048.0f
+                    glm::radians(user_state::field_of_view),
+                    (float) input_state::window_width / (float) input_state::window_height,
+                    0.05f, 2048.0f
             );
 
             auto camera_rotate = glm::mat4(1.0f);
@@ -762,7 +768,7 @@ namespace window {
             } else if (direction > -0.75f && direction <= -0.25f) {
                 facing_text += "+X East";
             }
-            ImGui::Text(facing_text.c_str());
+            ImGui::Text("%s", facing_text.c_str());
             ImGui::Text("Chunk: X: %d Z: %d", x_region, z_region);
             ImGui::End();
         }
