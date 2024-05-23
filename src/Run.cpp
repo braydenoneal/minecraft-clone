@@ -13,8 +13,6 @@
 #include "graphics/models/ui/Crosshair.hpp"
 #include "graphics/models/skybox/Skybox.hpp"
 #include "graphics/models/debug/BoundingBox.hpp"
-#include "graphics/models/entity/pig/Pig.hpp"
-#include "physics/entity/Pig.hpp"
 
 int main() {
     Window window{};
@@ -44,14 +42,6 @@ int main() {
     Crosshair crosshair{};
     bool render_bounding_box = false;
     BoundingBox bounding_box{};
-
-    int pig_count = 32;
-    std::vector<PigPhysics> pigs{};
-    pigs.reserve(pig_count);
-
-    for (int i = 0; i < pig_count; i++) {
-        pigs.push_back(*(new PigPhysics(chunk_loader, *(new Pig()))));
-    }
 
     while (!window.shouldClose()) {
         input.pollEvents();
@@ -91,10 +81,6 @@ int main() {
         Texture::unbind();
         VertexArray::unbind();
         Shader::unbind();
-
-        for (auto &pig: pigs) {
-            pig.stepAnimation(window.getAspectRatio(), world_state.camera_position, world_state.camera_angle);
-        }
 
         if (render_bounding_box) {
             glLineWidth(4);
