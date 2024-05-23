@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
-set(PROJECT_NAME minecraft_clone)
+set(PROJECT_NAME minecraft-clone)
 
 project(${PROJECT_NAME})
 
