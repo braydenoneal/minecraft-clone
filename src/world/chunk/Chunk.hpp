@@ -6,6 +6,7 @@
 #include <cmath>
 
 #define CHUNK_SIZE 16
+#define CHUNK_HEIGHT 16
 
 struct Block {
     int id;
@@ -22,7 +23,7 @@ struct Position {
 class Chunk {
 public:
     Position position{};
-    std::vector<Block> blocks{CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE};
+    std::vector<Block> blocks{CHUNK_SIZE * CHUNK_HEIGHT * CHUNK_SIZE};
 
     explicit Chunk(Position chunk_position);
 

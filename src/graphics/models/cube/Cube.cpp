@@ -55,10 +55,10 @@ void Cube::setUniforms(float aspect_ratio, glm::vec3 camera_position, glm::vec3 
 void Cube::chunkToMesh(const Chunk &chunk, std::vector<offset> &mesh, const std::vector<Chunk> &chunks) {
     std::vector<offset> new_mesh{};
 
-    std::vector<Block> blocks((CHUNK_SIZE + 2) * (CHUNK_SIZE + 2) * (CHUNK_SIZE + 2), {1});
+    std::vector<Block> blocks((CHUNK_SIZE + 2) * (CHUNK_HEIGHT + 2) * (CHUNK_SIZE + 2), {1});
 
     for (int x = 0; x < CHUNK_SIZE; x++) {
-        for (int y = 0; y < CHUNK_SIZE; y++) {
+        for (int y = 0; y < CHUNK_HEIGHT; y++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
                 blocks[pos(x, y, z)] = chunk.get(x, y, z);
             }
@@ -87,9 +87,9 @@ void Cube::chunkToMesh(const Chunk &chunk, std::vector<offset> &mesh, const std:
                 int start_x = direction.x < 1 ? direction.x : CHUNK_SIZE;
                 int end_x = start_x + (direction.x == 0 ? CHUNK_SIZE : 1);
 
-                int get_y = -direction.y * CHUNK_SIZE;
-                int start_y = direction.y < 1 ? direction.y : CHUNK_SIZE;
-                int end_y = start_y + (direction.y == 0 ? CHUNK_SIZE : 1);
+                int get_y = -direction.y * CHUNK_HEIGHT;
+                int start_y = direction.y < 1 ? direction.y : CHUNK_HEIGHT;
+                int end_y = start_y + (direction.y == 0 ? CHUNK_HEIGHT : 1);
 
                 int get_z = -direction.z * CHUNK_SIZE;
                 int start_z = direction.z < 1 ? direction.z : CHUNK_SIZE;
@@ -107,14 +107,14 @@ void Cube::chunkToMesh(const Chunk &chunk, std::vector<offset> &mesh, const std:
     }
 
     for (int x = 0; x < CHUNK_SIZE; x++) {
-        for (int y = 0; y < CHUNK_SIZE; y++) {
+        for (int y = 0; y < CHUNK_HEIGHT; y++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
                 Block block = chunk.get(x, y, z);
 
                 if (block.id != 0) {
-                    int x_offset = x + chunk.position.x * CHUNK_SIZE;
-                    int y_offset = y + chunk.position.y * CHUNK_SIZE;
-                    int z_offset = z + chunk.position.z * CHUNK_SIZE;
+                    GLint x_offset = x + chunk.position.x * CHUNK_SIZE;
+                    GLint y_offset = y + chunk.position.y * CHUNK_HEIGHT;
+                    GLint z_offset = z + chunk.position.z * CHUNK_SIZE;
 
                     if (blocks[pos(x - 1, y, z)].id == 0) {
                         bool n0 = blocks[pos(x - 1, y - 1, z    )].id != 0;
@@ -239,5 +239,5 @@ void Cube::setMesh(std::vector<offset> &total_mesh) {
 }
 
 int Cube::pos(int block_x, int block_y, int block_z) {
-    return (block_x + 1) * (CHUNK_SIZE + 2) * (CHUNK_SIZE + 2) + (block_y + 1) * (CHUNK_SIZE + 2) + (block_z + 1);
+    return (block_x + 1) * (CHUNK_SIZE + 2) * (CHUNK_HEIGHT + 2) + (block_y + 1) * (CHUNK_SIZE + 2) + (block_z + 1);
 }
