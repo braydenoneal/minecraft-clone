@@ -1,4 +1,3 @@
-#include <iostream>
 #include "ChunkLoader.hpp"
 
 ChunkLoader::ChunkLoader(std::mutex &mesh_lock_reference, std::vector<offset> &mesh_reference, glm::vec3 &camera_position)
@@ -64,6 +63,36 @@ void ChunkLoader::unloadChunks(const std::vector<Position> &positions) {
     }
 }
 
+void ChunkLoader::unloadDataQueue(const std::vector<Position> &positions) {
+    std::vector<Position> remove_positions{};
+
+    for (auto &queue_position: data_queue) {
+        bool remove = true;
+
+        for (auto position: positions) {
+            if (queue_position == position) {
+                remove = false;
+            }
+        }
+
+        if (remove) {
+            remove_positions.push_back(queue_position);
+        }
+    }
+
+    for (auto position: remove_positions) {
+        int remove_index = 0;
+
+        for (int i = 0; i < data_queue.size(); i++) {
+            if (data_queue[i] == position) {
+                remove_index = i;
+            }
+        }
+
+        data_queue.erase(data_queue.begin() + remove_index);
+    }
+}
+
 void ChunkLoader::unloadQueue(const std::vector<Position> &positions) {
     std::vector<Position> remove_positions{};
 
@@ -96,12 +125,10 @@ void ChunkLoader::unloadQueue(const std::vector<Position> &positions) {
 
 void ChunkLoader::setRenderQueue() {
     int next_x_chunk = std::floor(camera_position.x / (float) CHUNK_SIZE);
-    int next_y_chunk = std::floor(camera_position.y / (float) CHUNK_SIZE);
     int next_z_chunk = std::floor(camera_position.z / (float) CHUNK_SIZE);
 
     if (next_x_chunk != x_chunk || next_z_chunk != z_chunk) {
         x_chunk = next_x_chunk;
-        y_chunk = next_y_chunk;
         z_chunk = next_z_chunk;
 
         std::vector<Position> mesh_positions{};
@@ -111,11 +138,9 @@ void ChunkLoader::setRenderQueue() {
             for (int z = z_chunk - radius - 2; z <= z_chunk + radius + 2; z++) {
                 if (pow(x - x_chunk, 2) + pow(z - z_chunk, 2) < pow(radius + 1, 2)) {
                     mesh_positions.push_back({x, 0, z});
-                    mesh_positions.push_back({x, 1, z});
                 }
                 if (pow(x - x_chunk, 2) + pow(z - z_chunk, 2) < pow(radius + 4, 2)) {
                     chunk_positions.push_back({x, 0, z});
-                    chunk_positions.push_back({x, 1, z});
                 }
             }
         }
@@ -123,6 +148,7 @@ void ChunkLoader::setRenderQueue() {
         unloadMeshes(mesh_positions);
         unloadChunks(chunk_positions);
         unloadQueue(mesh_positions);
+        unloadDataQueue(chunk_positions);
 
         std::deque<Position> previous_queue = queue;
 
@@ -146,27 +172,40 @@ void ChunkLoader::setRenderQueue() {
             }
         }
 
+        std::deque<Position> previous_data_queue = data_queue;
+
         for (auto position: chunk_positions) {
             bool add_to_queue = true;
 
-            for (auto &chunk: meshes) {
+            for (auto &chunk: chunks) {
                 if (chunk.position == position) {
                     add_to_queue = false;
                 }
             }
 
-            for (auto &queue_position: previous_queue) {
+            for (auto &queue_position: previous_data_queue) {
                 if (queue_position == position) {
                     add_to_queue = false;
                 }
             }
 
             if (add_to_queue) {
-                chunks.emplace_back(position);
+                data_queue.push_back(position);
             }
         }
 
         std::sort(queue.begin(), queue.end(), QueueSorter(*this));
+        std::sort(data_queue.begin(), data_queue.end(), QueueSorter(*this));
+    }
+}
+
+void ChunkLoader::renderDataQueue() {
+    if (!data_queue.empty()) {
+        Position position = data_queue.front();
+
+        data_queue.pop_front();
+
+        chunks.emplace_back(position);
     }
 }
 
@@ -206,6 +245,9 @@ void ChunkLoader::renderQueue() {
 void ChunkLoader::chunkLoop() {
     while (true) {
         setRenderQueue();
+        for (int i = 0; i < 8; i++) {
+            renderDataQueue();
+        }
         renderQueue();
     }
 }

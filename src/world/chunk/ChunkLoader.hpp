@@ -19,9 +19,13 @@ public:
 
     void unloadChunks(const std::vector<Position> &positions);
 
+    void unloadDataQueue(const std::vector<Position> &positions);
+
     void unloadQueue(const std::vector<Position> &positions);
 
     void setRenderQueue();
+
+    void renderDataQueue();
 
     void renderQueue();
 
@@ -32,11 +36,12 @@ public:
 private:
     glm::vec3 &camera_position;
     std::vector<Mesh> meshes{};
+    std::deque<Position> data_queue{};
     std::deque<Position> queue{};
     int x_chunk{-1};
     int y_chunk{-1};
     int z_chunk{-1};
-    int radius = 12;
+    int radius = 16;
     std::mutex &mesh_lock;
     std::vector<offset> &total_mesh;
 
