@@ -242,7 +242,7 @@ void ChunkLoader::renderQueue() {
     }
 }
 
-void ChunkLoader::chunkLoop() {
+[[noreturn]] void ChunkLoader::chunkLoop() {
     while (true) {
         setRenderQueue();
         for (int i = 0; i < 8; i++) {

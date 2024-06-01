@@ -29,7 +29,7 @@ public:
 
     void renderQueue();
 
-    void chunkLoop();
+    [[noreturn]] void chunkLoop();
 
     Block getBlockAtPosition(glm::vec3 position);
 
